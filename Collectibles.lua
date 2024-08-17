@@ -298,6 +298,9 @@ local function has_weapon_component(weaponComponentId)
     return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
 end
 -- Missing mediaSticks here
+local function has_buried_stash(buriedStashId)
+    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
+end
 local function has_hidden_cache(hiddenCacheId)
     return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
 end
@@ -1135,16 +1138,28 @@ local collectibles = {
         --},
     },
     weaponComponents = {
-        [1]   = {coords = v3(-197.706,6379.5933,30.8371)},
-        [2]   = {coords = v3(1782.1915,4608.0522,36.1828)},
-        [3]   = {coords = v3(909.8119,3646.6177,35.1457)},
+        [1]  = {coords = v3(-197.706,6379.5933,30.8371)},
+        [2]  = {coords = v3(1782.1915,4608.0522,36.1828)},
+        [3]  = {coords = v3(909.8119,3646.6177,35.1457)},
         [4]  = {coords = v3(2529.068,2585.608,36.9449)},
         [5]  = {coords = v3(-2945.886,438.0791,14.2707)},
         [6]  = {coords = v3(-427.0431,292.809,82.2292)},
         [7]  = {coords = v3(814.2508,-485.0651,29.2078)},
         [8]  = {coords = v3(-1516.2374,-884.6562,9.1075)},
         [9]  = {coords = v3(-309.1961,-1186.2217,23.0354)},
-        [10]  = {coords = v3(488.1019,-2830.6887,1.771)}
+        [10] = {coords = v3(488.1019,-2830.6887,1.771)}
+    },
+    metalDetectors = {
+        [1]  = {coords = v3(-3122.528,201.104,1.538)},
+        [2]  = {coords = v3(-1802.943,-974.623,1.086)},
+        [3]  = {coords = v3(-834.239,-1634.443,0.285)},
+        [4]  = {coords = v3(-1814.044,-2721.336,3.397)},
+        [5]  = {coords = v3(-28.226,-2732.247,0.507)},
+        [6]  = {coords = v3(68.601,-2194.863,0.468)},
+        [7]  = {coords = v3(618.367,-2024.049,8.583)},
+        [8]  = {coords = v3(1556.522,-2752.049,0.615)},
+        [9]  = {coords = v3(2258.103,-2231.355,1.057)},
+        [10] = {coords = v3(2827.373,-684.395,-0.042)}
     },
     sprayCans = {
         [1]  = {coords = v3(-95.608,-1447.339,32.416)},
@@ -1180,6 +1195,28 @@ local collectibles = {
     }
 }
 local dailyCollectibles = {
+    buriedStashes = {
+        [1]  = {coords = v3(5579.7026,-5231.42,14.2512)},
+        [2]  = {coords = v3(5481.595,-5855.187,19.128)},
+        [3]  = {coords = v3(5549.2407,-5747.577,10.427)},
+        [4]  = {coords = v3(5295.542,-5587.4307,61.3964)},
+        [5]  = {coords = v3(5136.9844,-5524.6675,52.7719)},
+        [6]  = {coords = v3(4794.91,-5546.516,21.4945)},
+        [7]  = {coords = v3(4895.3125,-5335.3433,9.0204)},
+        [8]  = {coords = v3(4994.968,-5136.416,1.476)},
+        [9]  = {coords = v3(5323.654,-5276.0596,33.0353)},
+        [10] = {coords = v3(5362.1177,-5170.0854,28.035)},
+        [11] = {coords = v3(5164.5522,-4706.8384,1.1632)},
+        [12] = {coords = v3(4888.6104,-4789.4756,1.4911)},
+        [13] = {coords = v3(4735.3096,-4687.2236,1.2879)},
+        [14] = {coords = v3(4887.2036,-4630.111,13.149)},
+        [15] = {coords = v3(4796.803,-4317.4175,4.3515)},
+        [16] = {coords = v3(4522.936,-4649.638,10.037)},
+        [17] = {coords = v3(4408.228,-4470.875,3.3683)},
+        [18] = {coords = v3(4348.7827,-4311.3193,1.3335)},
+        [19] = {coords = v3(4235.67,-4552.0557,4.0738)},
+        [20] = {coords = v3(3901.899,-4720.187,3.4537)}
+    },
     hiddenCaches = {
         [1]   = {coords = v3(-150.585,-2852.332,-17.97)},
         [2]   = {coords = v3(-540.975,-2465.579,-18.201)},
@@ -1281,6 +1318,38 @@ local dailyCollectibles = {
         [98]  = {coords = v3(3406.32,-584.198,-18.545)},
         [99]  = {coords = v3(-3106.876,2432.615,-23.172)},
         [100] = {coords = v3(-2172.952,-3199.194,-33.315)}
+    },
+    shipwrecks = {
+        [1] = {coords = v3(-388.326,-2216.494,0.456)},
+        [2] = {coords = v3(-870.536,-3121.905,2.382)},
+        [3] = {coords = v3(-1968.847,-3076.143,2.048)},
+        [4] = {coords = v3(-1224.298,-1860.696,1.785)},
+        [5] = {coords = v3(-1681.625,-1079.203,0.391)},
+        [6] = {coords = v3(-2219.021,-435.363,1.403)},
+        [7] = {coords = v3(-3094.448,497.921,1.088)},
+        [8] = {coords = v3(-3224.264,1333.485,1.344)},
+        [9] = {coords = v3(-2882.416,2246.783,0.94)},
+        [10] = {coords = v3(-1767.434,2645.192,0.559)},
+        [11] = {coords = v3(-178.102,3081.764,19.454)},
+        [12] = {coords = v3(-2199.604,4603.461,1.529)},
+        [13] = {coords = v3(-1359.509,5378.855,0.583)},
+        [14] = {coords = v3(-847.562,6048.969,1.312)},
+        [15] = {coords = v3(123.999,7097.121,0.932)},
+        [16] = {coords = v3(474.961,6741.652,0.674)},
+        [17] = {coords = v3(1469.995,6632.111,-0.189)},
+        [18] = {coords = v3(2355.716,6660.165,0.168)},
+        [19] = {coords = v3(3378.922,5673.946,0.863)},
+        [20] = {coords = v3(3199.307,5097.294,-0.979)},
+        [21] = {coords = v3(3949.8467,4402.4434,0.4147)},
+        [22] = {coords = v3(3899.0745,3324.2227,0.9796)},
+        [23] = {coords = v3(3647.4497,3122.7847,0.6729)},
+        [24] = {coords = v3(2893.9724,1791.9009,1.7525)},
+        [25] = {coords = v3(2782.5322,1107.6036,0.5058)},
+        [26] = {coords = v3(2782.7258,86.5943,0.5355)},
+        [27] = {coords = v3(2822.303,-757.3513,1.4762)},
+        [28] = {coords = v3(2774.8013,-1603.5303,0.1327)},
+        [29] = {coords = v3(1821.4579,-2718.45,0.0513)},
+        [30] = {coords = v3(987.9012,-2683.0593,3.597)}
     },
     treasureChests = {
         {
@@ -1708,38 +1777,6 @@ local dailyCollectibles = {
         [23] = {coords = v3(1124.7676,-1010.5512,43.6728)},
         [24] = {coords = v3(167.95,-2222.4854,6.2361)},
         [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
-    },
-    shipwrecks = {
-        [1] = {coords = v3(-388.326,-2216.494,0.456)},
-        [2] = {coords = v3(-870.536,-3121.905,2.382)},
-        [3] = {coords = v3(-1968.847,-3076.143,2.048)},
-        [4] = {coords = v3(-1224.298,-1860.696,1.785)},
-        [5] = {coords = v3(-1681.625,-1079.203,0.391)},
-        [6] = {coords = v3(-2219.021,-435.363,1.403)},
-        [7] = {coords = v3(-3094.448,497.921,1.088)},
-        [8] = {coords = v3(-3224.264,1333.485,1.344)},
-        [9] = {coords = v3(-2882.416,2246.783,0.94)},
-        [10] = {coords = v3(-1767.434,2645.192,0.559)},
-        [11] = {coords = v3(-178.102,3081.764,19.454)},
-        [12] = {coords = v3(-2199.604,4603.461,1.529)},
-        [13] = {coords = v3(-1359.509,5378.855,0.583)},
-        [14] = {coords = v3(-847.562,6048.969,1.312)},
-        [15] = {coords = v3(123.999,7097.121,0.932)},
-        [16] = {coords = v3(474.961,6741.652,0.674)},
-        [17] = {coords = v3(1469.995,6632.111,-0.189)},
-        [18] = {coords = v3(2355.716,6660.165,0.168)},
-        [19] = {coords = v3(3378.922,5673.946,0.863)},
-        [20] = {coords = v3(3199.307,5097.294,-0.979)},
-        [21] = {coords = v3(3949.8467,4402.4434,0.4147)},
-        [22] = {coords = v3(3899.0745,3324.2227,0.9796)},
-        [23] = {coords = v3(3647.4497,3122.7847,0.6729)},
-        [24] = {coords = v3(2893.9724,1791.9009,1.7525)},
-        [25] = {coords = v3(2782.5322,1107.6036,0.5058)},
-        [26] = {coords = v3(2782.7258,86.5943,0.5355)},
-        [27] = {coords = v3(2822.303,-757.3513,1.4762)},
-        [28] = {coords = v3(2774.8013,-1603.5303,0.1327)},
-        [29] = {coords = v3(1821.4579,-2718.45,0.0513)},
-        [30] = {coords = v3(987.9012,-2683.0593,3.597)}
     }
 }
 local others = {
@@ -1788,9 +1825,9 @@ local collectiblesOnlineParentMenu_Feat = menu.add_feature("Grand Theft Auto Onl
 
 local collectiblesOnlineMenu_Feat = menu.add_feature("Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
 
-local seasonalCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Collectibles]", "parent", collectiblesOnlineMenu_Feat.id)
+local seasonalCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonals]", "parent", collectiblesOnlineMenu_Feat.id)
 
-local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Event Collectibles]", "parent", collectiblesOnlineMenu_Feat.id)
+local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]", "parent", collectiblesOnlineMenu_Feat.id)
 
 
 local dailyCollectiblesOnlineMenu_Feat = menu.add_feature("Daily Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
@@ -2005,27 +2042,47 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
 ------------------------ Weapon Components (5)     ------------------------
     local weaponComponentsMenu_Feat = menu.add_feature("Weapon Components (-1/5)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
-    local weaponComponent_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
+    local weaponComponents_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
         local index = feat.value
         local selectedWeaponComponent = collectibles.weaponComponents[index]
         teleport_myself(selectedWeaponComponent.coords.x, selectedWeaponComponent.coords.y, selectedWeaponComponent.coords.z)
     end)
-    weaponComponent_Feat.min = 1
-    weaponComponent_Feat.max = #collectibles.weaponComponents
+    weaponComponents_Feat.min = 1
+    weaponComponents_Feat.max = #collectibles.weaponComponents
 --
+------------------------ Metal Detectors (1)       ------------------------
+    local metalDetectorsMenu_Feat = menu.add_feature("Metal Detectors (-1/10)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
+
+    local metalDetectors_Feat = menu.add_feature("Metal Detector", "action_value_i", metalDetectorsMenu_Feat.id, function(feat)
+        local index = feat.value
+        local selectedMetalDetector = collectibles.metalDetectors[index]
+        teleport_myself(selectedMetalDetector.coords.x, selectedMetalDetector.coords.y, selectedMetalDetector.coords.z)
+    end)
+    metalDetectors_Feat.min = 1
+    metalDetectors_Feat.max = #collectibles.metalDetectors
+    metalDetectors_Feat.hint = 'Note:\nOnce you collect a "Metal Detector", it will no longer appear on Skeletons. However, you\'ll unlock the "Burried Stashes" Daily Collectible in Cayo Perico.'
 ------------------------ Spray Cans (1)            ------------------------
     local sprayCansMenu_Feat = menu.add_feature("Spray Can (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
 
-    local sprayCan_Feat = menu.add_feature("Spray Can", "action_value_i", sprayCansMenu_Feat.id, function(feat)
+    local sprayCans_Feat = menu.add_feature("Spray Can", "action_value_i", sprayCansMenu_Feat.id, function(feat)
         local index = feat.value
         local selectedSprayCan = collectibles.sprayCans[index]
         teleport_myself(selectedSprayCan.coords.x, selectedSprayCan.coords.y, selectedSprayCan.coords.z)
     end)
-    sprayCan_Feat.min = 1
-    sprayCan_Feat.max = #collectibles.sprayCans
-    sprayCan_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
+    sprayCans_Feat.min = 1
+    sprayCans_Feat.max = #collectibles.sprayCans
+    sprayCans_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
 --
 
+------------------------ Buried Stashes (2)              ------------------------
+    local buriedStashesMenu_Feat = menu.add_feature("Buried Stashes (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
+        buriedStashGroup.feat = menu.add_feature("Buried Stash " .. i, "action", buriedStashesMenu_Feat.id, function(feat)
+            teleport_myself(buriedStashGroup.coords.x, buriedStashGroup.coords.y, buriedStashGroup.coords.z)
+        end)
+    end
+--
 ------------------------ Hidden Caches (10)              ------------------------
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
@@ -2154,11 +2211,41 @@ local function update_feat_name__collectibles__state(has_collectible__Func, coll
     end
 end
 
+local function update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
+    metalDetectors_Feat.name = removeFeatNameColorCodes(metalDetectors_Feat.name)
+
+    if hasPlayerCollectedMetalDetectorForBuriedStashes then
+        metalDetectors_Feat.name = COLOR.COLLECTED.hex .. metalDetectors_Feat.name .. "#DEFAULT#"
+    end
+end
+
 local function update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
-    sprayCan_Feat.name = removeFeatNameColorCodes(sprayCan_Feat.name)
+    sprayCans_Feat.name = removeFeatNameColorCodes(sprayCans_Feat.name)
 
     if hasPlayerCollectedSprayCanForPosterTagging then
-        sprayCan_Feat.name = COLOR.COLLECTED.hex .. sprayCan_Feat.name .. "#DEFAULT#"
+        sprayCans_Feat.name = COLOR.COLLECTED.hex .. sprayCans_Feat.name .. "#DEFAULT#"
+    end
+end
+
+local function update_feat_name__buried_stashes__state(resolvedLocationsIds)
+    local resolvedLocationsSet = {}
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.buriedStashes) do
+        resolvedLocationsSet[resolvedLocationId] = i
+    end
+
+    for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
+        local updatedName = removeFeatNameColorCodes(buriedStashGroup.feat.name)
+
+        if resolvedLocationsSet[i] then
+            if has_buried_stash(resolvedLocationsSet[i] - 1) then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        buriedStashGroup.feat.name = updatedName
+        buriedStashGroup.feat.hint = 'Note:\nYou must first collect a "Metal Detector" from a Skeleton in [Collectibles > Random Events], for the chests to spawn in Cayo Perico.'
     end
 end
 
@@ -2346,11 +2433,20 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
     local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- Possibly HAS_PLAYER_COLLECTED_DRE_USB_MIX ?
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
+    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1) -- or/and 36629 idk exactly the difference between the two of em
     local hasPlayerSpinnedCasinoWheel = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26975, -1) -- 26975 (lucky wheel available / 1) Not working somehow
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
 
     local resolvedLocationsIds = {
+        buriedStashes = {
+            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
+            [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
+        },
+        shipwrecks = {
+            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
+            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- I think R* originally planned 2, but for now it's /1 max.
+        },
         hiddenCaches = {
             [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH0"), -1) + 1,
             [2]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH1"), -1) + 1,
@@ -2366,10 +2462,6 @@ mainLoop_Thread = create_tick_handler(function()
         treasureChests = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE1"), -1) + 1
-        },
-        shipwrecks = {
-            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
-            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1
         },
         lsTags = {
             [1] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51546, -1) + 1,
@@ -2400,13 +2492,14 @@ mainLoop_Thread = create_tick_handler(function()
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
     mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ?
 
-    --convenienceStoresMenu_Feat.name    = "Convenience Stores ("  .. ???,            -1)                                                                              .. "/19)"
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
+    metalDetectorsMenu_Feat.name       = "Metal Detectors ("     .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
     sprayCansMenu_Feat.name            = "Spray Cans ("          .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
-    hiddenCachesMenu_Feat.name         = "Hidden Caches ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
+    buriedStashesMenu_Feat.name        = "Buried Stashes ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"
     shipwreckMenu_Feat.name            = "Shipwrecks ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)  .. "/1)"
+    hiddenCachesMenu_Feat.name         = "Hidden Caches ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
     treasureChestsMenu_Feat.name       = "Treasure Chests ("     .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name               = "LS Tags ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar),      -1) .. "/5)" --[[script.get_global_i(Global.numberOfLsTagCollected)]]
@@ -2424,8 +2517,10 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
     -- Misses mediaSticks here
     -- Misses weaponComponents here
+    update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
 
+    update_feat_name__buried_stashes__state(resolvedLocationsIds)
     update_feat_name__hidden_caches__state(resolvedLocationsIds)
     update_feat_name__shipwrecks__state(resolvedLocationsIds)
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
@@ -2443,19 +2538,17 @@ end, 1000)
     Stunt Jumps
     Peyote Plants
     Media Sticks
-    Stores
+    Convenience Stores
     Gang Attacks
 
     Daily Collectibles:
-    Buried Stashes
     Junk Energy Skydives
     Casino Lucky Wheel
 ]]
 
 --[[ DEV NOTES:
+    Weapon Components:
+    so far 2/2 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41942, -1) -- something related with `case joaat("police5"):`
-
-    To find a currently active random thingy i can use NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(x, -1)
-    but idk
 ]]
