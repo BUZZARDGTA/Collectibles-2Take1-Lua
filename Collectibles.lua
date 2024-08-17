@@ -301,6 +301,9 @@ end
 local function has_hidden_cache(hiddenCacheId)
     return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
 end
+local function has_shipwreck(shipwreckId)
+    return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
+end
 local function has_treasure_chest(treasureChestId)
     return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
 end
@@ -1282,29 +1285,29 @@ local dailyCollectibles = {
     treasureChests = {
         {
             name = "land", spawns = {
-                [1]  = {id = 1,  coords = v3(4877.7646, -4781.151, 1.1379)},
-                [2]  = {id = 2,  coords = v3(4535.187, -4703.817, 1.1286)},
-                [3]  = {id = 3,  coords = v3(3900.6318, -4704.9194, 3.4813)},
-                [4]  = {id = 4,  coords = v3(4823.4844, -4323.176, 4.6816)},
-                [5]  = {id = 5,  coords = v3(5175.097, -4678.9375, 1.4205)},
-                [6]  = {id = 6,  coords = v3(5590.9507, -5216.8467, 13.351)},
-                [7]  = {id = 7,  coords = v3(5457.7954, -5860.7734, 19.0936)},
-                [8]  = {id = 8,  coords = v3(4855.598, -5561.794, 26.5093)},
-                [9]  = {id = 9,  coords = v3(4854.77, -5162.7295, 1.4387)},
-                [10] = {id = 10, coords = v3(4178.2944, -4357.763, 1.5826)}
+                [1]  = {id = 1,  coords = v3(4877.7646,-4781.151,1.1379)},
+                [2]  = {id = 2,  coords = v3(4535.187,-4703.817,1.1286)},
+                [3]  = {id = 3,  coords = v3(3900.6318,-4704.9194,3.4813)},
+                [4]  = {id = 4,  coords = v3(4823.4844,-4323.176,4.6816)},
+                [5]  = {id = 5,  coords = v3(5175.097,-4678.9375,1.4205)},
+                [6]  = {id = 6,  coords = v3(5590.9507,-5216.8467,13.351)},
+                [7]  = {id = 7,  coords = v3(5457.7954,-5860.7734,19.0936)},
+                [8]  = {id = 8,  coords = v3(4855.598,-5561.794,26.5093)},
+                [9]  = {id = 9,  coords = v3(4854.77,-5162.7295,1.4387)},
+                [10] = {id = 10, coords = v3(4178.2944,-4357.763,1.5826)}
             }
         }, {
             name = "underwater", spawns = {
-                [1]  = {id = 11, coords = v3(4942.0825, -5168.135, -3.575)},
-                [2]  = {id = 12, coords = v3(4560.804, -4356.775, -7.888)},
-                [3]  = {id = 13, coords = v3(5598.9644, -5604.2393, -6.0489)},
-                [4]  = {id = 14, coords = v3(5264.7236, -4920.671, -2.8715)},
-                [5]  = {id = 15, coords = v3(4944.2183, -4293.736, -6.6942)},
-                [6]  = {id = 16, coords = v3(4560.804, -4356.775, -7.888)}, -- Duplicate of [2] lol
-                [7]  = {id = 17, coords = v3(3983.0261, -4540.1865, -6.1264)},
-                [8]  = {id = 18, coords = v3(4414.676, -4651.4575, -5.083)},
-                [9]  = {id = 19, coords = v3(4540.07, -4774.899, -3.9321)},
-                [10] = {id = 20, coords = v3(4777.6006, -5394.6265, -5.0127)}
+                [1]  = {id = 11, coords = v3(4942.0825,-5168.135,-3.575)},
+                [2]  = {id = 12, coords = v3(4560.804,-4356.775,-7.888)},
+                [3]  = {id = 13, coords = v3(5598.9644,-5604.2393,-6.0489)},
+                [4]  = {id = 14, coords = v3(5264.7236,-4920.671,-2.8715)},
+                [5]  = {id = 15, coords = v3(4944.2183,-4293.736,-6.6942)},
+                [6]  = {id = 16, coords = v3(4560.804,-4356.775,-7.888)}, -- Duplicate of [2] lol
+                [7]  = {id = 17, coords = v3(3983.0261,-4540.1865,-6.1264)},
+                [8]  = {id = 18, coords = v3(4414.676,-4651.4575,-5.083)},
+                [9]  = {id = 19, coords = v3(4540.07,-4774.899,-3.9321)},
+                [10] = {id = 20, coords = v3(4777.6006,-5394.6265,-5.0127)}
             }
         }
     },
@@ -1680,32 +1683,64 @@ local dailyCollectibles = {
         }
     },
     stashHouses = {
-        [1]  = {coords = v3(-156.345, 6292.5244, 30.6833)},
-        [2]  = {coords = v3(-1101.3784, 4940.878, 217.3541)},
-        [3]  = {coords = v3(2258.4717, 5165.8105, 58.1167)},
-        [4]  = {coords = v3(2881.7866, 4511.734, 46.9993)},
-        [5]  = {coords = v3(1335.4141, 4306.677, 37.0984)},
-        [6]  = {coords = v3(1857.9542, 3854.2195, 32.0891)},
-        [7]  = {coords = v3(905.7146, 3586.9836, 32.3914)},
-        [8]  = {coords = v3(2404.0786, 3127.706, 47.1533)},
-        [9]  = {coords = v3(550.6724, 2655.782, 41.223)},
-        [10] = {coords = v3(-1100.8274, 2722.5867, 17.8004)},
-        [11] = {coords = v3(-125.9821, 1896.2302, 196.3329)},
-        [12] = {coords = v3(1546.2168, 2166.431, 77.7258)},
-        [13] = {coords = v3(-3169.8516, 1034.2666, 19.8417)},
-        [14] = {coords = v3(121.2199, 318.9121, 111.1516)},
-        [15] = {coords = v3(-583.559, 195.3448, 70.4433)},
-        [16] = {coords = v3(-1308.2467, -168.6344, 43.132)},
-        [17] = {coords = v3(99.3476, -240.9664, 50.3995)},
-        [18] = {coords = v3(1152.2288, -431.8629, 66.0115)},
-        [19] = {coords = v3(-546.0123, -873.7389, 26.1988)},
-        [20] = {coords = v3(-1293.3013, -1259.5853, 3.2025)},
-        [21] = {coords = v3(161.7004, -1306.8784, 28.3547)},
-        [22] = {coords = v3(979.653, -1981.9202, 29.6675)},
-        [23] = {coords = v3(1124.7676, -1010.5512, 43.6728)},
-        [24] = {coords = v3(167.95, -2222.4854, 6.2361)},
-        [25] = {coords = v3(-559.2866, -1803.9038, 21.6104)}
+        [1]  = {coords = v3(-156.345,6292.5244,30.6833)},
+        [2]  = {coords = v3(-1101.3784,4940.878,217.3541)},
+        [3]  = {coords = v3(2258.4717,5165.8105,58.1167)},
+        [4]  = {coords = v3(2881.7866,4511.734,46.9993)},
+        [5]  = {coords = v3(1335.4141,4306.677,37.0984)},
+        [6]  = {coords = v3(1857.9542,3854.2195,32.0891)},
+        [7]  = {coords = v3(905.7146,3586.9836,32.3914)},
+        [8]  = {coords = v3(2404.0786,3127.706,47.1533)},
+        [9]  = {coords = v3(550.6724,2655.782,41.223)},
+        [10] = {coords = v3(-1100.8274,2722.5867,17.8004)},
+        [11] = {coords = v3(-125.9821,1896.2302,196.3329)},
+        [12] = {coords = v3(1546.2168,2166.431,77.7258)},
+        [13] = {coords = v3(-3169.8516,1034.2666,19.8417)},
+        [14] = {coords = v3(121.2199,318.9121,111.1516)},
+        [15] = {coords = v3(-583.559,195.3448,70.4433)},
+        [16] = {coords = v3(-1308.2467,-168.6344,43.132)},
+        [17] = {coords = v3(99.3476,-240.9664,50.3995)},
+        [18] = {coords = v3(1152.2288,-431.8629,66.0115)},
+        [19] = {coords = v3(-546.0123,-873.7389,26.1988)},
+        [20] = {coords = v3(-1293.3013,-1259.5853,3.2025)},
+        [21] = {coords = v3(161.7004,-1306.8784,28.3547)},
+        [22] = {coords = v3(979.653,-1981.9202,29.6675)},
+        [23] = {coords = v3(1124.7676,-1010.5512,43.6728)},
+        [24] = {coords = v3(167.95,-2222.4854,6.2361)},
+        [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
     },
+    shipwrecks = {
+        [1] = {coords = v3(-388.326,-2216.494,0.456)},
+        [2] = {coords = v3(-870.536,-3121.905,2.382)},
+        [3] = {coords = v3(-1968.847,-3076.143,2.048)},
+        [4] = {coords = v3(-1224.298,-1860.696,1.785)},
+        [5] = {coords = v3(-1681.625,-1079.203,0.391)},
+        [6] = {coords = v3(-2219.021,-435.363,1.403)},
+        [7] = {coords = v3(-3094.448,497.921,1.088)},
+        [8] = {coords = v3(-3224.264,1333.485,1.344)},
+        [9] = {coords = v3(-2882.416,2246.783,0.94)},
+        [10] = {coords = v3(-1767.434,2645.192,0.559)},
+        [11] = {coords = v3(-178.102,3081.764,19.454)},
+        [12] = {coords = v3(-2199.604,4603.461,1.529)},
+        [13] = {coords = v3(-1359.509,5378.855,0.583)},
+        [14] = {coords = v3(-847.562,6048.969,1.312)},
+        [15] = {coords = v3(123.999,7097.121,0.932)},
+        [16] = {coords = v3(474.961,6741.652,0.674)},
+        [17] = {coords = v3(1469.995,6632.111,-0.189)},
+        [18] = {coords = v3(2355.716,6660.165,0.168)},
+        [19] = {coords = v3(3378.922,5673.946,0.863)},
+        [20] = {coords = v3(3199.307,5097.294,-0.979)},
+        [21] = {coords = v3(3949.8467,4402.4434,0.4147)},
+        [22] = {coords = v3(3899.0745,3324.2227,0.9796)},
+        [23] = {coords = v3(3647.4497,3122.7847,0.6729)},
+        [24] = {coords = v3(2893.9724,1791.9009,1.7525)},
+        [25] = {coords = v3(2782.5322,1107.6036,0.5058)},
+        [26] = {coords = v3(2782.7258,86.5943,0.5355)},
+        [27] = {coords = v3(2822.303,-757.3513,1.4762)},
+        [28] = {coords = v3(2774.8013,-1603.5303,0.1327)},
+        [29] = {coords = v3(1821.4579,-2718.45,0.0513)},
+        [30] = {coords = v3(987.9012,-2683.0593,3.597)}
+    }
 }
 local others = {
     gunVans = {
@@ -2000,6 +2035,15 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
         end)
     end
 --
+------------------------ Shipwrecks (1)                  ------------------------
+    local shipwreckMenu_Feat = menu.add_feature("Shipwrecks (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
+        shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function(feat)
+            teleport_myself(shipwreckGroup.coords.x, shipwreckGroup.coords.y, shipwreckGroup.coords.z)
+        end)
+    end
+--
 ------------------------ Treasure Chests (2)             ------------------------
     local treasureChestsMenu_Feat = menu.add_feature("Treasure Chests (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
@@ -2139,6 +2183,27 @@ local function update_feat_name__hidden_caches__state(resolvedLocationsIds)
     end
 end
 
+local function update_feat_name__shipwrecks__state(resolvedLocationsIds)
+    local resolvedLocationsSet = {}
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.shipwrecks) do
+        resolvedLocationsSet[resolvedLocationId] = i
+    end
+
+    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
+        local updatedName = removeFeatNameColorCodes(shipwreckGroup.feat.name)
+
+        if resolvedLocationsSet[i] then
+            if has_shipwreck(resolvedLocationsSet[i] - 1) then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        shipwreckGroup.feat.name = updatedName
+    end
+end
+
 local function update_feat_name__treasure_chests__state(resolvedLocationsIds)
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.treasureChests) do
@@ -2234,7 +2299,6 @@ end
 local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     stashHouse_Feat.name = removeFeatNameColorCodes(stashHouse_Feat.name)
     stashHouse_Feat.hint = ""
-    print(resolvedLocationsIds.stashHouse)
 
     if
             resolvedLocationsIds.stashHouse.marker >= 1
@@ -2303,6 +2367,10 @@ mainLoop_Thread = create_tick_handler(function()
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE1"), -1) + 1
         },
+        shipwrecks = {
+            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
+            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1
+        },
         lsTags = {
             [1] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51546, -1) + 1,
             [2] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51547, -1) + 1,
@@ -2338,6 +2406,7 @@ mainLoop_Thread = create_tick_handler(function()
     sprayCansMenu_Feat.name            = "Spray Cans ("          .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
     hiddenCachesMenu_Feat.name         = "Hidden Caches ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
+    shipwreckMenu_Feat.name            = "Shipwrecks ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)  .. "/1)"
     treasureChestsMenu_Feat.name       = "Treasure Chests ("     .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name               = "LS Tags ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar),      -1) .. "/5)" --[[script.get_global_i(Global.numberOfLsTagCollected)]]
@@ -2358,6 +2427,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
 
     update_feat_name__hidden_caches__state(resolvedLocationsIds)
+    update_feat_name__shipwrecks__state(resolvedLocationsIds)
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__collectibles__state(has_trick_or_treat,     dailyCollectibles.trickOrTreats)
@@ -2377,7 +2447,6 @@ end, 1000)
     Gang Attacks
 
     Daily Collectibles:
-    Shipwrecks
     Buried Stashes
     Junk Energy Skydives
     Casino Lucky Wheel
