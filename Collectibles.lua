@@ -1178,126 +1178,106 @@ local collectibles = {
 }
 local dailyCollectibles = {
     hiddenCaches = {
-        [1] = {
-            [1]  =  {id = 1,   coords = v3(-150.585,-2852.332,-17.97)},
-            [2]  =  {id = 2,   coords = v3(-540.975,-2465.579,-18.201)},
-            [3]  =  {id = 3,   coords = v3(15.332,-2323.989,-14.224)},
-            [4]  =  {id = 4,   coords = v3(461.483,-2386.212,-10.055)},
-            [5]  =  {id = 5,   coords = v3(839.554,-2782.746,-20.516)},
-            [6]  =  {id = 6,   coords = v3(1309.934,-2985.761,-21.344)},
-            [7]  =  {id = 7,   coords = v3(1394.588,-3371.972,-17.855)},
-            [8]  =  {id = 8,   coords = v3(1067.032,-3610.489,-52.777)},
-            [9]  =  {id = 9,   coords = v3(371.111,-3226.341,-19.88)},
-            [10] =  {id = 10,  coords = v3(-1365.19,-3701.575,-32.056)}
-        },
-        [2] = {
-            [1]  =  {id = 11,  coords = v3(-1983.722,-2769.391,-22.868)},
-            [2]  =  {id = 12,  coords = v3(-1295.859,-1948.583,-7.47)},
-            [3]  =  {id = 13,  coords = v3(-1791.493,-1284.341,-16.36)},
-            [4]  =  {id = 14,  coords = v3(-1879.817,-1111.846,-19.249)},
-            [5]  =  {id = 15,  coords = v3(-2086.537,-862.681,-37.465)},
-            [6]  =  {id = 16,  coords = v3(-2614.496,-636.549,-35.296)},
-            [7]  =  {id = 17,  coords = v3(-2815.156,-585.703,-59.753)},
-            [8]  =  {id = 18,  coords = v3(-3412.1304,165.8565,-32.6174)},
-            [9]  =  {id = 19,  coords = v3(-3554.145,817.679,-28.592)},
-            [10] =  {id = 20,  coords = v3(-3440.336,1416.229,-33.629)}
-        },
-        [3] = {
-            [1]  =  {id = 21,  coords = v3(-3295.557,2020.828,-20.276)},
-            [2]  =  {id = 22,  coords = v3(-3020.068,2527.044,-22.628)},
-            [3]  =  {id = 23,  coords = v3(-3183.344,3051.828,-39.251)},
-            [4]  =  {id = 24,  coords = v3(-3270.3245,3670.6917,-26.5299)},
-            [5]  =  {id = 25,  coords = v3(-2860.754,3912.275,-33.684)},
-            [6]  =  {id = 26,  coords = v3(-2752.189,4572.626,-21.415)},
-            [7]  =  {id = 27,  coords = v3(-2407.659,4898.846,-45.411)},
-            [8]  =  {id = 28,  coords = v3(-1408.649,5734.096,-36.339)},
-            [9]  =  {id = 29,  coords = v3(-1008.661,6531.678,-22.122)},
-            [10] =  {id = 30,  coords = v3(-811.495,6667.619,-14.098)}
-        },
-        [4] = {
-            [1]  =  {id = 31,  coords = v3(-420.119,7224.093,-44.899)},
-            [2]  =  {id = 32,  coords = v3(425.78,7385.154,-44.087)},
-            [3]  =  {id = 33,  coords = v3(556.131,7158.932,-38.031)},
-            [4]  =  {id = 34,  coords = v3(1441.456,6828.521,-44.977)},
-            [5]  =  {id = 35,  coords = v3(1820.262,7017.078,-78.959)},
-            [6]  =  {id = 36,  coords = v3(2396.039,6939.861,-104.858)},
-            [7]  =  {id = 37,  coords = v3(2475.159,6704.704,-9.333)},
-            [8]  =  {id = 38,  coords = v3(2696.607,6655.181,-21.513)},
-            [9]  =  {id = 39,  coords = v3(3049.285,6549.182,-36.306)},
-            [10] =  {id = 40,  coords = v3(3411.339,6308.514,-52.545)}
-        },
-        [5] = {
-            [1]  =  {id = 41,  coords = v3(3770.457,5838.503,-27.88)},
-            [2]  =  {id = 42,  coords = v3(3625,5543.203,-26.645)},
-            [3]  =  {id = 43,  coords = v3(3986.087,3867.625,-31.705)},
-            [4]  =  {id = 44,  coords = v3(3846.006,3683.454,-17.227)},
-            [5]  =  {id = 45,  coords = v3(4130.328,3530.792,-27.516)},
-            [6]  =  {id = 46,  coords = v3(3897.776,3050.804,-19.277)},
-            [7]  =  {id = 47,  coords = v3(3751.005,2672.416,-48.526)},
-            [8]  =  {id = 48,  coords = v3(3559.241,2070.137,-38.01)},
-            [9]  =  {id = 49,  coords = v3(3410.804,1225.255,-55.684)},
-            [10] =  {id = 50,  coords = v3(3373.351,323.788,-20.246)}
-        },
-        [6] = {
-            [1]  =  {id = 51,  coords = v3(3152.983,-261.257,-8.355)},
-            [2]  =  {id = 52,  coords = v3(3192.368,-367.909,-30.311)},
-            [3]  =  {id = 53,  coords = v3(3178.722,-988.684,-25.133)},
-            [4]  =  {id = 54,  coords = v3(2701.915,-1365.816,-13.163)},
-            [5]  =  {id = 55,  coords = v3(3045.378,-1682.987,-31.797)},
-            [6]  =  {id = 56,  coords = v3(2952.829,-2313.142,-94.421)},
-            [7]  =  {id = 57,  coords = v3(2361.167,-2728.077,-67.131)},
-            [8]  =  {id = 58,  coords = v3(1824.039,-2973.19,-41.865)},
-            [9]  =  {id = 59,  coords = v3(-575.734,-3132.886,-21.879)},
-            [10] =  {id = 60,  coords = v3(-1872.968,-2087.878,-61.897)}
-        },
-        [7] = {
-            [1]  =  {id = 61,  coords = v3(-3205.486,-144.9,-31.784)},
-            [2]  =  {id = 62,  coords = v3(-1760.539,5721.301,-74.808)},
-            [3]  =  {id = 63,  coords = v3(-1293.948,5886.757,-27.186)},
-            [4]  =  {id = 64,  coords = v3(-6.032,7464.313,-12.313)},
-            [5]  =  {id = 65,  coords = v3(3627.174,5286.089,-35.437)},
-            [6]  =  {id = 66,  coords = v3(3978.554,4987.259,-69.702)},
-            [7]  =  {id = 67,  coords = v3(3995.491,4858.986,-37.555)},
-            [8]  =  {id = 68,  coords = v3(4218.075,4116.594,-29.013)},
-            [9]  =  {id = 69,  coords = v3(3795.855,2327.765,-37.352)},
-            [10] =  {id = 70,  coords = v3(3247.753,1395.029,-50.268)}
-        },
-        [8] = {
-            [1]  =  {id = 71,  coords = v3(3451.907,278.014,-99.633)},
-            [2]  =  {id = 72,  coords = v3(1061.475,7157.525,-28.239)},
-            [3]  =  {id = 73,  coords = v3(-1551.109,5558.511,-22.472)},
-            [4]  =  {id = 74,  coords = v3(-29.194,-3484.225,-34.377)},
-            [5]  =  {id = 75,  coords = v3(2981.125,843.773,-4.586)},
-            [6]  =  {id = 76,  coords = v3(2446.59,-2413.441,-35.135)},
-            [7]  =  {id = 77,  coords = v3(423.342,-2864.345,-16.944)},
-            [8]  =  {id = 78,  coords = v3(668.404,-3173.142,-6.337)},
-            [9]  =  {id = 79,  coords = v3(-2318.251,4976.115,-101.11)},
-            [10] =  {id = 80,  coords = v3(806.924,6846.94,-3.666)}
-        },
-        [9] = {
-            [1]  =  {id = 81,  coords = v3(4404.907,4617.076,-20.163)},
-            [2]  =  {id = 82,  coords = v3(3276.699,1648.139,-44.099)},
-            [3]  =  {id = 83,  coords = v3(2979.325,1.033,-16.746)},
-            [4]  =  {id = 84,  coords = v3(-838.069,-1436.609,-10.248)},
-            [5]  =  {id = 85,  coords = v3(-3334.358,3276.015,-27.291)},
-            [6]  =  {id = 86,  coords = v3(-808.456,6165.307,-3.398)},
-            [7]  =  {id = 87,  coords = v3(-397.854,6783.974,-19.076)},
-            [8]  =  {id = 88,  coords = v3(95.133,3898.854,24.086)},
-            [9]  =  {id = 89,  coords = v3(660.099,3760.461,19.43)},
-            [10] =  {id = 90,  coords = v3(2241.487,4022.88,25.675)}
-        },
-        [10] = {
-            [1]  =  {id = 91,  coords = v3(1553.867,4321.805,19.761)},
-            [2]  =  {id = 92,  coords = v3(857.875,3958.953,6.001)},
-            [3]  =  {id = 93,  coords = v3(3431.468,717.226,-93.674)},
-            [4]  =  {id = 94,  coords = v3(-1634.57,-1741.677,-34.462)},
-            [5]  =  {id = 95,  coords = v3(-3378.466,503.853,-27.274)},
-            [6]  =  {id = 96,  coords = v3(-1732.212,5336.15,-7.72)},
-            [7]  =  {id = 97,  coords = v3(-2612.415,4266.765,-30.535)},
-            [8]  =  {id = 98,  coords = v3(3406.32,-584.198,-18.545)},
-            [9]  =  {id = 99,  coords = v3(-3106.876,2432.615,-23.172)},
-            [10] =  {id = 100, coords = v3(-2172.952,-3199.194,-33.315)}
-        }
+        [1]   = {coords = v3(-150.585,-2852.332,-17.97)},
+        [2]   = {coords = v3(-540.975,-2465.579,-18.201)},
+        [3]   = {coords = v3(15.332,-2323.989,-14.224)},
+        [4]   = {coords = v3(461.483,-2386.212,-10.055)},
+        [5]   = {coords = v3(839.554,-2782.746,-20.516)},
+        [6]   = {coords = v3(1309.934,-2985.761,-21.344)},
+        [7]   = {coords = v3(1394.588,-3371.972,-17.855)},
+        [8]   = {coords = v3(1067.032,-3610.489,-52.777)},
+        [9]   = {coords = v3(371.111,-3226.341,-19.88)},
+        [10]  = {coords = v3(-1365.19,-3701.575,-32.056)},
+        [11]  = {coords = v3(-1983.722,-2769.391,-22.868)},
+        [12]  = {coords = v3(-1295.859,-1948.583,-7.47)},
+        [13]  = {coords = v3(-1791.493,-1284.341,-16.36)},
+        [14]  = {coords = v3(-1879.817,-1111.846,-19.249)},
+        [15]  = {coords = v3(-2086.537,-862.681,-37.465)},
+        [16]  = {coords = v3(-2614.496,-636.549,-35.296)},
+        [17]  = {coords = v3(-2815.156,-585.703,-59.753)},
+        [18]  = {coords = v3(-3412.1304,165.8565,-32.6174)},
+        [19]  = {coords = v3(-3554.145,817.679,-28.592)},
+        [20]  = {coords = v3(-3440.336,1416.229,-33.629)},
+        [21]  = {coords = v3(-3295.557,2020.828,-20.276)},
+        [22]  = {coords = v3(-3020.068,2527.044,-22.628)},
+        [23]  = {coords = v3(-3183.344,3051.828,-39.251)},
+        [24]  = {coords = v3(-3270.3245,3670.6917,-26.5299)},
+        [25]  = {coords = v3(-2860.754,3912.275,-33.684)},
+        [26]  = {coords = v3(-2752.189,4572.626,-21.415)},
+        [27]  = {coords = v3(-2407.659,4898.846,-45.411)},
+        [28]  = {coords = v3(-1408.649,5734.096,-36.339)},
+        [29]  = {coords = v3(-1008.661,6531.678,-22.122)},
+        [30]  = {coords = v3(-811.495,6667.619,-14.098)},
+        [31]  = {coords = v3(-420.119,7224.093,-44.899)},
+        [32]  = {coords = v3(425.78,7385.154,-44.087)},
+        [33]  = {coords = v3(556.131,7158.932,-38.031)},
+        [34]  = {coords = v3(1441.456,6828.521,-44.977)},
+        [35]  = {coords = v3(1820.262,7017.078,-78.959)},
+        [36]  = {coords = v3(2396.039,6939.861,-104.858)},
+        [37]  = {coords = v3(2475.159,6704.704,-9.333)},
+        [38]  = {coords = v3(2696.607,6655.181,-21.513)},
+        [39]  = {coords = v3(3049.285,6549.182,-36.306)},
+        [40]  = {coords = v3(3411.339,6308.514,-52.545)},
+        [41]  = {coords = v3(3770.457,5838.503,-27.88)},
+        [42]  = {coords = v3(3625,5543.203,-26.645)},
+        [43]  = {coords = v3(3986.087,3867.625,-31.705)},
+        [44]  = {coords = v3(3846.006,3683.454,-17.227)},
+        [45]  = {coords = v3(4130.328,3530.792,-27.516)},
+        [46]  = {coords = v3(3897.776,3050.804,-19.277)},
+        [47]  = {coords = v3(3751.005,2672.416,-48.526)},
+        [48]  = {coords = v3(3559.241,2070.137,-38.01)},
+        [49]  = {coords = v3(3410.804,1225.255,-55.684)},
+        [50]  = {coords = v3(3373.351,323.788,-20.246)},
+        [51]  = {coords = v3(3152.983,-261.257,-8.355)},
+        [52]  = {coords = v3(3192.368,-367.909,-30.311)},
+        [53]  = {coords = v3(3178.722,-988.684,-25.133)},
+        [54]  = {coords = v3(2701.915,-1365.816,-13.163)},
+        [55]  = {coords = v3(3045.378,-1682.987,-31.797)},
+        [56]  = {coords = v3(2952.829,-2313.142,-94.421)},
+        [57]  = {coords = v3(2361.167,-2728.077,-67.131)},
+        [58]  = {coords = v3(1824.039,-2973.19,-41.865)},
+        [59]  = {coords = v3(-575.734,-3132.886,-21.879)},
+        [60]  = {coords = v3(-1872.968,-2087.878,-61.897)},
+        [61]  = {coords = v3(-3205.486,-144.9,-31.784)},
+        [62]  = {coords = v3(-1760.539,5721.301,-74.808)},
+        [63]  = {coords = v3(-1293.948,5886.757,-27.186)},
+        [64]  = {coords = v3(-6.032,7464.313,-12.313)},
+        [65]  = {coords = v3(3627.174,5286.089,-35.437)},
+        [66]  = {coords = v3(3978.554,4987.259,-69.702)},
+        [67]  = {coords = v3(3995.491,4858.986,-37.555)},
+        [68]  = {coords = v3(4218.075,4116.594,-29.013)},
+        [69]  = {coords = v3(3795.855,2327.765,-37.352)},
+        [70]  = {coords = v3(3247.753,1395.029,-50.268)},
+        [71]  = {coords = v3(3451.907,278.014,-99.633)},
+        [72]  = {coords = v3(1061.475,7157.525,-28.239)},
+        [73]  = {coords = v3(-1551.109,5558.511,-22.472)},
+        [74]  = {coords = v3(-29.194,-3484.225,-34.377)},
+        [75]  = {coords = v3(2981.125,843.773,-4.586)},
+        [76]  = {coords = v3(2446.59,-2413.441,-35.135)},
+        [77]  = {coords = v3(423.342,-2864.345,-16.944)},
+        [78]  = {coords = v3(668.404,-3173.142,-6.337)},
+        [79]  = {coords = v3(-2318.251,4976.115,-101.11)},
+        [80]  = {coords = v3(806.924,6846.94,-3.666)},
+        [81]  = {coords = v3(4404.907,4617.076,-20.163)},
+        [82]  = {coords = v3(3276.699,1648.139,-44.099)},
+        [83]  = {coords = v3(2979.325,1.033,-16.746)},
+        [84]  = {coords = v3(-838.069,-1436.609,-10.248)},
+        [85]  = {coords = v3(-3334.358,3276.015,-27.291)},
+        [86]  = {coords = v3(-808.456,6165.307,-3.398)},
+        [87]  = {coords = v3(-397.854,6783.974,-19.076)},
+        [88]  = {coords = v3(95.133,3898.854,24.086)},
+        [89]  = {coords = v3(660.099,3760.461,19.43)},
+        [90]  = {coords = v3(2241.487,4022.88,25.675)},
+        [91]  = {coords = v3(1553.867,4321.805,19.761)},
+        [92]  = {coords = v3(857.875,3958.953,6.001)},
+        [93]  = {coords = v3(3431.468,717.226,-93.674)},
+        [94]  = {coords = v3(-1634.57,-1741.677,-34.462)},
+        [95]  = {coords = v3(-3378.466,503.853,-27.274)},
+        [96]  = {coords = v3(-1732.212,5336.15,-7.72)},
+        [97]  = {coords = v3(-2612.415,4266.765,-30.535)},
+        [98]  = {coords = v3(3406.32,-584.198,-18.545)},
+        [99]  = {coords = v3(-3106.876,2432.615,-23.172)},
+        [100] = {coords = v3(-2172.952,-3199.194,-33.315)}
     },
     treasureChests = {
         {
@@ -2015,13 +1995,9 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
-        hiddenCacheGroup.feat = menu.add_feature("Hidden Caches [" .. (i * 10) - 9 .. "-" .. i * 10 .. "]", "action_value_i", hiddenCachesMenu_Feat.id, function(feat)
-            local index = feat.value
-            local selectedCache = hiddenCacheGroup[index]
-            teleport_myself(selectedCache.coords.x, selectedCache.coords.y, selectedCache.coords.z)
+        hiddenCacheGroup.feat = menu.add_feature("Hidden Cache " .. i, "action", hiddenCachesMenu_Feat.id, function(feat)
+            teleport_myself(hiddenCacheGroup.coords.x, hiddenCacheGroup.coords.y, hiddenCacheGroup.coords.z)
         end)
-        hiddenCacheGroup.feat.min = 1
-        hiddenCacheGroup.feat.max = #hiddenCacheGroup
     end
 --
 ------------------------ Treasure Chests (2)             ------------------------
@@ -2143,33 +2119,23 @@ local function update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForP
 end
 
 local function update_feat_name__hidden_caches__state(resolvedLocationsIds)
-    -- I still have to iterate all of em one by one for the hint to update.
+    local resolvedLocationsSet = {}
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.hiddenCaches) do
+        resolvedLocationsSet[resolvedLocationId] = i
+    end
+
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
-        local selectedCache = hiddenCacheGroup[hiddenCacheGroup.feat.value]
         local updatedName = removeFeatNameColorCodes(hiddenCacheGroup.feat.name)
-        local updatedHint = "This is Hidden Cache #" .. selectedCache.id
-        local foundAt = {}
 
-        local hasPlayerCollectedAll10HiddenCaches = true
-        for i2, hiddenCache in ipairs(hiddenCacheGroup) do
-            local resolvedLocationsId = resolvedLocationsIds.hiddenCaches[i2]
-
-            if hiddenCache.id == resolvedLocationsId then
-                if not has_hidden_cache(i2 - 1) then
-                    hasPlayerCollectedAll10HiddenCaches = false
-                    updatedName = COLOR.FOUND.hex .. removeFeatNameColorCodes(hiddenCacheGroup.feat.name) .. "#DEFAULT#"
-                    table.insert(foundAt, (#foundAt == 0 and "\n\n" or "\n") .. "Found at: < " .. i2 .. " >")
-                end
+        if resolvedLocationsSet[i] then
+            if has_hidden_cache(resolvedLocationsSet[i] - 1) then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
-                hasPlayerCollectedAll10HiddenCaches = false
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
             end
-        end
-        if hasPlayerCollectedAll10HiddenCaches then
-            updatedName = COLOR.COLLECTED.hex .. removeFeatNameColorCodes(hiddenCacheGroup.feat.name) .. "#DEFAULT#"
         end
 
         hiddenCacheGroup.feat.name = updatedName
-        hiddenCacheGroup.feat.hint = updatedHint .. table.concat(foundAt)
     end
 end
 
