@@ -1150,6 +1150,7 @@ local collectibles = {
         [10] = {coords = v3(488.1019,-2830.6887,1.771)}
     },
     metalDetectors = {
+        -- CREDIT: https://gtalens.com/map/metal-detectors
         [1]  = {coords = v3(-3122.528,201.104,1.538)},
         [2]  = {coords = v3(-1802.943,-974.623,1.086)},
         [3]  = {coords = v3(-834.239,-1634.443,0.285)},
@@ -1777,6 +1778,23 @@ local dailyCollectibles = {
         [23] = {coords = v3(1124.7676,-1010.5512,43.6728)},
         [24] = {coords = v3(167.95,-2222.4854,6.2361)},
         [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
+    },
+    madrazoHits = {
+        [1]  = {coords = v3(1355.1779,3600.6501,33.9761)},
+        [2]  = {coords = v3(2258.5862,3146.8416,47.7513)},
+        [3]  = {coords = v3(2414.5872,4850.1777,37.2357)},
+        [4]  = {coords = v3(-306.0638,6248.7246,30.4665)},
+        [5]  = {coords = v3(924.7427,-2066.5093,29.5178)},
+        [6]  = {coords = v3(302.9755,-1860.7911,25.7811)},
+        [7]  = {coords = v3(-592.9996,-882.7405,24.918)},
+        [8]  = {coords = v3(-140.1684,-1534.7019,33.2548)},
+        [9]  = {coords = v3(1317.918,-1614.6876,51.3666)},
+        [10] = {coords = v3(650.728,-2872.411,5.057)},
+        [11] = {coords = v3(-3137.5437,1055.0897,19.3245)},
+        [12] = {coords = v3(-965.4027,-2608.117,12.981)},
+        [13] = {coords = v3(219.8501,284.7484,104.4699)},
+        [14] = {coords = v3(116.2243,3401.1082,36.7988)},
+        [15] = {coords = v3(-559.1921,175.2093,67.6451)}
     }
 }
 local others = {
@@ -2166,7 +2184,17 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
         gCacheGroup.feat.max = #gCacheGroup.spawns
     end
 --
------------------------- Stash House (1)         ------------------------
+------------------------ Madrazo Hit (1)           ------------------------
+    local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hits (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
+        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action", madrazoHitsMenu_Feat.id, function(feat)
+            teleport_myself(madrazoHitGroup.coords.x, madrazoHitGroup.coords.y, madrazoHitGroup.coords.z)
+        end)
+        madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hits" to spawn in the map.'
+    end
+--
+------------------------ Stash House (1)           ------------------------
     local stashHousesMenu_Feat = menu.add_feature("Stash House (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     local stashHouse_Feat = menu.add_feature("Stash House", "action_value_i", stashHousesMenu_Feat.id, function(feat)
@@ -2177,7 +2205,7 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
     stashHouse_Feat.min = 1
     stashHouse_Feat.max = #dailyCollectibles.stashHouses
 --
------------------------- Gun Van (1)            ------------------------
+------------------------ Gun Van (1)               ------------------------
     local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
 
     local gunVan_Feat = menu.add_feature("Gun Van", "action_value_i", gunVansMenu_Feat.id, function(feat)
@@ -2403,6 +2431,27 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
     end
 end
 
+local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
+    local resolvedLocationsSet = {}
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.madrazoHits) do
+        resolvedLocationsSet[resolvedLocationId] = i
+    end
+
+    for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
+        local updatedName = removeFeatNameColorCodes(madrazoHitGroup.feat.name)
+
+        if resolvedLocationsSet[i] then
+            if hasPlayerKilledMadrazoHit then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        madrazoHitGroup.feat.name = updatedName
+    end
+end
+
 local function update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
     gunVan_Feat.name = removeFeatNameColorCodes(gunVan_Feat.name)
     gunVan_Feat.hint = ""
@@ -2430,6 +2479,21 @@ end
 
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22034: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22036: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22037: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22038: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22039: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22040: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22041: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41218: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41223: 3
+    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41228: 3
+    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51554, -1))
+    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51198, -1))
+    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(42269, -1))
+    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(9537, -1))
+
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) -- Tunable: XM22_GUN_VAN_AVAILABLE
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
@@ -2438,6 +2502,7 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
+    local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
     local hasPlayerSpinnedCasinoWheel = false -- TODO: Possibly in NATIVES.STATS.GET_PACKED_STAT_INT_CODE(x, -1)
     local hasPlayerCompletedJunkEnergyTimeTrials = false -- TODO: Where the f- is that stored in ...
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
@@ -2478,6 +2543,9 @@ mainLoop_Thread = create_tick_handler(function()
             searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
         },
+        madrazoHits = {
+            [1] = script.get_global_i(2738934 + 6838) + 1 -- THIS IS THE MADRAZO HIT curent target but i woud like to use GET_PACKED_STAT_INT_CODE rather then global.
+        },
         stashHouse = {
             marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1
         },
@@ -2510,6 +2578,8 @@ mainLoop_Thread = create_tick_handler(function()
     stashHousesMenu_Feat.name          = "Stash House ("         .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
     gCachesMenu_Feat.name              = "G's Cache ("           .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
 
+    madrazoHitsMenu_Feat.name          = "Madrazo Hits ("        .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+
     gunVansMenu_Feat.name              = "Gun Vans ("            .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
@@ -2533,6 +2603,8 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
 
+    update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
+
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
 end, 1000)
 
@@ -2552,7 +2624,6 @@ end, 1000)
 ]]
 
 --[[ DEV NOTES:
-    42269 = bool stat for madrazo hits
     Weapon Components:
     so far 2/2 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
