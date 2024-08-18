@@ -2314,11 +2314,13 @@ local function update_feat_name__treasure_chests__state(resolvedLocationsIds)
         for i2, treasureChest in ipairs(treasureChestGroup.spawns) do
             local resolvedFeatIndexFound = i2
 
-            -- Note for me in the future, I'm pretty sure I have to do resolvedFeatIndexFound - 1 for anything after 6 ?
-            -- I'm just waiting tomorrow to fix it just in case this is actualyl correct
             if treasureChestGroup.name == "underwater" then
-                if resolvedFeatIndexFound == 6 then
-                    resolvedFeatIndexFound = 2
+                if resolvedFeatIndexFound >= 6 then
+                    if resolvedFeatIndexFound == 6 then
+                        resolvedFeatIndexFound = 2
+                    else
+                        resolvedFeatIndexFound = resolvedFeatIndexFound - 1
+                    end
                 end
             end
 
@@ -2431,11 +2433,13 @@ mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) -- Tunable: XM22_GUN_VAN_AVAILABLE
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- Possibly HAS_PLAYER_COLLECTED_DRE_USB_MIX ?
+    local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- TODO: Possibly HAS_PLAYER_COLLECTED_DRE_USB_MIX ?
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
-    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- idk exactly which one is the actual one, but wathever I just assumed both.
-    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1) -- or/and 36629 idk exactly the difference between the two of em
-    local hasPlayerSpinnedCasinoWheel = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26975, -1) -- 26975 (lucky wheel available / 1) Not working somehow
+    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
+    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
+    local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
+    local hasPlayerSpinnedCasinoWheel = false -- TODO: Possibly in NATIVES.STATS.GET_PACKED_STAT_INT_CODE(x, -1)
+    local hasPlayerCompletedJunkEnergyTimeTrials = false -- TODO: Where the f- is that stored in ...
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
 
     local resolvedLocationsIds = {
@@ -2490,15 +2494,15 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ?
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ?
 
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
     metalDetectorsMenu_Feat.name       = "Metal Detectors ("     .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
     sprayCansMenu_Feat.name            = "Spray Cans ("          .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
-    buriedStashesMenu_Feat.name        = "Buried Stashes ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"
-    shipwreckMenu_Feat.name            = "Shipwrecks ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)  .. "/1)"
+    buriedStashesMenu_Feat.name        = "Buried Stashes ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)" -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
+    shipwreckMenu_Feat.name            = "Shipwrecks ("          .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
     hiddenCachesMenu_Feat.name         = "Hidden Caches ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
     treasureChestsMenu_Feat.name       = "Treasure Chests ("     .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
@@ -2515,8 +2519,8 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
-    -- Misses mediaSticks here
-    -- Misses weaponComponents here
+    -- TODO: Misses mediaSticks here
+    -- TODO: Misses weaponComponents here
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
 
@@ -2542,11 +2546,13 @@ end, 1000)
     Gang Attacks
 
     Daily Collectibles:
+    Junk Energy Time Trials
     Junk Energy Skydives
     Casino Lucky Wheel
 ]]
 
 --[[ DEV NOTES:
+    42269 = bool stat for madrazo hits
     Weapon Components:
     so far 2/2 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
