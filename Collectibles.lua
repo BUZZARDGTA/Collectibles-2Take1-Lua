@@ -1098,44 +1098,54 @@ local collectibles = {
     },
     mediaSticks = {
         -- Credit: https://gtalens.com/map/media-sticks
-        {778.3044,-1859.3079,0.0},
-        {955.8713,48.9292,112.0268},
-        {778.7164,-1851.8921,0.0},
-        {25.73371,521.6043,170.028},
-        {-861.0848,-230.468,61.228},
-        {756.989,-1332.463,26.2802},
-        {345.2846,-977.7734,29.4634},
-        {-120.798,-1260.488,28.3088},
-        {5.667,221.309,106.7566},
-        {871.312,-2099.551,29.4768},
-        {-676.6141,-2458.2104,12.9444},
-        {195.416,-3167.3811,4.7903},
-        {371.0099,252.2451,103.0081},
-        {-1285.0198,-652.3701,25.6332},
-        {-1174.5742,-1153.4714,4.6582},
-        {-247.6898,6212.915,30.944},
-        {1695.1714,4785.1177,40.9847},
-        {-116.3816,-1772.1368,28.8592},
-        {-599.5152,279.6308,81.074},
-        {-1273.2231,-304.1054,37.2289},
-        {758.3455,-815.9312,25.2905},
-        {388.3036,-74.6683,67.1805},
-        {-1016.535,-413.186,38.6161},
-        {-589.4908,-707.4646,35.2844},
-        {-1039.083,-756.4792,18.8395},
-        {-55.69081,-1089.542,25.913},
-        {77.626,-1946.111,21.038},
-        {-435.913,1058.663,327.705},
-        {-67.077,-806.703,321.239},
-        {-1636.231,-1091.961,13.238}
-        --{
-        --    -2172.587, 1159.6364, -24.372166,
-        --    markerData = {
-        --        pos = v3(779.31817626953, -1867.4962158203, 29.299724578857),
-        --        interiorId = NATIVES.INTERIOR.GET_INTERIOR_AT_COORDS(-2000.0, 1113.211, -25.36243),
-        --        notificationText = "I'm first trying to teleport you to the LS Car Meet because you first need to be inside, or the teleport will not work.\n\nPlease wait till the LS Car Meet interior loads up..."
-        --    }
-        --},
+        { group = "Permanent Locations (LS Tuners DLC)", locations = {
+            { coords = v3(778.3044,-1859.3079,29.2997), bools = { 31733,31711 }, artist = "CircoLoco Records", title = "Black EP", hint = "Inside LS Car Meet." },
+            { coords = v3(955.8713,48.9292,112.0268), bools = { 42149,31730 }, artist = "CircoLoco Records", title = "Blue EP", hint = "On the roof of the Diamond Casino." },
+            { coords = v3(778.7164,-1851.8921,29.2997), bools = { 31758,31712 }, artist = "Moodymann", title = "Kenny's Backyard Boogie", hint = "Inside the trunk of randomly parked Moodymann's white Gauntlet Hellfire at the LS Car Meet. The car is not always available." }
+            }
+        },
+        { group = "Permanent Locations (The Contract DLC)", locations = {
+            { coords = v3(25.73371,521.6043,170.028), bools = { 31722,31714 }, artist = "NEZ ft. Schoolboy Q", title = "Let's Get It", hint = "At the Franklin Clinton's house." },
+            { coords = v3(-861.0848,-230.468,61.228), bools = { 31732,31713 }, artist = "NEZ", title = "You Wanna?", hint = "On the roof of Record A Studios." }
+            }
+        },
+        { group = "Nightclub", locations = {
+            { coords = v3(756.989,-1332.463,26.2802), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(345.2846,-977.7734,29.4634), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-120.798,-1260.488,28.3088), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(5.667,221.309,106.7566), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(871.312,-2099.551,29.4768), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-676.6141,-2458.2104,12.9444), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(195.416,-3167.3811,4.7903), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(371.0099,252.2451,103.0081), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-1285.0198,-652.3701,25.6332), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-1174.5742,-1153.4714,4.6582), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." }
+            }
+        },
+        { group = "Arcade", locations = {
+            { coords = v3(-247.6898,6212.915,30.944), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(1695.1714,4785.1177,40.9847), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-116.3816,-1772.1368,28.8592), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-599.5152,279.6308,81.074), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-1273.2231,-304.1054,37.2289), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(758.3455,-815.9312,25.2905), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." }
+            }
+        },
+        { group = "Agency", locations = {
+            { coords = v3(388.3036,-74.6683,67.1805), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
+            { coords = v3(-1016.535,-413.186,38.6161), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
+            { coords = v3(-589.4908,-707.4646,35.2844), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
+            { coords = v3(-1039.083,-756.4792,18.8395), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." }
+            }
+        },
+        { group = "Permanent Locations (Chop Shop DLC)", locations = {
+            { coords = v3(-55.69081,-1089.542,25.913), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(77.626,-1946.111,21.038), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-435.913,1058.663,327.705), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-67.077,-806.703,321.239), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-1636.231,-1091.961,13.238), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." }
+            }
+        }
     },
     weaponComponents = {
         [1]  = {coords = v3(-197.706,6379.5933,30.8371)},
@@ -2048,13 +2058,14 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
 ------------------------ Media Sticks (10)         ------------------------
     local mediaSticksMenu_Feat = menu.add_feature("Media Sticks (-1/10)", "parent", collectiblesOnlineMenu_Feat.id)
 
-    for i, mediaStick in ipairs(collectibles.mediaSticks) do
-        mediaStick.feat = menu.add_feature("Media Stick " .. i, "action", mediaSticksMenu_Feat.id, function()
-            --if mediaStick.markerData then
-            --    teleport_in_marker(mediaStick.markerData.pos, mediaStick.markerData.interiorId, mediaStick.markerData.notificationText)
-            --end
-            teleport_myself(mediaStick[1], mediaStick[2], mediaStick[3])
-        end)
+    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
+        mediaStickGroup.feat = menu.add_feature(mediaStickGroup.group, "parent", mediaSticksMenu_Feat.id)
+        for i2, location in ipairs(mediaStickGroup.locations) do
+            location.feat = menu.add_feature("Media Stick: " .. location.artist .. (location.title and " (" .. location.title .. ")" or ""), "action", mediaStickGroup.feat.id, function()
+                teleport_myself(location.coords.x, location.coords.y, location.coords.z)
+            end)
+            location.feat.hint = location.hint or ""
+        end
     end
 --
 ------------------------ Weapon Components (5)     ------------------------
@@ -2236,6 +2247,40 @@ local function update_feat_name__collectibles__state(has_collectible__Func, coll
             updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
         end
         feat.name = updatedName
+    end
+end
+
+local function has_all_bools(packedStatBoolCodesTable)
+    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
+        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
+            return false
+        end
+    end
+    return true
+end
+
+local function update_feat_name__mediaSticks__state()
+    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
+        local updatedParentFeatName = removeFeatNameColorCodes(mediaStickGroup.feat.name)
+        local hasCollectedAllChilds = true
+
+        for i2, location in ipairs(mediaStickGroup.locations) do
+            local updatedFeatName = removeFeatNameColorCodes(location.feat.name)
+
+            if has_all_bools(location.bools) then
+                updatedFeatName = COLOR.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+            else
+                hasCollectedAllChilds = false
+            end
+
+            location.feat.name = updatedFeatName
+        end
+
+        if hasCollectedAllChilds then
+            updatedParentFeatName = COLOR.COLLECTED.hex .. updatedParentFeatName .. "#DEFAULT#"
+        end
+
+        mediaStickGroup.feat.name = updatedParentFeatName
     end
 end
 
@@ -2479,25 +2524,10 @@ end
 
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22034: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22036: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22037: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22038: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22039: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22040: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:07] 22041: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41218: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41223: 3
-    -- POTENTIALLY MADRAZO HIT LIST NOT GLOABL [2024-08-18 22:37:08] 41228: 3
-    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51554, -1))
-    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51198, -1))
-    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(42269, -1))
-    -- print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(9537, -1))
-
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) -- Tunable: XM22_GUN_VAN_AVAILABLE
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- TODO: Possibly HAS_PLAYER_COLLECTED_DRE_USB_MIX ?
+    local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- Unused + unsure
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
@@ -2508,6 +2538,7 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
 
     local resolvedLocationsIds = {
+        -- Misses resolves the random location USB stick 1/5 location from "Chop Shop DLC"
         buriedStashes = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
@@ -2544,7 +2575,7 @@ mainLoop_Thread = create_tick_handler(function()
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
         },
         madrazoHits = {
-            [1] = script.get_global_i(2738934 + 6838) + 1 -- THIS IS THE MADRAZO HIT curent target but i woud like to use GET_PACKED_STAT_INT_CODE rather then global.
+            [1] = script.get_global_i(2738934 + 6838) + 1
         },
         stashHouse = {
             marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1
@@ -2562,7 +2593,7 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ?
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69
 
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
@@ -2589,7 +2620,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
-    -- TODO: Misses mediaSticks here
+    update_feat_name__mediaSticks__state()
     -- TODO: Misses weaponComponents here
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
@@ -2621,11 +2652,14 @@ end, 1000)
     Junk Energy Time Trials
     Junk Energy Skydives
     Casino Lucky Wheel
+
+    Others:
+    Street Dealers
 ]]
 
 --[[ DEV NOTES:
     Weapon Components:
-    so far 2/2 results shows that the weapon components are progressively unlocked as in the V3's order.
+    so far 3/3 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41942, -1) -- something related with `case joaat("police5"):`
 ]]
