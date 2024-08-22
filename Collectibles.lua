@@ -1100,7 +1100,7 @@ local collectibles = {
         -- Credit: https://gtalens.com/map/media-sticks
         { group = "Permanent Locations (LS Tuners DLC)", locations = {
             { coords = v3(778.3044,-1859.3079,29.2997), bools = { 31733,31711 }, artist = "CircoLoco Records", title = "Black EP", hint = "Inside LS Car Meet." },
-            { coords = v3(955.8713,48.9292,112.0268), bools = { 42149,31730 }, artist = "CircoLoco Records", title = "Blue EP", hint = "On the roof of the Diamond Casino." },
+            { coords = v3(955.8713,48.9292,112.0268), bools = { 31730 }, artist = "CircoLoco Records", title = "Blue EP", hint = "On the roof of the Diamond Casino." },
             { coords = v3(778.7164,-1851.8921,29.2997), bools = { 31758,31712 }, artist = "Moodymann", title = "Kenny's Backyard Boogie", hint = "Inside the trunk of randomly parked Moodymann's white Gauntlet Hellfire at the LS Car Meet. The car is not always available." }
             }
         },
@@ -2259,7 +2259,7 @@ local function has_all_bools(packedStatBoolCodesTable)
     return true
 end
 
-local function update_feat_name__mediaSticks__state()
+local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
         local updatedParentFeatName = removeFeatNameColorCodes(mediaStickGroup.feat.name)
         local hasCollectedAllChilds = true
@@ -2270,6 +2270,10 @@ local function update_feat_name__mediaSticks__state()
             if has_all_bools(location.bools) then
                 updatedFeatName = COLOR.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
+                if mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" and location.artist == "DâM-FunK" and location.title == "Even the Score" and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore[1] then
+                    updatedFeatName = COLOR.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                end
+
                 hasCollectedAllChilds = false
             end
 
@@ -2538,7 +2542,9 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
 
     local resolvedLocationsIds = {
-        -- Misses resolves the random location USB stick 1/5 location from "Chop Shop DLC"
+        mediaStick_DamFunk_EvenTheScore = {
+            [1] = script.get_global_i(2708657) + 1
+        },
         buriedStashes = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
@@ -2593,7 +2599,7 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/10)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/9)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69
 
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
@@ -2620,7 +2626,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
-    update_feat_name__mediaSticks__state()
+    update_feat_name__mediaSticks__state(resolvedLocationsIds)
     -- TODO: Misses weaponComponents here
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
@@ -2661,5 +2667,5 @@ end, 1000)
     Weapon Components:
     so far 3/3 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
-    NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41942, -1) -- something related with `case joaat("police5"):`
+    NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41942, -1) -- something related with `case joaat("police5"):` / bareel (1/5) component
 ]]
