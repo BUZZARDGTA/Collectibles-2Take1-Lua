@@ -60,8 +60,8 @@ local Global <const> = {
     numberOfGhostsExposedCollected = 2708057 + 534,
     numberOfLsTagCollected = 2708057 + 547,
     isGunVanAvailable = 262145 + 33232,
-    activeGunVanId = 2652592 + 2671,
-    activeStashhouseId = 2738934 + 6837,
+    activeMediaStick_DamFunk_EvenTheScore = 2708657,
+    activeMadrazoHits = 2738934 + 6838
 }
 ---- Global constants 2/2 END
 
@@ -2270,7 +2270,7 @@ local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
             if has_all_bools(location.bools) then
                 updatedFeatName = COLOR.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                if mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" and location.artist == "DâM-FunK" and location.title == "Even the Score" and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore[1] then
+                if mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" and location.artist == "DâM-FunK" and location.title == "Even the Score" and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore then
                     updatedFeatName = COLOR.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
                 end
 
@@ -2481,15 +2481,10 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
 end
 
 local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
-    local resolvedLocationsSet = {}
-    for i, resolvedLocationId in pairs(resolvedLocationsIds.madrazoHits) do
-        resolvedLocationsSet[resolvedLocationId] = i
-    end
-
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
         local updatedName = removeFeatNameColorCodes(madrazoHitGroup.feat.name)
 
-        if resolvedLocationsSet[i] then
+        if i == resolvedLocationsIds.madrazoHits then
             if hasPlayerKilledMadrazoHit then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2542,9 +2537,8 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
 
     local resolvedLocationsIds = {
-        mediaStick_DamFunk_EvenTheScore = {
-            [1] = script.get_global_i(2708657) + 1
-        },
+        mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMadrazoHits) + 1,
+        madrazoHits = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
         buriedStashes = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
@@ -2580,9 +2574,6 @@ mainLoop_Thread = create_tick_handler(function()
             searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
         },
-        madrazoHits = {
-            [1] = script.get_global_i(2738934 + 6838) + 1
-        },
         stashHouse = {
             marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1
         },
@@ -2599,7 +2590,7 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/9)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/9)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69 -- Shit says 6/9 even when I'm at 8/9 I should use bool probably bbut I wanna debug it more.
 
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
