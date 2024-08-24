@@ -2262,7 +2262,7 @@ end
 local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
         local updatedParentFeatName = removeFeatNameColorCodes(mediaStickGroup.feat.name)
-        local hasCollectedAllChilds = true
+        local hasCollectedAllMediaSticks = true
 
         for i2, location in ipairs(mediaStickGroup.locations) do
             local updatedFeatName = removeFeatNameColorCodes(location.feat.name)
@@ -2274,13 +2274,13 @@ local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
                     updatedFeatName = COLOR.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
                 end
 
-                hasCollectedAllChilds = false
+                hasCollectedAllMediaSticks = false
             end
 
             location.feat.name = updatedFeatName
         end
 
-        if hasCollectedAllChilds then
+        if hasCollectedAllMediaSticks then
             updatedParentFeatName = COLOR.COLLECTED.hex .. updatedParentFeatName .. "#DEFAULT#"
         end
 
@@ -2521,6 +2521,33 @@ local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     return count
 end
 
+-- (this function is not from R* source code)
+local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    --[[
+    There is a bug (with R* games) where collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
+    After going to Singleplayer and going back online, it does not count that one as collected anymore.
+    That's the reason I've made this function here.
+    The following line is what I'd use if R* didn't fucked up:
+    local count = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"), -1) -- Global_2708057.f_425 - v1.69 (b3258)
+    ]]
+    --
+    local count = 0
+    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
+        for i2, location in ipairs(mediaStickGroup.locations) do
+            local updatedFeatName = removeFeatNameColorCodes(location.feat.name)
+
+            if has_all_bools(location.bools) then
+                count = count + 1
+            end
+
+            if mediaStickGroup.group == "Nightclub" or mediaStickGroup.group == "Arcade" or mediaStickGroup.group == "Agency" or mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" then
+                break
+            end
+        end
+    end
+    return count
+end
+
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
@@ -2535,10 +2562,11 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerSpinnedCasinoWheel = false -- TODO: Possibly in NATIVES.STATS.GET_PACKED_STAT_INT_CODE(x, -1)
     local hasPlayerCompletedJunkEnergyTimeTrials = false -- TODO: Where the f- is that stored in ...
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
+    local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
 
     local resolvedLocationsIds = {
-        mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMadrazoHits) + 1,
-        madrazoHits = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
+        mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
+        madrazoHits = script.get_global_i(Global.activeMadrazoHits) + 1,
         buriedStashes = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
@@ -2590,7 +2618,7 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"),       -1)  .. "/9)" -- TODO: is it even really "USB_RADIO_COLLECTED"  -- this is wrong stat, on a new acc is saying 19/30 -- RADIOSTATION_COLLECTED ? -- Global_2708057.f_425   v1.69 -- Shit says 6/9 even when I'm at 8/9 I should use bool probably bbut I wanna debug it more.
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
 
     --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
