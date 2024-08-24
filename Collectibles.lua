@@ -59,9 +59,13 @@ local Global <const> = {
     ]]
     numberOfGhostsExposedCollected = 2708057 + 534,
     numberOfLsTagCollected = 2708057 + 547,
-    isGunVanAvailable = 262145 + 33232,
+    isGunVanAvailable = 262145 + 33232, --> Tunable: XM22_GUN_VAN_AVAILABLE
+    areStreetDealersAvailable = 262145 + 33479, --> Tunable: ENABLE_STREETDEALERS_DLC22022
     activeMediaStick_DamFunk_EvenTheScore = 2708657,
-    activeMadrazoHits = 2738934 + 6838
+    activeMadrazoHits = 2738934 + 6838,
+    activeStreetDealer1 = 2738934 + 6813 + (0 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1  --> Global_2738934.f_6813[iParam0 /*7*/]
 }
 ---- Global constants 2/2 END
 
@@ -1097,7 +1101,7 @@ local collectibles = {
         {1340.639,-1585.771,53.218}
     },
     mediaSticks = {
-        -- Credit: https://gtalens.com/map/media-sticks
+        -- CREDIT: https://gtalens.com/map/media-sticks
         { group = "Permanent Locations (LS Tuners DLC)", locations = {
             { coords = v3(778.3044,-1859.3079,29.2997), bools = { 31733,31711 }, artist = "CircoLoco Records", title = "Black EP", hint = "Inside LS Car Meet." },
             { coords = v3(955.8713,48.9292,112.0268), bools = { 31730 }, artist = "CircoLoco Records", title = "Blue EP", hint = "On the roof of the Diamond Casino." },
@@ -1839,6 +1843,58 @@ local others = {
         [28] = {coords = v3(1465.633,6553.67,13.771)},
         [29] = {coords = v3(1101.032,-335.172,66.944)},
         [30] = {coords = v3(149.683,-1655.674,29.028)}
+    },
+    streetDealers = {
+        [1] = {coords = v3(550.8953,-1774.5175,28.3121)},
+        [2] = {coords = v3(-154.924,6434.428,30.916)},
+        [3] = {coords = v3(400.9768,2635.3691,43.5045)},
+        [4] = {coords = v3(1533.846,3796.837,33.456)},
+        [5] = {coords = v3(-1666.642,-1080.0201,12.1537)},
+        [6] = {coords = v3(-1560.6105,-413.3221,37.1001)},
+        [7] = {coords = v3(819.2939,-2988.8562,5.0209)},
+        [8] = {coords = v3(1001.701,-2162.448,29.567)},
+        [9] = {coords = v3(1388.9678,-1506.0815,57.0407)},
+        [10] = {coords = v3(-3054.574,556.711,0.661)},
+        [11] = {coords = v3(-72.8903,80.717,70.6161)},
+        [12] = {coords = v3(198.6676,-167.0663,55.3187)},
+        [13] = {coords = v3(814.636,-280.109,65.463)},
+        [14] = {coords = v3(-237.004,-256.513,38.122)},
+        [15] = {coords = v3(-493.654,-720.734,22.921)},
+        [16] = {coords = v3(156.1586,6656.525,30.5882)},
+        [17] = {coords = v3(1986.3129,3786.75,31.2791)},
+        [18] = {coords = v3(-685.5629,5762.8706,16.511)},
+        [19] = {coords = v3(1707.703,4924.311,41.078)},
+        [20] = {coords = v3(1195.3047,2630.4685,36.81)},
+        [21] = {coords = v3(167.0163,2228.922,89.7867)},
+        [22] = {coords = v3(2724.0076,1483.066,23.5007)},
+        [23] = {coords = v3(1594.9329,6452.817,24.3172)},
+        [24] = {coords = v3(-2177.397,4275.945,48.12)},
+        [25] = {coords = v3(-2521.249,2311.794,32.216)},
+        [26] = {coords = v3(-3162.873,1115.6418,19.8526)},
+        [27] = {coords = v3(-1145.026,-2048.466,12.218)},
+        [28] = {coords = v3(-1304.321,-1318.848,3.88)},
+        [29] = {coords = v3(-946.727,322.081,70.357)},
+        [30] = {coords = v3(-895.112,-776.624,14.91)},
+        [31] = {coords = v3(-250.614,-1527.617,30.561)},
+        [32] = {coords = v3(-601.639,-1026.49,21.55)},
+        [33] = {coords = v3(2712.9868,4324.1157,44.8521)},
+        [34] = {coords = v3(726.772,4169.101,39.709)},
+        [35] = {coords = v3(178.3272,3086.2603,42.0742)},
+        [36] = {coords = v3(2351.592,2524.249,46.694)},
+        [37] = {coords = v3(388.9941,799.6882,186.6764)},
+        [38] = {coords = v3(2587.9822,433.6803,107.6139)},
+        [39] = {coords = v3(830.2875,-1052.7747,27.6666)},
+        [40] = {coords = v3(-759.662,-208.396,36.271)},
+        [41] = {coords = v3(-43.7171,-2015.22,17.017)},
+        [42] = {coords = v3(124.02,-1039.884,28.213)},
+        [43] = {coords = v3(479.0473,-597.5507,27.4996)},
+        [44] = {coords = v3(959.67,3619.036,31.668)},
+        [45] = {coords = v3(2375.8994,3162.9954,47.2087)},
+        [46] = {coords = v3(-1505.687,1526.558,114.257)},
+        [47] = {coords = v3(645.737,242.173,101.153)},
+        [48] = {coords = v3(1173.1378,-388.2896,70.5896)},
+        [49] = {coords = v3(-1801.85,172.49,67.771)},
+        [50] = {coords = v3(3729.2568,4524.872,21.4755)}
     }
 }
 
@@ -1864,6 +1920,7 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
 
 local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectiblesOnlineParentMenu_Feat.id)
 
+local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent", collectiblesOnlineParentMenu_Feat.id)
 
 ------------------------ Action Figures (100)      ------------------------
     local actionFiguresMenu_Feat = menu.add_feature("Action Figures (-1/100)", "parent", collectiblesOnlineMenu_Feat.id, function()
@@ -2227,7 +2284,17 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
     gunVan_Feat.min = 1
     gunVan_Feat.max = #others.gunVans
 --
+------------------------ Street Dealers (3)               ------------------------
+local streetDealersMenu_Feat = menu.add_feature("Street Dealers (-1/3)", "parent", streetDealersOnlineMenu_Feat.id)
 
+local streetDealers_Feat = menu.add_feature("Street Dealer", "action_value_i", streetDealersMenu_Feat.id, function(feat)
+    local index = feat.value
+    local selectedStreetDealer = others.streetDealers[index]
+    teleport_myself(selectedStreetDealer.coords.x, selectedStreetDealer.coords.y, selectedStreetDealer.coords.z)
+end)
+streetDealers_Feat.min = 1
+streetDealers_Feat.max = #others.streetDealers
+--
 
 -- Function to remove any color codes from a feat name
 local function removeFeatNameColorCodes(featName)
@@ -2510,6 +2577,28 @@ local function update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAv
     end
 end
 
+local function update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
+    local function areStreetDealersResolvedLocationsValid(streetDealersResolvedLocationsIds)
+        for i = 1, 3 do
+            if streetDealersResolvedLocationsIds[i] < 1 or streetDealersResolvedLocationsIds[i] > #others.streetDealers then
+                return false
+            end
+        end
+        return true
+    end
+
+    streetDealers_Feat.name = removeFeatNameColorCodes(streetDealers_Feat.name)
+    streetDealers_Feat.hint = ""
+
+    if
+        areStreetDealersAvailable
+        and areStreetDealersResolvedLocationsValid(resolvedLocationsIds.streetDealers)
+    then
+        streetDealers_Feat.name = COLOR.FOUND.hex .. streetDealers_Feat.name .. "#DEFAULT#"
+        streetDealers_Feat.hint = "Found at:\n< " .. table.concat(resolvedLocationsIds.streetDealers, " >\n< ") .. " >"
+    end
+end
+
 -- This is the same code as the leaked source code, couldn't find a stat for it.
 local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local count = 0
@@ -2551,16 +2640,21 @@ end
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
-    local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) -- Tunable: XM22_GUN_VAN_AVAILABLE
+
+    -- [DEBBUG] POSSIBLY ACTIVE STREET DEALERS (PROBABLY NOT) print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(21297, -1) + 1)
+    -- [DEBBUG] POSSIBLY ACTIVE STREET DEALERS (PROBABLY NOT) print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51549, -1) + 1)
+
+    local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
+    local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedAll4CricolocoRecordsMediaSticks  = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32275, -1) -- Unused + unsure
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
-    local hasPlayerSpinnedCasinoWheel = false -- TODO: Possibly in NATIVES.STATS.GET_PACKED_STAT_INT_CODE(x, -1)
-    local hasPlayerCompletedJunkEnergyTimeTrials = false -- TODO: Where the f- is that stored in ...
+    local hasPlayerSpinnedCasinoWheel = false           -- TODO: Where the f- is that stored in ...
+    local hasPlayerCompletedJunkEnergyTimeTrial = false -- TODO: Where the f- is that stored in ...
+    local hasPlayerCompletedTimeTrial = false           -- TODO: Where the f- is that stored in ...
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
 
@@ -2597,6 +2691,11 @@ mainLoop_Thread = create_tick_handler(function()
             [3] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51548, -1) + 1,
             [4] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51549, -1) + 1,
             [5] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51550, -1) + 1
+        },
+        streetDealers = {
+            [1] = script.get_global_i(Global.activeStreetDealer1) + 1,
+            [2] = script.get_global_i(Global.activeStreetDealer2) + 1,
+            [3] = script.get_global_i(Global.activeStreetDealer3) + 1
         },
         gCache = {
             searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
@@ -2637,6 +2736,7 @@ mainLoop_Thread = create_tick_handler(function()
     madrazoHitsMenu_Feat.name          = "Madrazo Hits ("        .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
 
     gunVansMenu_Feat.name              = "Gun Vans ("            .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
+    streetDealersMenu_Feat.name        = "Street Dealers ("      .. tostring(areStreetDealersAvailable and 3 or 0)                                                       .. "/3)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
     update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
@@ -2662,6 +2762,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
+    update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
 end, 1000)
 
 
@@ -2669,17 +2770,15 @@ end, 1000)
     Collectibles:
     Stunt Jumps
     Peyote Plants
-    Media Sticks
     Convenience Stores
     Gang Attacks
 
     Daily Collectibles:
-    Junk Energy Time Trials
+    Junk Energy Time Trial
     Junk Energy Skydives
     Casino Lucky Wheel
-
-    Others:
-    Street Dealers
+    RC Bandito Time Trial
+    Time Trial
 ]]
 
 --[[ DEV NOTES:
