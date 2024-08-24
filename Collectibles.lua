@@ -277,6 +277,15 @@ local function teleport_in_marker(markerPos, interiorId, notificationText)
     end
 end
 
+local function has_all_bools(packedStatBoolCodesTable)
+    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
+        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
+            return false
+        end
+    end
+    return true
+end
+
 local function has_action_figure(actionFigureId)
     return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
 end
@@ -301,7 +310,6 @@ end
 local function has_weapon_component(weaponComponentId)
     return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
 end
--- Missing mediaSticks here
 local function has_buried_stash(buriedStashId)
     return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
 end
@@ -1099,6 +1107,58 @@ local collectibles = {
         {-1105.3816,-1398.6503,4.1505},
         {-252.2187,-1561.5228,30.8514},
         {1340.639,-1585.771,53.218}
+    },
+    stuntJumps = {
+        [1]  = {coords = {_start = v3(2.143237, 1720.5264, 224.36223),    _end = v3(98.661514,1846.0696,173.6653)}},
+        [2]  = {coords = {_start = v3(-437.43567, -1196.3062, 52.99947),  _end = v3(-435.02042,-1242.0337,48.43407)}},
+        [3]  = {coords = {_start = v3(466.72003, 4319.375, 59.95854),     _end = v3(401.46814,4394.32,61.782753)}},
+        [4]  = {coords = {_start = v3(-166.34563, 6578.911, 12.059387),   _end = v3(-151.75652,6588.687,8.772982)}},
+        [5]  = {coords = {_start = v3(-977.3154, 4180.1816, 133.4073),    _end = v3(-1068.2544,4267.542,101.99857)}},
+        [6]  = {coords = {_start = v3(-7.579316, -1037.7183, 37.534637),  _end = v3(-32.064377,-1018.61975,26.909771)}},
+        [7]  = {coords = {_start = v3(-268.0506, -770.5955, 55.124),      _end = v3(-213.37762,-799.55383,28.454012)}},
+        [8]  = {coords = {_start = v3(-86.19047, -537.1067, 38.11981),    _end = v3(-102.13432,-526.78503,26.510422)}},
+        [9]  = {coords = {_start = v3(-1594.7732, -762.3895, 20.853231),  _end = v3(-1634.0385,-735.4114,9.369503)}},
+        [10] = {coords = {_start = v3(-248.65648, -215.40202, 47.082996), _end = v3(-288.78427,-199.22147,36.635315)}},
+        [11] = {coords = {_start = v3(-1442.9155, 403.0396, 109.28736),   _end = v3(-1431.1521,327.97552,60.381454)}},
+        [12] = {coords = {_start = v3(3351.9866, 5156.3345, 18.207516),   _end = v3(3418.5293,5166.2812,3.857807)}},
+        [13] = {coords = {_start = v3(1687.4855, 2340.2605, 73.36435),    _end = v3(1685.3633,2411.0728,43.42663)}},
+        [14] = {coords = {_start = v3(307.3563, -621.0101, 42.3353),      _end = v3(-649.0976,27.6553,390.8702)}},
+        [15] = {coords = {_start = v3(-882.79474, -854.2749, 17.6236),    _end = v3(-963.61,-859.19727,11.989673)}},
+        [16] = {coords = {_start = v3(364.7186, -1162.9991, 28.2918),     _end = v3(-1195.9619,37.1024,344.4012)}},
+        [17] = {coords = {_start = v3(396.10138, -1656.2368, 48.000576),  _end = v3(423.40088,-1627.2831,27.291819)}},
+        [18] = {coords = {_start = v3(52.473076, -779.20447, 42.219185),  _end = v3(74.71162,-792.1132,29.642887)}},
+        [19] = {coords = {_start = v3(32.60692, 6526.0977, 29.624762),    _end = v3(28.092398,6507.57,29.43886)}},
+        [20] = {coords = {_start = v3(1789.045, 2049.2378, 65.45301),     _end = v3(1839.6664,1912.0605,56.960133)}},
+        [21] = {coords = {_start = v3(-1070.7548, 10.703864, 50.348785),  _end = v3(-1059.8037,7.505019,59.629753)}},
+        [22] = {coords = {_start = v3(84.6931, -2196.2747, 5.747),        _end = v3(15.7866,-2207.5728,3.1184)}},
+        [23] = {coords = {_start = v3(1637.9042, 3608.2751, 33.474846),   _end = v3(1590.5509,3584.659,30.728943)}},
+        [24] = {coords = {_start = v3(566.68, -594.16003, 43.86801),      _end = v3(584.3754,-656.73627,10.542001)}},
+        [25] = {coords = {_start = v3(452.99863, -1374.922, 43.02972),    _end = v3(491.9446,-1413.1997,27.305395)}},
+        [26] = {coords = {_start = v3(-425.5986, -1555.6082, 22.706762),  _end = v3(-425.47293,-1443.8934,19.719975)}},
+        [27] = {coords = {_start = v3(-963.1714, -2778.5056, 14.478279),  _end = v3(-988.8297,-2830.7893,11.964784)}},
+        [28] = {coords = {_start = v3(-2009.6931, -319.28024, 47.545036), _end = v3(-2102.1323,-241.92262,7.677715)}},
+        [29] = {coords = {_start = v3(1671.9133, 3151.226, 45.29734),     _end = v3(1658.6874,3255.261,38.572178)}},
+        [30] = {coords = {_start = v3(-524.65186, -1489.8649, 12.315341), _end = v3(-499.42178,-1491.9802,8.405223)}},
+        [31] = {coords = {_start = v3(787.837, -2912.4077, 5.628719),     _end = v3(734.11743,-2910.2605,3.919759)}},
+        [32] = {coords = {_start = v3(1978.6943, 1925.877, 87.246),       _end = v3(1918.1731,1913.6854,55.10921)}},
+        [33] = {coords = {_start = v3(672.2588, -3003.4043, 6.047905),    _end = v3(782.1926,-2994.9321,4.036896)}},
+        [34] = {coords = {_start = v3(108.17593, -2815.1226, 9.17942),    _end = v3(93.96964,-2739.8582,4.505202)}},
+        [35] = {coords = {_start = v3(109.05937, -3209.3123, 7.463991),   _end = v3(127.454666,-3257.3904,14.779922)}},
+        [36] = {coords = {_start = v3(124.214874, -2954.8147, 9.250035),  _end = v3(128.92989,-3006.8005,15.476112)}},
+        [37] = {coords = {_start = v3(174.63142, -2782.5117, 7.013673),   _end = v3(260.69302,-2675.1648,16.322165)}},
+        [38] = {coords = {_start = v3(163.6802, -2961.3328, 7.712487),    _end = v3(142.2329,-2895.0386,12.959893)}},
+        [39] = {coords = {_start = v3(285.75012, -3014.0552, 8.774601),   _end = v3(274.98248,-2988.7988,3.447593)}},
+        [40] = {coords = {_start = v3(371.4717, -2635.26, 9.349143),      _end = v3(506.06033,-2627.2344,4.586116)}},
+        [41] = {coords = {_start = v3(-854.31323, -2551.8374, 20.418636), _end = v3(-798.0812,-2469.6638,11.884529)}},
+        [42] = {coords = {_start = v3(-986.5257, -2507.1882, 20.45239),   _end = v3(-987.5785,-2554.4663,32.705853)}},
+        [43] = {coords = {_start = v3(-589.2717, -1532.1613, 3.122784),   _end = v3(-704.96295,-1488.5146,3.172576)}},
+        [44] = {coords = {_start = v3(-626.5751, -1075.8972, 21.066702),  _end = v3(-704.2628,-1075.6385,11.31195)}},
+        [45] = {coords = {_start = v3(-453.6471, -1397.4199, 30.327072),  _end = v3(-456.18817,-1440.832,27.297173)}},
+        [46] = {coords = {_start = v3(-445.23865, -542.0142, 24.500528),  _end = v3(-445.70044,-442.11624,40.409298)}},
+        [47] = {coords = {_start = v3(-594.9152, -109.85971, 40.96681),   _end = v3(-625.0757,-166.66788,35.669353)}},
+        [48] = {coords = {_start = v3(-726.34106, -58.790874, 39.675186), _end = v3(-771.4631,-75.396164,35.85175)}},
+        [49] = {coords = {_start = v3(1480.1853, -2218.5376, 77.756454),  _end = v3(1429.0216,-2249.86,59.383785)}},
+        [50] = {coords = {_start = v3(367.16415, -2522.2588, 6.246408),   _end = v3(401.67624,-2508.9697,10.139722)}}
     },
     mediaSticks = {
         -- CREDIT: https://gtalens.com/map/media-sticks
@@ -2112,8 +2172,26 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Media Sticks (10)         ------------------------
-    local mediaSticksMenu_Feat = menu.add_feature("Media Sticks (-1/10)", "parent", collectiblesOnlineMenu_Feat.id)
+------------------------ Stunt Jumps (50)          ------------------------
+    local stuntJumpsMenu_Feat = menu.add_feature("Stunt Jumps (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
+    for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
+        stuntJumpGroup.feat = menu.add_feature("Stunt Jump " .. i, "action_value_i", stuntJumpsMenu_Feat.id, function(feat)
+            local selectedCoords = nil
+            if feat.value == 1 then
+                selectedCoords = stuntJumpGroup.coords._start
+            elseif feat.value == 2 then
+                selectedCoords = stuntJumpGroup.coords._end
+            end
+            if selectedCoords then
+                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
+            end
+        end)
+        stuntJumpGroup.feat.min = 1
+        stuntJumpGroup.feat.max = 2
+    end
+--
+------------------------ Media Sticks (9)          ------------------------
+    local mediaSticksMenu_Feat = menu.add_feature("Media Sticks (-1/9)", "parent", collectiblesOnlineMenu_Feat.id)
 
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
         mediaStickGroup.feat = menu.add_feature(mediaStickGroup.group, "parent", mediaSticksMenu_Feat.id)
@@ -2317,13 +2395,16 @@ local function update_feat_name__collectibles__state(has_collectible__Func, coll
     end
 end
 
-local function has_all_bools(packedStatBoolCodesTable)
-    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
-        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
-            return false
+local function update_feat_name__StuntJumps__state(is_stunt_jump_completed, lastMpChar)
+    for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
+        local updatedName = removeFeatNameColorCodes(stuntJumpGroup.feat.name)
+
+        if is_stunt_jump_completed(i-1, lastMpChar) then
+            updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
         end
+
+        stuntJumpGroup.feat.name = updatedName
     end
-    return true
 end
 
 local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
@@ -2337,7 +2418,13 @@ local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
             if has_all_bools(location.bools) then
                 updatedFeatName = COLOR.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                if mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" and location.artist == "DâM-FunK" and location.title == "Even the Score" and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore then
+                if
+                    is_session_started()
+                    and mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)"
+                    and location.artist == "DâM-FunK"
+                    and location.title == "Even the Score"
+                    and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore
+                then
                     updatedFeatName = COLOR.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
                 end
 
@@ -2380,7 +2467,10 @@ local function update_feat_name__buried_stashes__state(resolvedLocationsIds)
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
         local updatedName = removeFeatNameColorCodes(buriedStashGroup.feat.name)
 
-        if resolvedLocationsSet[i] then
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
             if has_buried_stash(resolvedLocationsSet[i] - 1) then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2402,7 +2492,10 @@ local function update_feat_name__hidden_caches__state(resolvedLocationsIds)
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
         local updatedName = removeFeatNameColorCodes(hiddenCacheGroup.feat.name)
 
-        if resolvedLocationsSet[i] then
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
             if has_hidden_cache(resolvedLocationsSet[i] - 1) then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2423,7 +2516,10 @@ local function update_feat_name__shipwrecks__state(resolvedLocationsIds)
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
         local updatedName = removeFeatNameColorCodes(shipwreckGroup.feat.name)
 
-        if resolvedLocationsSet[i] then
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
             if has_shipwreck(resolvedLocationsSet[i] - 1) then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2468,7 +2564,10 @@ local function update_feat_name__treasure_chests__state(resolvedLocationsIds)
                 end
             end
 
-            if resolvedLocationsSet[treasureChest.id] then
+            if
+                is_session_started()
+                and resolvedLocationsSet[treasureChest.id]
+            then
                 if has_treasure_chest(i - 1) then
                     updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
                     table.insert(foundAt, (#foundAt == 0 and "\n\n" or "\n") .. "Collected at: < " .. resolvedFeatIndexFound .. " >")
@@ -2493,7 +2592,10 @@ local function update_feat_name__ls_tags__state(resolvedLocationsIds)
     for i, lsTagGroup in ipairs(dailyCollectibles.lsTags) do
         local updatedName = removeFeatNameColorCodes(lsTagGroup.feat.name)
 
-        if resolvedLocationsSet[i] then
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
             if has_ls_tag(resolvedLocationsSet[i] - 1) then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2505,19 +2607,20 @@ local function update_feat_name__ls_tags__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__g_caches__state(resolvedLocationsIds, hasCollectible)
+local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
         gCacheGroup.feat.name = removeFeatNameColorCodes(gCacheGroup.feat.name)
         gCacheGroup.feat.hint = ""
 
         if
-                resolvedLocationsIds.gCache.searchArea >= 1
+            is_session_started()
+            and resolvedLocationsIds.gCache.searchArea >= 1
             and resolvedLocationsIds.gCache.searchArea <= #dailyCollectibles.gCaches
             and resolvedLocationsIds.gCache.spawn >= 1
             and resolvedLocationsIds.gCache.spawn <= #dailyCollectibles.gCaches[i].spawns
         then
             if i == resolvedLocationsIds.gCache.searchArea then
-                if hasCollectible then
+                if hasPlayerCollectedGCache then
                     gCacheGroup.feat.name = COLOR.COLLECTED.hex .. gCacheGroup.feat.name .. "#DEFAULT#"
                     gCacheGroup.feat.hint = "Collected at:\n< " .. resolvedLocationsIds.gCache.spawn .. " >"
                 else
@@ -2534,7 +2637,8 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
     stashHouse_Feat.hint = ""
 
     if
-            resolvedLocationsIds.stashHouse.marker >= 1
+        is_session_started()
+        and resolvedLocationsIds.stashHouse.marker >= 1
         and resolvedLocationsIds.stashHouse.marker <= #dailyCollectibles.stashHouses
     then
         if hasPlayerCollectedStashHouse then
@@ -2551,7 +2655,10 @@ local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPl
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
         local updatedName = removeFeatNameColorCodes(madrazoHitGroup.feat.name)
 
-        if i == resolvedLocationsIds.madrazoHits then
+        if
+            is_session_started()
+            and i == resolvedLocationsIds.madrazoHits
+        then
             if hasPlayerKilledMadrazoHit then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
@@ -2568,7 +2675,8 @@ local function update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAv
     gunVan_Feat.hint = ""
 
     if
-        isGunVanAvailable
+        is_session_started()
+        and isGunVanAvailable
         and resolvedLocationsIds.gunVan.spawn >= 1
         and resolvedLocationsIds.gunVan.spawn <= #others.gunVans
     then
@@ -2591,7 +2699,8 @@ local function update_feat_name__street_dealers__state(resolvedLocationsIds, are
     streetDealers_Feat.hint = ""
 
     if
-        areStreetDealersAvailable
+        is_session_started()
+        and areStreetDealersAvailable
         and areStreetDealersResolvedLocationsValid(resolvedLocationsIds.streetDealers)
     then
         streetDealers_Feat.name = COLOR.FOUND.hex .. streetDealers_Feat.name .. "#DEFAULT#"
@@ -2637,12 +2746,23 @@ local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     return count
 end
 
+-- This is the same code as the leaked source code.
+local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
+    local invalidstuntJumpId = -1
+
+    if stuntJumpId ~= invalidstuntJumpId then
+        local stat = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
+        local stuntJumpsFoundMask = stats.stat_get_u64(stat)
+        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
+    end
+
+    return false
+end
+
+
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
-
-    -- [DEBBUG] POSSIBLY ACTIVE STREET DEALERS (PROBABLY NOT) print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(21297, -1) + 1)
-    -- [DEBBUG] POSSIBLY ACTIVE STREET DEALERS (PROBABLY NOT) print(NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51549, -1) + 1)
 
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
     local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
@@ -2652,9 +2772,6 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
-    local hasPlayerSpinnedCasinoWheel = false           -- TODO: Where the f- is that stored in ...
-    local hasPlayerCompletedJunkEnergyTimeTrial = false -- TODO: Where the f- is that stored in ...
-    local hasPlayerCompletedTimeTrial = false           -- TODO: Where the f- is that stored in ...
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
 
@@ -2717,9 +2834,9 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
 
-    --stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)"
+    stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
+    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
     metalDetectorsMenu_Feat.name       = "Metal Detectors ("     .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
     sprayCansMenu_Feat.name            = "Spray Cans ("          .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
@@ -2730,13 +2847,12 @@ mainLoop_Thread = create_tick_handler(function()
     treasureChestsMenu_Feat.name       = "Treasure Chests ("     .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name               = "LS Tags ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar),      -1) .. "/5)" --[[script.get_global_i(Global.numberOfLsTagCollected)]]
-    stashHousesMenu_Feat.name          = "Stash House ("         .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
     gCachesMenu_Feat.name              = "G's Cache ("           .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
-
     madrazoHitsMenu_Feat.name          = "Madrazo Hits ("        .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+    stashHousesMenu_Feat.name          = "Stash House ("         .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
 
     gunVansMenu_Feat.name              = "Gun Vans ("            .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
-    streetDealersMenu_Feat.name        = "Street Dealers ("      .. tostring(areStreetDealersAvailable and 3 or 0)                                                       .. "/3)"
+    streetDealersMenu_Feat.name        = "Street Dealers ("      .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
     update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
@@ -2745,6 +2861,8 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
+
+    update_feat_name__StuntJumps__state(is_stunt_jump_completed, lastMpChar)
     update_feat_name__mediaSticks__state(resolvedLocationsIds)
     -- TODO: Misses weaponComponents here
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
@@ -2768,7 +2886,6 @@ end, 1000)
 
 --[[ TODO:
     Collectibles:
-    Stunt Jumps
     Peyote Plants
     Convenience Stores
     Gang Attacks
