@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Online_Version-1.69-green" alt="Online Version">
+  <img src="https://img.shields.io/badge/Game_Build-3274-green" alt="Game Build">
+  <br><br>
+</p>
+
 # Collectibles-2Take1-Lua
 
 Script to collect collectibles. Is in development but here are stable commits only.
