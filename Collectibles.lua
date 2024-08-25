@@ -59,6 +59,7 @@ local Global <const> = {
     ]]
     numberOfGhostsExposedCollected = 2708057 + 534,
     numberOfLsTagCollected = 2708057 + 547,
+    numberOfNightclubToiletAttendantTipped = 1579649,
     isGunVanAvailable = 262145 + 33232, --> Tunable: XM22_GUN_VAN_AVAILABLE
     areStreetDealersAvailable = 262145 + 33479, --> Tunable: ENABLE_STREETDEALERS_DLC22022
     activeMediaStick_DamFunk_EvenTheScore = 2708657,
@@ -277,472 +278,19 @@ local function teleport_in_marker(markerPos, interiorId, notificationText)
     end
 end
 
-local function has_all_bools(packedStatBoolCodesTable)
-    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
-        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
-            return false
-        end
-    end
-    return true
-end
 
-local function has_action_figure(actionFigureId)
-    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
-end
-local function has_ghost_exposed(ghostExposedId)
-    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
-end
-local function has_ld_organic_product(ldOrganicProductId)
-    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(34262 + ldOrganicProductId, -1) or false
-end
-local function has_movie_prop(moviePropId)
-    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
-end
-local function has_playing_card(playingCardId)
-    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26911 + playingCardId, -1) or false
-end
-local function has_signal_jammer(signalJammerId)
-    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(28099 + signalJammerId, -1) or false
-end
-local function has_snowman(snowmanId)
-    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36630 + snowmanId, -1) or false
-end
-local function has_weapon_component(weaponComponentId)
-    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
-end
-local function has_buried_stash(buriedStashId)
-    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
-end
-local function has_hidden_cache(hiddenCacheId)
-    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
-end
-local function has_shipwreck(shipwreckId)
-    return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
-end
-local function has_treasure_chest(treasureChestId)
-    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
-end
-local function has_ls_tag(lsTagId)
-    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
-end
-local function has_trick_or_treat(trickOrTreatId)
-    local packedStatId = false
-    if is_in_range(trickOrTreatId, 0, 9) then
-        packedStatId = 34252 + trickOrTreatId
-    elseif is_in_range(trickOrTreatId, 10, 199) then
-        packedStatId = 34512 + (trickOrTreatId - 10)
-    end
-    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
-end
-
-local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collectibleTypeName)
-    local collectibleHandlers_Table = {
-        ["Action Figures"] = has_action_figure,
-        ["Movie Props"]    = has_movie_prop,
-        ["Playing Cards"]  = has_playing_card,
-    }
-
-    -- Iterate through all pickups
-    for i, pickup in ipairs(pickup_Table) do
-        if not feat.on then
-            break
-        end
-
-        -- Skips teleports related to random events.
-        if collectibleTypeName == "Movie Props" then
-            if i > 7 then
-                return
-            end
-        end
-
-        -- Checks if we didn't already collected that one, if so skip.
-        if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-            local initialWait_Time = 4
-            if pickup["extraWait_Time"] then
-                initialWait_Time = pickup["extraWait_Time"]
-            end
-
-            if pickup["notification"] then
-                menu.notify(pickup["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-            end
-
-            menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #pickup_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-            teleport_myself(pickup[1], pickup[2], pickup[3])
-
-            -- If this flag is set, it means we must wait a lil longer after a teleport, ex: loading the Casino building.
-            if pickup["extraWait_Time"] then
-                local start_Time = os.clock()
-                while (os.clock() - start_Time) < initialWait_Time do
-                    system.yield()
-                    teleport_myself(pickup[1], pickup[2], pickup[3])
-                    system.yield(100)
-                end
-            end
-
-            local start_Time = os.clock()
-            local foundPickupNearby = false
-            local verifyPickup_Time = nil
-
-            -- Check for any matching collectibles for up to 4 seconds
-            while (os.clock() - start_Time) < 4 do -- Going under that makes it not collect 100% of them.
-                system.yield()
-
-                if foundPickupNearby and (os.clock() - verifyPickup_Time) > 3 then
-                    break -- Timeout of 3 seconds if a matched pickup was found, but still not collected
-                end
-
-                local nearbyPickups_Table = object.get_all_pickups() -- OBJECT::HAS_PICKUP_BEEN_COLLECTED, OBJECT::DOES_PICKUP_EXIST, OBJECT::DOES_PICKUP_OBJECT_EXIST
-                for _, nearbyPickup in pairs(nearbyPickups_Table) do
-                    local entityHash = entity.get_entity_model_hash(nearbyPickup)
-                    if table_contains(pickupHashes_Table, entityHash) then
-                        foundPickupNearby = true
-                        verifyPickup_Time = os.clock() -- Init verification time
-                        local pickupEntityPos = entity.get_entity_coords(nearbyPickup)
-                        teleport_myself(pickupEntityPos.x, pickupEntityPos.y, pickupEntityPos.z)
-                        system.yield(1000) -- Wait 1 second before rechecking, I do that in case the player as to "fall" on the ground, in order to collect the pickup.
-                        break -- Exit the inner loop to recheck the list of pickups
-                    end
-                end
-
-                -- Exit the loop if no pickup is found after checking
-                if verifyPickup_Time and not foundPickupNearby then
-                    break
-                end
-            end
-        end
-    end
-end
-
-local function auto_mode_e(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
-    local function start_auto_mode(noClip_Feat)
-        local initialWait_Time = 4
-
-        local function try_and_collect_it(collectible)
-            local function rotate_around_entity(targetEntity, radius, stepAngle)
-                local entityPos = entity.get_entity_coords(targetEntity)
-                local startAngle = 0
-                local endAngle = 360
-                local lookFront_Time = os.clock()
-                local lookBehind_Time = nil
-                local e_Time = os.clock()
-                local e_State = true
-
-                -- Perform the 360-degree rotation
-                for angle = startAngle, endAngle - stepAngle, stepAngle do
-                    if not feat.on then
-                        return
-                    end
-
-                    if e_State then
-                        if (os.clock() - e_Time) > 0.053 then
-                            controls.set_control_normal(0, 51, 0.0)
-                            e_State = false
-                            e_Time = os.clock()
-                        end
-                    else
-                        if (os.clock() - e_Time) > 0.053 then
-                            controls.set_control_normal(0, 51, 1.0)
-                            e_State = true
-                            e_Time = os.clock()
-                        end
-                    end
-
-                    if lookFront_Time then
-                        lookBehind_Time = nil
-                        if (os.clock() - lookFront_Time) > 0.15 then
-                            lookFront_Time = nil
-                            lookBehind_Time = os.clock()
-                        end
-                        controls.set_control_normal(0, 26, 0.0)
-                    elseif lookBehind_Time then
-                        lookFront_Time = nil
-                        if (os.clock() - lookBehind_Time) > 0.15 then
-                            lookBehind_Time = nil
-                            lookFront_Time = os.clock()
-                        end
-                        controls.set_control_normal(0, 26, 1.0)
-                    end
-
-                    system.yield()
-
-                    -- Convert angle to radians
-                    local radians = math.rad(angle)
-
-                    -- Calculate the new position based on the angle
-                    local xOffset = radius * math.cos(radians)
-                    local yOffset = radius * math.sin(radians)
-
-                    -- Calculate the new position
-                    local newPos = {
-                        x = entityPos.x + xOffset,
-                        y = entityPos.y + yOffset,
-                        z = entityPos.z
-                    }
-
-                    teleport_myself(newPos.x, newPos.y, newPos.z)
-                end
-            end
-
-            local start_Time = os.clock()
-            local verifyCollectible_Time = nil
-            local checkNearbyCollectibles_Time = nil
-            local collectibleEntity = 0
-
-            -- Check for any matching collectibles for up to {initialWait_Time} seconds
-            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
-                if not feat.on then
-                    return
-                end
-                system.yield()
-
-                -- Timeout of 6 seconds if a matched collectible was found, but still not collected
-                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 6 then
-                    return
-                end
-
-                local foundCollectibleThisFrame = false
-
-                -- Update player's nearby collectibles every 0.1 second to reduce CPU usage.
-                if not checkNearbyCollectibles_Time or (os.clock() - checkNearbyCollectibles_Time) > 0.1 then
-                    for _, collectibleHash in ipairs(collectibleHashes_Table) do
-                        collectibleEntity = NATIVES.OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(collectible[1], collectible[2], collectible[3], 0.01, collectibleHash, false, false, false)
-                        if collectibleEntity ~= 0 then
-                            break
-                        end
-                    end
-
-                    checkNearbyCollectibles_Time = os.clock()
-                end
-
-                if collectibleEntity ~= 0 then
-                    foundCollectibleThisFrame = true
-                    verifyCollectible_Time = os.clock() -- Init verification time
-
-                    local entityMaxSizeY = get_entity_max_size(collectibleEntity).y
-                    local radius = (entityMaxSizeY > 1.0 and entityMaxSizeY) or 1.0
-                    local stepAngle = 6 -- Define the angle increment for each step
-                    rotate_around_entity(collectibleEntity, radius, stepAngle)
-                end
-
-                -- Exit the loop if no collectibles are found after checking
-                if verifyCollectible_Time and not foundCollectibleThisFrame then
-                    return true
-                end
-            end
-
-            return false
-        end
-
-        local collectibleHandlers_Table = {
-            ["LD Organics Product"] = has_ld_organic_product,
-        }
-        local foundPreviousCollectible = false
-
-        -- Iterate through all collectibles
-        for i, collectible in ipairs(collectible_Table) do
-            if not feat.on then
-                return
-            end
-
-            -- Checks if we didn't already collected that one, if so skip.
-            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-                if collectible["notification"] then
-                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-                end
-
-
-                teleport_myself(collectible[1], collectible[2], collectible[3], true)
-                if foundPreviousCollectible then
-                    system.yield(3000) -- For 100% it's just requiered.
-                end
-                foundPreviousCollectible = try_and_collect_it(collectible, initialWait_Time)
-            end
-        end
-    end
-
-    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
-    local noClipState = noClip_Feat.on
-
-    start_auto_mode(noClip_Feat)
-
-    -- Restore player/ped settings
-    if not noClipState then
-        noClip_Feat.on = false
-    end
-    controls.set_control_normal(0, 26, 0.0)
-    controls.set_control_normal(0, 51, 0.0)
-    system.yield()
-end
-
-local function auto_mode_destroyable(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
-    local function start_auto_mode(noClip_Feat)
-        local function try_and_collect_it(collectible, initialWait_Time)
-            local start_Time = os.clock()
-            local verifyCollectible_Time = nil
-
-            -- Check for any matching collectibles for up to {initialWait_Time} seconds
-            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
-                if not feat.on then
-                    return
-                end
-                system.yield()
-
-                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 3 then
-                    return -- Timeout of 3 seconds if a matched collectible to shoot was found, but still not collected
-                end
-
-                local foundCollectibleNearby = false
-                local nearbyObjects_Table = object.get_all_objects()
-                for _, nearbyObject in pairs(nearbyObjects_Table) do
-                    local entityHash = entity.get_entity_model_hash(nearbyObject)
-                    if table_contains(collectibleHashes_Table, entityHash) then
-                        foundCollectibleNearby = true
-                        verifyCollectible_Time = os.clock() -- Init verification time
-                        local playerPed = player.player_ped()
-                        local playerPos = entity.get_entity_coords(playerPed)
-                        local collectibleEntity = nearbyObject
-                        local collectibleEntityPos = entity.get_entity_coords(collectibleEntity)
-                        if NATIVES.SYSTEM.VDIST(collectible[1], collectible[2], collectible[3], collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z) <= 0.01 then
-                            teleport_myself(collectibleEntityPos.x - 2, collectibleEntityPos.y - 2, collectibleEntityPos.z, true)
-                            NATIVES.FIRE.ADD_OWNED_EXPLOSION(playerPed, collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z, 36, 0.2, false, true, 0.0) -- 36 = railgun
-                            NATIVES.ENTITY.SET_ENTITY_HEALTH(collectibleEntity, 0, 0, 0) -- not needed but it doesn't hurt
-                            --gameplay.shoot_single_bullet_between_coords(playerPos, collectibleEntityPos, 0, gameplay.get_hash_key("weapon_pistol"), playerPed, false, true, 100000.0)
-                            break -- Exit the inner loop to recheck the list of collectibles
-                        end
-                    end
-                end
-
-                -- Exit the loop if no collectibles to shoot is found after checking
-                if verifyCollectible_Time and not foundCollectibleNearby then
-                    system.yield(1000) -- It just depends if you want it to be fast or not. I personally don't like it being too fast.
-                    return
-                end
-            end
-        end
-
-        local collectibleHandlers_Table = {
-            ["Signal Jammers"] = has_signal_jammer,
-            ["Snowmen"] = has_snowman,
-        }
-        local initialWait_Time = 8
-
-        -- Iterate through all collectibles to shoot
-        for i, collectible in ipairs(collectible_Table) do
-            if not feat.on then
-                return
-            end
-
-            -- Checks if we didn't already collected that one, if so skip.
-            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-                if collectible["notification"] then
-                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-                end
-
-                if not noClip_Feat.on then
-                    noClip_Feat.on = true
-                end
-
-                teleport_myself(collectible[1], collectible[2], collectible[3], true)
-                try_and_collect_it(collectible, initialWait_Time)
-            end
-        end
-    end
-
-    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
-    local noClipState = noClip_Feat.on
-
-    start_auto_mode(noClip_Feat)
-
-    -- Restore player/ped settings
-    if not noClipState then
-        noClip_Feat.on = false
-    end
-end
-
-local function remove_event_listener(eventType, listener)
-    if listener and event.remove_event_listener(eventType, listener) then
-        return
-    end
-
-    return listener
-end
-
-local function handle_script_exit(params)
-    params = params or {}
-    if params.clearAllNotifications == nil then
-        params.clearAllNotifications = false
-    end
-    if params.hasScriptCrashed == nil then
-        params.hasScriptCrashed = false
-    end
-
-    scriptExitEventListener = remove_event_listener("exit", scriptExitEventListener)
-
-    -- This will delete notifications from other scripts too.
-    -- Suggestion is open: https://discord.com/channels/1088976448452304957/1092480948353904752/1253065431720394842
-    if params.clearAllNotifications then
-        menu.clear_all_notifications()
-    end
-
-    if params.hasScriptCrashed then
-        menu.notify("Oh no... Script crashed:(\nYou gotta restart it manually.", SCRIPT_NAME, 12, COLOR.RED.int)
-    end
-
-    menu.exit()
-end
----- Global functions 2/2 END
-
----- Global event listeners START
-scriptExitEventListener = event.add_event_listener("exit", function()
-    handle_script_exit()
-end)
----- Global event listeners END
--- Globals END
-
-
--- Permissions Startup Checking START
-local unnecessaryPermissions = {}
-local missingPermissions = {}
-
-for _, flag in ipairs(TRUSTED_FLAGS) do
-    if menu.is_trusted_mode_enabled(flag.bitValue) then
-        if not flag.isRequiered then
-            table.insert(unnecessaryPermissions, flag.menuName)
-        end
-    else
-        if flag.isRequiered then
-            table.insert(missingPermissions, flag.menuName)
-        end
-    end
-end
-
-if #unnecessaryPermissions > 0 then
-    menu.notify("You do not require the following " .. pluralize("permission", #unnecessaryPermissions) .. ":\n" .. table.concat(unnecessaryPermissions, "\n"),
-        SCRIPT_NAME, 6, COLOR.ORANGE.int)
-end
-if #missingPermissions > 0 then
-    menu.notify(
-        "You need to enable the following " .. pluralize("permission", #missingPermissions) .. ":\n" .. table.concat(missingPermissions, "\n"),
-        SCRIPT_NAME, 6, COLOR.RED.int)
-    handle_script_exit()
-end
--- Permissions Startup Checking END
-
-
--- === Main Menu Features === --
-local myRootMenu_Feat = menu.add_feature(SCRIPT_TITLE, "parent", 0)
-
-local exitScript_Feat = menu.add_feature("#FF0000DD#Stop Script#DEFAULT#", "action", myRootMenu_Feat.id, function()
-    handle_script_exit()
-end)
-exitScript_Feat.hint = 'Stop "' .. SCRIPT_NAME .. '"'
-
-menu.add_feature("<- - - -  Collectibles by IB_U_Z_Z_A_R_Dl  - - - - ->", "action", myRootMenu_Feat.id)
+local nightclubs = {
+    [1]  = v3(756.989,-1332.463,26.2802),
+    [2]  = v3(345.2846,-977.7734,29.4634),
+    [3]  = v3(-120.798,-1260.488,28.3088),
+    [4]  = v3(5.667,221.309,106.7566),
+    [5]  = v3(871.312,-2099.551,29.4768),
+    [6]  = v3(-676.6141,-2458.2104,12.9444),
+    [7]  = v3(195.416,-3167.3811,4.7903),
+    [8]  = v3(371.0099,252.2451,103.0081),
+    [9]  = v3(-1285.0198,-652.3701,25.6332),
+    [10] = v3(-1174.5742,-1153.4714,4.6582)
+}
 
 local collectibles = {
     actionFigures = {
@@ -1160,6 +708,13 @@ local collectibles = {
         [49] = {coords = {_start = v3(1480.1853, -2218.5376, 77.756454),  _end = v3(1429.0216,-2249.86,59.383785)}},
         [50] = {coords = {_start = v3(367.16415, -2522.2588, 6.246408),   _end = v3(401.67624,-2508.9697,10.139722)}}
     },
+    -- Arena War: December 11th, 2018
+    epsilonRobes = {
+        [1] = {tips = 12,  name = "Seeking the Truth", hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes\n\nNote:\nDon't forget that the nightclub toilet attendant only accepts wallet money."},
+        [2] = {tips = 157, name = "Chasing the Truth", hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes\n\nNote:\nDon't forget that the nightclub toilet attendant only accepts wallet money."},
+        [3] = {tips = 577, name = "Bearing the Truth", hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes\n\nNote:\nDon't forget that the nightclub toilet attendant only accepts wallet money."}
+    },
+    -- Los Santos Tuners: July 20, 2021
     mediaSticks = {
         -- CREDIT: https://gtalens.com/map/media-sticks
         { group = "Permanent Locations (LS Tuners DLC)", locations = {
@@ -1174,16 +729,16 @@ local collectibles = {
             }
         },
         { group = "Nightclub", locations = {
-            { coords = v3(756.989,-1332.463,26.2802), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(345.2846,-977.7734,29.4634), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-120.798,-1260.488,28.3088), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(5.667,221.309,106.7566), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(871.312,-2099.551,29.4768), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-676.6141,-2458.2104,12.9444), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(195.416,-3167.3811,4.7903), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(371.0099,252.2451,103.0081), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-1285.0198,-652.3701,25.6332), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-1174.5742,-1153.4714,4.6582), bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." }
+            { coords = nightclubs[1],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[2],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[3],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[4],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[5],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[6],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[7],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[8],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[9],  bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = nightclubs[10], bools = { 31726,31710 }, artist = "CircoLoco Records", title = "Violet EP", hint = "Note:\nIt only spawns in one of them." }
             }
         },
         { group = "Arcade", locations = {
@@ -1211,18 +766,7 @@ local collectibles = {
             }
         }
     },
-    weaponComponents = {
-        [1]  = {coords = v3(-197.706,6379.5933,30.8371)},
-        [2]  = {coords = v3(1782.1915,4608.0522,36.1828)},
-        [3]  = {coords = v3(909.8119,3646.6177,35.1457)},
-        [4]  = {coords = v3(2529.068,2585.608,36.9449)},
-        [5]  = {coords = v3(-2945.886,438.0791,14.2707)},
-        [6]  = {coords = v3(-427.0431,292.809,82.2292)},
-        [7]  = {coords = v3(814.2508,-485.0651,29.2078)},
-        [8]  = {coords = v3(-1516.2374,-884.6562,9.1075)},
-        [9]  = {coords = v3(-309.1961,-1186.2217,23.0354)},
-        [10] = {coords = v3(488.1019,-2830.6887,1.771)}
-    },
+    -- The Criminal Enterprises: July 26th, 2022
     metalDetectors = {
         -- CREDIT: https://gtalens.com/map/metal-detectors
         [1]  = {coords = v3(-3122.528,201.104,1.538)},
@@ -1236,6 +780,20 @@ local collectibles = {
         [9]  = {coords = v3(2258.103,-2231.355,1.057)},
         [10] = {coords = v3(2827.373,-684.395,-0.042)}
     },
+    -- The Criminal Enterprises: August 11, 2022
+    weaponComponents = {
+        [1]  = {coords = v3(-197.706,6379.5933,30.8371)},
+        [2]  = {coords = v3(1782.1915,4608.0522,36.1828)},
+        [3]  = {coords = v3(909.8119,3646.6177,35.1457)},
+        [4]  = {coords = v3(2529.068,2585.608,36.9449)},
+        [5]  = {coords = v3(-2945.886,438.0791,14.2707)},
+        [6]  = {coords = v3(-427.0431,292.809,82.2292)},
+        [7]  = {coords = v3(814.2508,-485.0651,29.2078)},
+        [8]  = {coords = v3(-1516.2374,-884.6562,9.1075)},
+        [9]  = {coords = v3(-309.1961,-1186.2217,23.0354)},
+        [10] = {coords = v3(488.1019,-2830.6887,1.771)}
+    },
+    -- Bottom Dollar Bounties: June 25th, 2024
     sprayCans = {
         [1]  = {coords = v3(-95.608,-1447.339,32.416)},
         [2]  = {coords = v3(391.1991,-2001.3088,22.5562)},
@@ -1854,21 +1412,22 @@ local dailyCollectibles = {
         [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
     },
     madrazoHits = {
-        [1]  = {coords = v3(1355.1779,3600.6501,33.9761)},
-        [2]  = {coords = v3(2258.5862,3146.8416,47.7513)},
-        [3]  = {coords = v3(2414.5872,4850.1777,37.2357)},
-        [4]  = {coords = v3(-306.0638,6248.7246,30.4665)},
-        [5]  = {coords = v3(924.7427,-2066.5093,29.5178)},
-        [6]  = {coords = v3(302.9755,-1860.7911,25.7811)},
-        [7]  = {coords = v3(-592.9996,-882.7405,24.918)},
-        [8]  = {coords = v3(-140.1684,-1534.7019,33.2548)},
-        [9]  = {coords = v3(1317.918,-1614.6876,51.3666)},
-        [10] = {coords = v3(650.728,-2872.411,5.057)},
-        [11] = {coords = v3(-3137.5437,1055.0897,19.3245)},
-        [12] = {coords = v3(-965.4027,-2608.117,12.981)},
-        [13] = {coords = v3(219.8501,284.7484,104.4699)},
-        [14] = {coords = v3(116.2243,3401.1082,36.7988)},
-        [15] = {coords = v3(-559.1921,175.2093,67.6451)}
+        -- CREDIT: https://gtalens.com/map/madrazo-hits (`searchArea`)
+        [1]  = {coords = {eventTrigger = v3(1355.1779,3600.6501,33.9761),  searchArea = v3(1504.671,3680.395,33.601)}},
+        [2]  = {coords = {eventTrigger = v3(2258.5862,3146.8416,47.7513),  searchArea = v3(2385.852,3070.623,47.178)}},
+        [3]  = {coords = {eventTrigger = v3(2414.5872,4850.1777,37.2357),  searchArea = v3(2413.71,5004.968,45.654)}},
+        [4]  = {coords = {eventTrigger = v3(-306.0638,6248.7246,30.4665),  searchArea = v3(-113.07,6368.725,30.471)}},
+        [5]  = {coords = {eventTrigger = v3(924.7427,-2066.5093,29.5178),  searchArea = v3(954.914,-1893.672,30.198)}},
+        [6]  = {coords = {eventTrigger = v3(302.9755,-1860.7911,25.7811),  searchArea = v3(416.693,-1833.275,27.073)}},
+        [7]  = {coords = {eventTrigger = v3(-592.9996,-882.7405,24.918),   searchArea = v3(-692.822,-811.996,43.932)}},
+        [8]  = {coords = {eventTrigger = v3(-140.1684,-1534.7019,33.2548), searchArea = v3(-177.522,-1652.095,32.294)}},
+        [9]  = {coords = {eventTrigger = v3(1317.918,-1614.6876,51.3666),  searchArea = v3(1388.607,-1505.113,57.042)}},
+        [10] = {coords = {eventTrigger = v3(650.728,-2872.411,5.057),      searchArea = v3(493.08,-3024.28,5.063)}},
+        [11] = {coords = {eventTrigger = v3(-3137.5437,1055.0897,19.3245), searchArea = v3(-3252.282,967.669,10.431)}},
+        [12] = {coords = {eventTrigger = v3(-965.4027,-2608.117,12.981),   searchArea = v3(-1034.911,-2719.181,12.773)}},
+        [13] = {coords = {eventTrigger = v3(219.8501,284.7484,104.4699),   searchArea = v3(274.576,178.777,103.585)}},
+        [14] = {coords = {eventTrigger = v3(116.2243,3401.1082,36.7988),   searchArea = v3(52.146,3640.737,38.613)}},
+        [15] = {coords = {eventTrigger = v3(-559.1921,175.2093,67.6451),   searchArea = v3(-550.353,257.324,82.069)}},
     }
 }
 local others = {
@@ -1958,6 +1517,536 @@ local others = {
     }
 }
 
+
+local function has_all_bools(packedStatBoolCodesTable)
+    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
+        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
+            return false
+        end
+    end
+    return true
+end
+
+local function has_action_figure(actionFigureId)
+    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
+end
+local function has_ghost_exposed(ghostExposedId)
+    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
+end
+local function has_ld_organic_product(ldOrganicProductId)
+    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(34262 + ldOrganicProductId, -1) or false
+end
+local function has_movie_prop(moviePropId)
+    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
+end
+local function has_playing_card(playingCardId)
+    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26911 + playingCardId, -1) or false
+end
+local function has_signal_jammer(signalJammerId)
+    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(28099 + signalJammerId, -1) or false
+end
+local function has_snowman(snowmanId)
+    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36630 + snowmanId, -1) or false
+end
+local function has_epsilon_robe(epsilonRobeId)
+    return is_in_range(epsilonRobeId, 0, 2) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25003 + epsilonRobeId, -1) or false
+end
+local function has_weapon_component(weaponComponentId)
+    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
+end
+local function has_buried_stash(buriedStashId)
+    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
+end
+local function has_hidden_cache(hiddenCacheId)
+    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
+end
+local function has_shipwreck(shipwreckId)
+    return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
+end
+local function has_treasure_chest(treasureChestId)
+    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
+end
+local function has_ls_tag(lsTagId)
+    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
+end
+local function has_trick_or_treat(trickOrTreatId)
+    local packedStatId = false
+    if is_in_range(trickOrTreatId, 0, 9) then
+        packedStatId = 34252 + trickOrTreatId
+    elseif is_in_range(trickOrTreatId, 10, 199) then
+        packedStatId = 34512 + (trickOrTreatId - 10)
+    end
+    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
+end
+
+-- (this function is not from R* source code)
+local function GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
+    local count = 0
+    for i = 1, 3 do
+        if has_epsilon_robe(i - 1) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- (this function is not from R* source code)
+local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    --[[
+    There is a bug (with R* games) where collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
+    After going to Singleplayer and going back online, it does not count that one as collected anymore.
+    That's the reason I've made this function here.
+    The following line is what I'd use if R* didn't fucked up:
+    local count = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"), -1) -- Global_2708057.f_425 - v1.69 (b3258)
+    ]]
+    --
+    local count = 0
+    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
+        for i2, location in ipairs(mediaStickGroup.locations) do
+            if has_all_bools(location.bools) then
+                count = count + 1
+            end
+
+            if mediaStickGroup.group == "Nightclub" or mediaStickGroup.group == "Arcade" or mediaStickGroup.group == "Agency" or mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" then
+                break
+            end
+        end
+    end
+    return count
+end
+
+-- This is the same code as the leaked source code, couldn't find a stat for it.
+local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
+    local count = 0
+    for i = 1, 5 do
+        if has_weapon_component(i - 1) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- This is the same code as the leaked source code.
+local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
+    local invalidstuntJumpId = -1
+
+    if stuntJumpId ~= invalidstuntJumpId then
+        local stat = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
+        local stuntJumpsFoundMask = stats.stat_get_u64(stat)
+        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
+    end
+
+    return false
+end
+
+local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collectibleTypeName)
+    local collectibleHandlers_Table = {
+        ["Action Figures"] = has_action_figure,
+        ["Movie Props"]    = has_movie_prop,
+        ["Playing Cards"]  = has_playing_card,
+    }
+
+    -- Iterate through all pickups
+    for i, pickup in ipairs(pickup_Table) do
+        if not feat.on then
+            break
+        end
+
+        -- Skips teleports related to random events.
+        if collectibleTypeName == "Movie Props" then
+            if i > 7 then
+                return
+            end
+        end
+
+        -- Checks if we didn't already collected that one, if so skip.
+        if not collectibleHandlers_Table[collectibleTypeName](i-1) then
+            local initialWait_Time = 4
+            if pickup["extraWait_Time"] then
+                initialWait_Time = pickup["extraWait_Time"]
+            end
+
+            if pickup["notification"] then
+                menu.notify(pickup["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+            end
+
+            menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #pickup_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+
+            teleport_myself(pickup[1], pickup[2], pickup[3])
+
+            -- If this flag is set, it means we must wait a lil longer after a teleport, ex: loading the Casino building.
+            if pickup["extraWait_Time"] then
+                local start_Time = os.clock()
+                while (os.clock() - start_Time) < initialWait_Time do
+                    system.yield()
+                    teleport_myself(pickup[1], pickup[2], pickup[3])
+                    system.yield(100)
+                end
+            end
+
+            local start_Time = os.clock()
+            local foundPickupNearby = false
+            local verifyPickup_Time = nil
+
+            -- Check for any matching collectibles for up to 4 seconds
+            while (os.clock() - start_Time) < 4 do -- Going under that makes it not collect 100% of them.
+                system.yield()
+
+                if foundPickupNearby and (os.clock() - verifyPickup_Time) > 3 then
+                    break -- Timeout of 3 seconds if a matched pickup was found, but still not collected
+                end
+
+                local nearbyPickups_Table = object.get_all_pickups() -- OBJECT::HAS_PICKUP_BEEN_COLLECTED, OBJECT::DOES_PICKUP_EXIST, OBJECT::DOES_PICKUP_OBJECT_EXIST
+                for _, nearbyPickup in pairs(nearbyPickups_Table) do
+                    local entityHash = entity.get_entity_model_hash(nearbyPickup)
+                    if table_contains(pickupHashes_Table, entityHash) then
+                        foundPickupNearby = true
+                        verifyPickup_Time = os.clock() -- Init verification time
+                        local pickupEntityPos = entity.get_entity_coords(nearbyPickup)
+                        teleport_myself(pickupEntityPos.x, pickupEntityPos.y, pickupEntityPos.z)
+                        system.yield(1000) -- Wait 1 second before rechecking, I do that in case the player as to "fall" on the ground, in order to collect the pickup.
+                        break -- Exit the inner loop to recheck the list of pickups
+                    end
+                end
+
+                -- Exit the loop if no pickup is found after checking
+                if verifyPickup_Time and not foundPickupNearby then
+                    break
+                end
+            end
+        end
+    end
+end
+
+local function auto_mode_e(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
+    local function start_auto_mode(noClip_Feat)
+        local initialWait_Time = 4
+
+        local function try_and_collect_it(collectible)
+            local function rotate_around_entity(targetEntity, radius, stepAngle)
+                local entityPos = entity.get_entity_coords(targetEntity)
+                local startAngle = 0
+                local endAngle = 360
+                local lookFront_Time = os.clock()
+                local lookBehind_Time = nil
+                local e_Time = os.clock()
+                local e_State = true
+
+                -- Perform the 360-degree rotation
+                for angle = startAngle, endAngle - stepAngle, stepAngle do
+                    if not feat.on then
+                        return
+                    end
+
+                    if e_State then
+                        if (os.clock() - e_Time) > 0.053 then
+                            controls.set_control_normal(0, 51, 0.0)
+                            e_State = false
+                            e_Time = os.clock()
+                        end
+                    else
+                        if (os.clock() - e_Time) > 0.053 then
+                            controls.set_control_normal(0, 51, 1.0)
+                            e_State = true
+                            e_Time = os.clock()
+                        end
+                    end
+
+                    if lookFront_Time then
+                        lookBehind_Time = nil
+                        if (os.clock() - lookFront_Time) > 0.15 then
+                            lookFront_Time = nil
+                            lookBehind_Time = os.clock()
+                        end
+                        controls.set_control_normal(0, 26, 0.0)
+                    elseif lookBehind_Time then
+                        lookFront_Time = nil
+                        if (os.clock() - lookBehind_Time) > 0.15 then
+                            lookBehind_Time = nil
+                            lookFront_Time = os.clock()
+                        end
+                        controls.set_control_normal(0, 26, 1.0)
+                    end
+
+                    system.yield()
+
+                    -- Convert angle to radians
+                    local radians = math.rad(angle)
+
+                    -- Calculate the new position based on the angle
+                    local xOffset = radius * math.cos(radians)
+                    local yOffset = radius * math.sin(radians)
+
+                    -- Calculate the new position
+                    local newPos = {
+                        x = entityPos.x + xOffset,
+                        y = entityPos.y + yOffset,
+                        z = entityPos.z
+                    }
+
+                    teleport_myself(newPos.x, newPos.y, newPos.z)
+                end
+            end
+
+            local start_Time = os.clock()
+            local verifyCollectible_Time = nil
+            local checkNearbyCollectibles_Time = nil
+            local collectibleEntity = 0
+
+            -- Check for any matching collectibles for up to {initialWait_Time} seconds
+            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
+                if not feat.on then
+                    return
+                end
+                system.yield()
+
+                -- Timeout of 6 seconds if a matched collectible was found, but still not collected
+                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 6 then
+                    return
+                end
+
+                local foundCollectibleThisFrame = false
+
+                -- Update player's nearby collectibles every 0.1 second to reduce CPU usage.
+                if not checkNearbyCollectibles_Time or (os.clock() - checkNearbyCollectibles_Time) > 0.1 then
+                    for _, collectibleHash in ipairs(collectibleHashes_Table) do
+                        collectibleEntity = NATIVES.OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(collectible[1], collectible[2], collectible[3], 0.01, collectibleHash, false, false, false)
+                        if collectibleEntity ~= 0 then
+                            break
+                        end
+                    end
+
+                    checkNearbyCollectibles_Time = os.clock()
+                end
+
+                if collectibleEntity ~= 0 then
+                    foundCollectibleThisFrame = true
+                    verifyCollectible_Time = os.clock() -- Init verification time
+
+                    local entityMaxSizeY = get_entity_max_size(collectibleEntity).y
+                    local radius = (entityMaxSizeY > 1.0 and entityMaxSizeY) or 1.0
+                    local stepAngle = 6 -- Define the angle increment for each step
+                    rotate_around_entity(collectibleEntity, radius, stepAngle)
+                end
+
+                -- Exit the loop if no collectibles are found after checking
+                if verifyCollectible_Time and not foundCollectibleThisFrame then
+                    return true
+                end
+            end
+
+            return false
+        end
+
+        local collectibleHandlers_Table = {
+            ["LD Organics Product"] = has_ld_organic_product,
+        }
+        local foundPreviousCollectible = false
+
+        -- Iterate through all collectibles
+        for i, collectible in ipairs(collectible_Table) do
+            if not feat.on then
+                return
+            end
+
+            -- Checks if we didn't already collected that one, if so skip.
+            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
+                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+
+                if collectible["notification"] then
+                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+                end
+
+
+                teleport_myself(collectible[1], collectible[2], collectible[3])
+                if foundPreviousCollectible then
+                    system.yield(3000) -- For 100% it's just requiered.
+                end
+                foundPreviousCollectible = try_and_collect_it(collectible, initialWait_Time)
+            end
+        end
+    end
+
+    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
+    local noClipState = noClip_Feat.on
+
+    start_auto_mode(noClip_Feat)
+
+    -- Restore player/ped settings
+    if not noClipState then
+        noClip_Feat.on = false
+    end
+    controls.set_control_normal(0, 26, 0.0)
+    controls.set_control_normal(0, 51, 0.0)
+    system.yield()
+end
+
+local function auto_mode_destroyable(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
+    local function start_auto_mode(noClip_Feat)
+        local function try_and_collect_it(collectible, initialWait_Time)
+            local start_Time = os.clock()
+            local verifyCollectible_Time = nil
+
+            -- Check for any matching collectibles for up to {initialWait_Time} seconds
+            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
+                if not feat.on then
+                    return
+                end
+                system.yield()
+
+                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 3 then
+                    return -- Timeout of 3 seconds if a matched collectible to shoot was found, but still not collected
+                end
+
+                local foundCollectibleNearby = false
+                local nearbyObjects_Table = object.get_all_objects()
+                for _, nearbyObject in pairs(nearbyObjects_Table) do
+                    local entityHash = entity.get_entity_model_hash(nearbyObject)
+                    if table_contains(collectibleHashes_Table, entityHash) then
+                        foundCollectibleNearby = true
+                        verifyCollectible_Time = os.clock() -- Init verification time
+                        local playerPed = player.player_ped()
+                        local playerPos = entity.get_entity_coords(playerPed)
+                        local collectibleEntity = nearbyObject
+                        local collectibleEntityPos = entity.get_entity_coords(collectibleEntity)
+                        if NATIVES.SYSTEM.VDIST(collectible[1], collectible[2], collectible[3], collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z) <= 0.01 then
+                            teleport_myself(collectibleEntityPos.x - 2, collectibleEntityPos.y - 2, collectibleEntityPos.z)
+                            NATIVES.FIRE.ADD_OWNED_EXPLOSION(playerPed, collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z, 36, 0.2, false, true, 0.0) -- 36 = railgun
+                            NATIVES.ENTITY.SET_ENTITY_HEALTH(collectibleEntity, 0, 0, 0) -- not needed but it doesn't hurt
+                            --gameplay.shoot_single_bullet_between_coords(playerPos, collectibleEntityPos, 0, gameplay.get_hash_key("weapon_pistol"), playerPed, false, true, 100000.0)
+                            break -- Exit the inner loop to recheck the list of collectibles
+                        end
+                    end
+                end
+
+                -- Exit the loop if no collectibles to shoot is found after checking
+                if verifyCollectible_Time and not foundCollectibleNearby then
+                    system.yield(1000) -- It just depends if you want it to be fast or not. I personally don't like it being too fast.
+                    return
+                end
+            end
+        end
+
+        local collectibleHandlers_Table = {
+            ["Signal Jammers"] = has_signal_jammer,
+            ["Snowmen"] = has_snowman,
+        }
+        local initialWait_Time = 8
+
+        -- Iterate through all collectibles to shoot
+        for i, collectible in ipairs(collectible_Table) do
+            if not feat.on then
+                return
+            end
+
+            -- Checks if we didn't already collected that one, if so skip.
+            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
+                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+
+                if collectible["notification"] then
+                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+                end
+
+                if not noClip_Feat.on then
+                    noClip_Feat.on = true
+                end
+
+                teleport_myself(collectible[1], collectible[2], collectible[3])
+                try_and_collect_it(collectible, initialWait_Time)
+            end
+        end
+    end
+
+    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
+    local noClipState = noClip_Feat.on
+
+    start_auto_mode(noClip_Feat)
+
+    -- Restore player/ped settings
+    if not noClipState then
+        noClip_Feat.on = false
+    end
+end
+
+local function remove_event_listener(eventType, listener)
+    if listener and event.remove_event_listener(eventType, listener) then
+        return
+    end
+
+    return listener
+end
+
+local function handle_script_exit(params)
+    params = params or {}
+    if params.clearAllNotifications == nil then
+        params.clearAllNotifications = false
+    end
+    if params.hasScriptCrashed == nil then
+        params.hasScriptCrashed = false
+    end
+
+    scriptExitEventListener = remove_event_listener("exit", scriptExitEventListener)
+
+    -- This will delete notifications from other scripts too.
+    -- Suggestion is open: https://discord.com/channels/1088976448452304957/1092480948353904752/1253065431720394842
+    if params.clearAllNotifications then
+        menu.clear_all_notifications()
+    end
+
+    if params.hasScriptCrashed then
+        menu.notify("Oh no... Script crashed:(\nYou gotta restart it manually.", SCRIPT_NAME, 12, COLOR.RED.int)
+    end
+
+    menu.exit()
+end
+---- Global functions 2/2 END
+
+---- Global event listeners START
+scriptExitEventListener = event.add_event_listener("exit", function()
+    handle_script_exit()
+end)
+---- Global event listeners END
+-- Globals END
+
+
+-- Permissions Startup Checking START
+local unnecessaryPermissions = {}
+local missingPermissions = {}
+
+for _, flag in ipairs(TRUSTED_FLAGS) do
+    if menu.is_trusted_mode_enabled(flag.bitValue) then
+        if not flag.isRequiered then
+            table.insert(unnecessaryPermissions, flag.menuName)
+        end
+    else
+        if flag.isRequiered then
+            table.insert(missingPermissions, flag.menuName)
+        end
+    end
+end
+
+if #unnecessaryPermissions > 0 then
+    menu.notify("You do not require the following " .. pluralize("permission", #unnecessaryPermissions) .. ":\n" .. table.concat(unnecessaryPermissions, "\n"),
+        SCRIPT_NAME, 6, COLOR.ORANGE.int)
+end
+if #missingPermissions > 0 then
+    menu.notify(
+        "You need to enable the following " .. pluralize("permission", #missingPermissions) .. ":\n" .. table.concat(missingPermissions, "\n"),
+        SCRIPT_NAME, 6, COLOR.RED.int)
+    handle_script_exit()
+end
+-- Permissions Startup Checking END
+
+
+-- === Main Menu Features === --
+local myRootMenu_Feat = menu.add_feature(SCRIPT_TITLE, "parent", 0)
+
+local exitScript_Feat = menu.add_feature("#FF0000DD#Stop Script#DEFAULT#", "action", myRootMenu_Feat.id, function()
+    handle_script_exit()
+end)
+exitScript_Feat.hint = 'Stop "' .. SCRIPT_NAME .. '"'
+
+menu.add_feature("<- - - -  Collectibles by IB_U_Z_Z_A_R_Dl  - - - - ->", "action", myRootMenu_Feat.id)
 
 local collectiblesVMenu_Feat = menu.add_feature("Grand Theft Auto V - [COMING SOON]", "parent", myRootMenu_Feat.id, function(feat)
     feat.parent:toggle()
@@ -2146,7 +2235,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 
     for i, signalJammer in ipairs(collectibles.signalJammers) do
         signalJammer.feat = menu.add_feature("Signal Jammer " .. i, "action", signalJammersMenu_Feat.id, function()
-            teleport_myself(signalJammer[1], signalJammer[2], signalJammer[3], true)
+            teleport_myself(signalJammer[1], signalJammer[2], signalJammer[3])
         end)
     end
 --
@@ -2167,7 +2256,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     autoSnowmen_Feat.hint = "This will automatically destroy the 25 Snowmen for you, allowing you to go AFK.\n\nFor performance reasons, it is highly recommended to do this in an invite-only session."
 
     for i, snowman in ipairs(collectibles.snowmen) do
-        snowman.feat = menu.add_feature("snowman " .. i, "action", snowmenMenu_Feat.id, function()
+        snowman.feat = menu.add_feature("Snowman " .. i, "action", snowmenMenu_Feat.id, function()
             teleport_myself(snowman[1], snowman[2], snowman[3])
         end)
     end
@@ -2183,11 +2272,47 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
                 selectedCoords = stuntJumpGroup.coords._end
             end
             if selectedCoords then
-                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
+                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z, true)
             end
         end)
         stuntJumpGroup.feat.min = 1
         stuntJumpGroup.feat.max = 2
+    end
+--
+------------------------ Epsilon Robes (3)         ------------------------
+    local epsilonRobesMenu_Feat = menu.add_feature("Epsilon Robes (-1/3)", "parent", collectiblesOnlineMenu_Feat.id)
+
+    local autoEpsilonRobesMenu_Feat = menu.add_feature("Auto Mode", "toggle", epsilonRobesMenu_Feat.id, function(feat)
+        local playerNextToAttendantCoords = v3(-1611.39, -3009.97, -79.01)
+
+        while feat.on and GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED() < 3 do
+            local playerCoords = player.get_player_coords(player.player_id())
+
+            if NATIVES.SYSTEM.VDIST(playerCoords.x, playerCoords.y, playerCoords.z, playerNextToAttendantCoords.x, playerNextToAttendantCoords.y, playerNextToAttendantCoords.z) > 0.01 then
+                teleport_myself(playerNextToAttendantCoords.x, playerNextToAttendantCoords.y, playerNextToAttendantCoords.z)
+            end
+            entity.set_entity_heading(player.player_ped(), 40.0)
+
+            controls.set_control_normal(0, 51, 1.0)
+            system.yield()
+            controls.set_control_normal(0, 51, 0.0)
+            system.yield()
+        end
+        feat.on = false
+
+        controls.set_control_normal(0, 51, 0.0)
+        system.yield()
+    end)
+    autoEpsilonRobesMenu_Feat.hint = "This will automatically spam [E] (INPUT_CONTEXT) to collect all 3 Epsilon Robes, allowing you to go AFK.\n\nIMPORTANT:\n1. You must be in front of the nightclub toilet attendant and have them in view with the camera, or it won't work.\n2. Don't forget that the nightclub toilet attendant only accepts wallet money."
+
+    for i, epsilonRobeGroup in ipairs(collectibles.epsilonRobes) do
+        epsilonRobeGroup.feat = menu.add_feature(epsilonRobeGroup.name, "action_value_i", epsilonRobesMenu_Feat.id, function(feat)
+            local selectedCoords = nightclubs[feat.value]
+            teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
+        end)
+        epsilonRobeGroup.feat.min = 1
+        epsilonRobeGroup.feat.max = #nightclubs
+        epsilonRobeGroup.feat.hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes"
     end
 --
 ------------------------ Media Sticks (9)          ------------------------
@@ -2203,17 +2328,6 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end
     end
 --
------------------------- Weapon Components (5)     ------------------------
-    local weaponComponentsMenu_Feat = menu.add_feature("Weapon Components (-1/5)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
-
-    local weaponComponents_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
-        local index = feat.value
-        local selectedWeaponComponent = collectibles.weaponComponents[index]
-        teleport_myself(selectedWeaponComponent.coords.x, selectedWeaponComponent.coords.y, selectedWeaponComponent.coords.z)
-    end)
-    weaponComponents_Feat.min = 1
-    weaponComponents_Feat.max = #collectibles.weaponComponents
---
 ------------------------ Metal Detectors (1)       ------------------------
     local metalDetectorsMenu_Feat = menu.add_feature("Metal Detectors (-1/10)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
@@ -2225,6 +2339,18 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     metalDetectors_Feat.min = 1
     metalDetectors_Feat.max = #collectibles.metalDetectors
     metalDetectors_Feat.hint = 'Note:\nOnce you collect a "Metal Detector", it will no longer appear on Skeletons. However, you\'ll unlock the "Burried Stashes" Daily Collectible in Cayo Perico.'
+--
+------------------------ Weapon Components (5)     ------------------------
+    local weaponComponentsMenu_Feat = menu.add_feature("Weapon Components (-1/5)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
+
+    local weaponComponents_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
+        local index = feat.value
+        local selectedWeaponComponent = collectibles.weaponComponents[index]
+        teleport_myself(selectedWeaponComponent.coords.x, selectedWeaponComponent.coords.y, selectedWeaponComponent.coords.z)
+    end)
+    weaponComponents_Feat.min = 1
+    weaponComponents_Feat.max = #collectibles.weaponComponents
+--
 ------------------------ Spray Cans (1)            ------------------------
     local sprayCansMenu_Feat = menu.add_feature("Spray Can (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
 
@@ -2238,34 +2364,34 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     sprayCans_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
 --
 
------------------------- Buried Stashes (2)              ------------------------
+------------------------ Buried Stashes (2)        ------------------------
     local buriedStashesMenu_Feat = menu.add_feature("Buried Stashes (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
-        buriedStashGroup.feat = menu.add_feature("Buried Stash " .. i, "action", buriedStashesMenu_Feat.id, function(feat)
+        buriedStashGroup.feat = menu.add_feature("Buried Stash " .. i, "action", buriedStashesMenu_Feat.id, function()
             teleport_myself(buriedStashGroup.coords.x, buriedStashGroup.coords.y, buriedStashGroup.coords.z)
         end)
     end
 --
------------------------- Hidden Caches (10)              ------------------------
+------------------------ Hidden Caches (10)        ------------------------
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
-        hiddenCacheGroup.feat = menu.add_feature("Hidden Cache " .. i, "action", hiddenCachesMenu_Feat.id, function(feat)
+        hiddenCacheGroup.feat = menu.add_feature("Hidden Cache " .. i, "action", hiddenCachesMenu_Feat.id, function()
             teleport_myself(hiddenCacheGroup.coords.x, hiddenCacheGroup.coords.y, hiddenCacheGroup.coords.z)
         end)
     end
 --
------------------------- Shipwrecks (1)                  ------------------------
+------------------------ Shipwrecks (1)            ------------------------
     local shipwreckMenu_Feat = menu.add_feature("Shipwrecks (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
-        shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function(feat)
+        shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function()
             teleport_myself(shipwreckGroup.coords.x, shipwreckGroup.coords.y, shipwreckGroup.coords.z)
         end)
     end
 --
------------------------- Treasure Chests (2)             ------------------------
+------------------------ Treasure Chests (2)       ------------------------
     local treasureChestsMenu_Feat = menu.add_feature("Treasure Chests (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, treasureChestGroup in ipairs(dailyCollectibles.treasureChests) do
@@ -2334,10 +2460,20 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hits (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
-        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action", madrazoHitsMenu_Feat.id, function(feat)
-            teleport_myself(madrazoHitGroup.coords.x, madrazoHitGroup.coords.y, madrazoHitGroup.coords.z)
+        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitsMenu_Feat.id, function(feat)
+            local selectedCoords = nil
+            if feat.value == 1 then
+                selectedCoords = madrazoHitGroup.coords.eventTrigger
+            elseif feat.value == 2 then
+                selectedCoords = madrazoHitGroup.coords.searchArea
+            end
+            if selectedCoords then
+                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
+            end
         end)
-        madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hits" to spawn in the map.'
+        madrazoHitGroup.feat.min = 1
+        madrazoHitGroup.feat.max = 2
+        madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hits" trigger event to spawn in the map.'
     end
 --
 ------------------------ Stash House (1)           ------------------------
@@ -2362,16 +2498,16 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     gunVan_Feat.min = 1
     gunVan_Feat.max = #others.gunVans
 --
------------------------- Street Dealers (3)               ------------------------
-local streetDealersMenu_Feat = menu.add_feature("Street Dealers (-1/3)", "parent", streetDealersOnlineMenu_Feat.id)
+------------------------ Street Dealers (3)        ------------------------
+    local streetDealersMenu_Feat = menu.add_feature("Street Dealers (-1/3)", "parent", streetDealersOnlineMenu_Feat.id)
 
-local streetDealers_Feat = menu.add_feature("Street Dealer", "action_value_i", streetDealersMenu_Feat.id, function(feat)
-    local index = feat.value
-    local selectedStreetDealer = others.streetDealers[index]
-    teleport_myself(selectedStreetDealer.coords.x, selectedStreetDealer.coords.y, selectedStreetDealer.coords.z)
-end)
-streetDealers_Feat.min = 1
-streetDealers_Feat.max = #others.streetDealers
+    local streetDealers_Feat = menu.add_feature("Street Dealer", "action_value_i", streetDealersMenu_Feat.id, function(feat)
+        local index = feat.value
+        local selectedStreetDealer = others.streetDealers[index]
+        teleport_myself(selectedStreetDealer.coords.x, selectedStreetDealer.coords.y, selectedStreetDealer.coords.z)
+    end)
+    streetDealers_Feat.min = 1
+    streetDealers_Feat.max = #others.streetDealers
 --
 
 -- Function to remove any color codes from a feat name
@@ -2395,7 +2531,7 @@ local function update_feat_name__collectibles__state(has_collectible__Func, coll
     end
 end
 
-local function update_feat_name__StuntJumps__state(is_stunt_jump_completed, lastMpChar)
+local function update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
     for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
         local updatedName = removeFeatNameColorCodes(stuntJumpGroup.feat.name)
 
@@ -2407,7 +2543,45 @@ local function update_feat_name__StuntJumps__state(is_stunt_jump_completed, last
     end
 end
 
-local function update_feat_name__mediaSticks__state(resolvedLocationsIds)
+local function update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpChar)
+    local selectedMaxProgress = {
+        [1] = 12,
+        [2] = 157,
+        [3] = 577
+    }
+
+    for i, epsilonRobeGroup in ipairs(collectibles.epsilonRobes) do
+        local updatedName = removeFeatNameColorCodes(epsilonRobeGroup.feat.name)
+
+        if has_epsilon_robe(i-1, lastMpChar) then
+            updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+        end
+
+        local maxProgressNum = -1
+        local currentProgressNum = script.get_global_i(Global.numberOfNightclubToiletAttendantTipped)
+        if epsilonRobeGroup.name == "Seeking the Truth" then
+            maxProgressNum = 12
+            if currentProgressNum >= maxProgressNum then
+                currentProgressNum = maxProgressNum
+            end
+        elseif epsilonRobeGroup.name == "Chasing the Truth" then
+            maxProgressNum = 157
+            if currentProgressNum >= maxProgressNum then
+                currentProgressNum = maxProgressNum
+            end
+        elseif epsilonRobeGroup.name == "Bearing the Truth" then
+            maxProgressNum = 577
+            if currentProgressNum >= maxProgressNum then
+                currentProgressNum = maxProgressNum
+            end
+        end
+
+        epsilonRobeGroup.feat.name = updatedName
+        epsilonRobeGroup.feat.hint = epsilonRobeGroup.hint .. "\n\nCurrent progress:\n" .. currentProgressNum .. "/" .. maxProgressNum
+    end
+end
+
+local function update_feat_name__media_sticks__state(resolvedLocationsIds)
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
         local updatedParentFeatName = removeFeatNameColorCodes(mediaStickGroup.feat.name)
         local hasCollectedAllMediaSticks = true
@@ -2449,6 +2623,8 @@ local function update_feat_name__metal_detector__state(hasPlayerCollectedMetalDe
         metalDetectors_Feat.name = COLOR.COLLECTED.hex .. metalDetectors_Feat.name .. "#DEFAULT#"
     end
 end
+
+-- weaponComponents goes here
 
 local function update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
     sprayCans_Feat.name = removeFeatNameColorCodes(sprayCans_Feat.name)
@@ -2708,57 +2884,6 @@ local function update_feat_name__street_dealers__state(resolvedLocationsIds, are
     end
 end
 
--- This is the same code as the leaked source code, couldn't find a stat for it.
-local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
-    local count = 0
-    for i = 1, 5 do
-        if has_weapon_component(i - 1) then
-            count = count + 1
-        end
-    end
-    return count
-end
-
--- (this function is not from R* source code)
-local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
-    --[[
-    There is a bug (with R* games) where collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
-    After going to Singleplayer and going back online, it does not count that one as collected anymore.
-    That's the reason I've made this function here.
-    The following line is what I'd use if R* didn't fucked up:
-    local count = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"), -1) -- Global_2708057.f_425 - v1.69 (b3258)
-    ]]
-    --
-    local count = 0
-    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
-        for i2, location in ipairs(mediaStickGroup.locations) do
-            local updatedFeatName = removeFeatNameColorCodes(location.feat.name)
-
-            if has_all_bools(location.bools) then
-                count = count + 1
-            end
-
-            if mediaStickGroup.group == "Nightclub" or mediaStickGroup.group == "Arcade" or mediaStickGroup.group == "Agency" or mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" then
-                break
-            end
-        end
-    end
-    return count
-end
-
--- This is the same code as the leaked source code.
-local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
-    local invalidstuntJumpId = -1
-
-    if stuntJumpId ~= invalidstuntJumpId then
-        local stat = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
-        local stuntJumpsFoundMask = stats.stat_get_u64(stat)
-        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
-    end
-
-    return false
-end
-
 
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
@@ -2772,6 +2897,7 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
+    local localPlayerNumEpsilonRobesCollected = GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
 
@@ -2836,6 +2962,7 @@ mainLoop_Thread = create_tick_handler(function()
     snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
 
     stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
+    epsilonRobesMenu_Feat.name         = "Epsilon Robes ("       .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
     mediaSticksMenu_Feat.name          = "Media Sticks ("        .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
     weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
     metalDetectorsMenu_Feat.name       = "Metal Detectors ("     .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
@@ -2862,8 +2989,9 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
 
-    update_feat_name__StuntJumps__state(is_stunt_jump_completed, lastMpChar)
-    update_feat_name__mediaSticks__state(resolvedLocationsIds)
+    update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
+    update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpChar)
+    update_feat_name__media_sticks__state(resolvedLocationsIds)
     -- TODO: Misses weaponComponents here
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
@@ -2889,6 +3017,11 @@ end, 1000)
     Peyote Plants
     Convenience Stores
     Gang Attacks
+    Arm Wrestling
+    Darts (unsure)
+    Tenis (unsure)
+    Golf  (unsure)
+    San Andreas Flight School
 
     Daily Collectibles:
     Junk Energy Time Trial
@@ -2896,9 +3029,17 @@ end, 1000)
     Casino Lucky Wheel
     RC Bandito Time Trial
     Time Trial
+
+    Add Green color to all collected MenuFeat's
+    make snowmens, jack o lanters etc .. blue when they are available otherwite remove color
+    maybe make note hints green when done
+    make a protection for globals when running on the wrong version of the game.
+    I really need to find out when to tp with vehicles or not, make a setting for each probably.
 ]]
 
 --[[ DEV NOTES:
+    maybe for all "Note:\nIt only spawns in one of them." make them action_value_i
+
     Weapon Components:
     so far 3/3 results shows that the weapon components are progressively unlocked as in the V3's order.
     NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51556, -1) -- as not unlocked any/as all weapon component?
