@@ -58,7 +58,8 @@ local Global <const> = {
                        --> "How to update after new build update"
     ]]
     numberOfGhostsExposedCollected = 2708057 + 534,
-    numberOfLsTagCollected = 2708057 + 547,
+    -- UNUSED numberOfJunkEnergySkydivesCollected = 2708057 + 519,
+    -- UNUSED numberOfLsTagCollected = 2708057 + 547,
     numberOfNightclubToiletAttendantTipped = 1579649,
     isGunVanAvailable = 262145 + 33232, --> Tunable: XM22_GUN_VAN_AVAILABLE
     areStreetDealersAvailable = 262145 + 33479, --> Tunable: ENABLE_STREETDEALERS_DLC22022
@@ -952,7 +953,35 @@ local dailyCollectibles = {
         [99]  = {coords = v3(-3106.876,2432.615,-23.172)},
         [100] = {coords = v3(-2172.952,-3199.194,-33.315)}
     },
-    shipwrecks = {
+    -- CREDIT: https://gtalens.com/map/junk-energy-skydives
+    junkEnergySkydives = {
+        [1]  = {location = "Pillbox Hill",      coords = v3(-121.199, -962.557, 26.524)},
+        [2]  = {location = "FIB Headquarters",  coords = v3(153.572, -721.103, 46.328)},
+        [3]  = {location = "Rockford Hills",    coords = v3(-812.47, 299.77, 85.407)},
+        [4]  = {location = "Mount Josiah",      coords = v3(-1223.345, 3856.44, 488.126)},
+        [5]  = {location = "Mount Chiliad",     coords = v3(426.341, 5612.683, 765.588)},
+        [6]  = {location = "Alamo Sea",         coords = v3(503.8174, 5506.424, 773.6786)},
+        [7]  = {location = "Pricopio Beach",    coords = v3(813.5065, 5720.619, 693.7969)},
+        [8]  = {location = "Cassidy Creek",     coords = v3(-860.4413, 4729.499, 275.6516)},
+        [9]  = {location = "Sandy Shores Airf", coords = v3(1717.648, 3295.517, 40.4591)},
+        [10] = {location = "McKenzie Field",    coords = v3(2033.484, 4733.43, 40.8773)},
+        [11] = {location = "LSIA",              coords = v3(-1167.212, -2494.621, 12.956)},
+        [12] = {location = "Palmer-Taylor Pow", coords = v3(2790.4, 1465.635, 23.518)},
+        [13] = {location = "La Puerta",         coords = v3(-782.166, -1452.285, 4.013)},
+        [14] = {location = "Little Seoul",      coords = v3(-559.43, -909.031, 22.863)},
+        [15] = {location = "Paleto Bay",        coords = v3(-136.551, 6356.967, 30.492)},
+        [16] = {location = "Grand Senora Dese", coords = v3(742.95, 2535.935, 72.156)},
+        [17] = {location = "Banham Canyon",     coords = v3(-2952.79, 441.363, 14.251)},
+        [18] = {location = "Tongva Valley",     coords = v3(-1522.113, 1491.642, 110.595)},
+        [19] = {location = "Alta",              coords = v3(261.555, -209.291, 60.566)},
+        [20] = {location = "La Mesa",           coords = v3(739.4191, -1223.175, 23.7705)},
+        [21] = {location = "Del Perro Pier",    coords = v3(-1724.428, -1129.78, 12.0438)},
+        [22] = {location = "Baytree Canyon",    coords = v3(735.9623, 1303.177, 359.293)},
+        [23] = {location = "Land Act Dam",      coords = v3(2555.34, 301.0995, 107.4623)},
+        [24] = {location = "Zancudo River",     coords = v3(-1143.571, 2683.302, 17.0937)},
+        [25] = {location = "Vespucci Canals",   coords = v3(-917.5775, -1155.129, 3.7723)}
+    },
+    shipwreck = {
         [1] = {coords = v3(-388.326,-2216.494,0.456)},
         [2] = {coords = v3(-870.536,-3121.905,2.382)},
         [3] = {coords = v3(-1968.847,-3076.143,2.048)},
@@ -1559,6 +1588,31 @@ local function has_buried_stash(buriedStashId)
 end
 local function has_hidden_cache(hiddenCacheId)
     return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
+end
+local function has_junk_energy_skydive(junkEnergySkydiveId)
+    --[[
+    ChatGPT + decompiled script enginered, I have doen nothing but copy paste decompiled and asked GPT to make the working algorythm.
+    Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
+    ]]
+    if not is_in_range(junkEnergySkydiveId, 0, 9) then
+        return false
+    end
+
+    -- Calculate the base stat IDs for the specific skydive ID
+    local statId1 = 34837 + junkEnergySkydiveId * 4
+    local statId2 = 34839 + junkEnergySkydiveId * 4
+    local statId3 = 34838 + junkEnergySkydiveId * 4
+
+    -- Check if any of the stats indicate the skydive has been collected
+    if
+        NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
+    then
+        return true
+    end
+
+    return false
 end
 local function has_shipwreck(shipwreckId)
     return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
@@ -2382,10 +2436,19 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Shipwrecks (1)            ------------------------
-    local shipwreckMenu_Feat = menu.add_feature("Shipwrecks (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+------------------------ Junk Energy Skydives (10) ------------------------
+    local junkEnergySkydivesMenu_Feat = menu.add_feature("Junk Energy Skydives (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
-    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
+    for i, junkEnergySkydiveGroup in ipairs(dailyCollectibles.junkEnergySkydives) do
+        junkEnergySkydiveGroup.feat = menu.add_feature("Junk Energy Skydive " .. i .. " (" .. junkEnergySkydiveGroup.location .. ")", "action", junkEnergySkydivesMenu_Feat.id, function()
+            teleport_myself(junkEnergySkydiveGroup.coords.x, junkEnergySkydiveGroup.coords.y, junkEnergySkydiveGroup.coords.z)
+        end)
+    end
+--
+------------------------ Shipwreck (1)             ------------------------
+    local shipwreckMenu_Feat = menu.add_feature("Shipwreck (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
         shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function()
             teleport_myself(shipwreckGroup.coords.x, shipwreckGroup.coords.y, shipwreckGroup.coords.z)
         end)
@@ -2683,13 +2746,37 @@ local function update_feat_name__hidden_caches__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__shipwrecks__state(resolvedLocationsIds)
+local function update_feat_name__junk_energy_skydives__state(resolvedLocationsIds)
     local resolvedLocationsSet = {}
-    for i, resolvedLocationId in pairs(resolvedLocationsIds.shipwrecks) do
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.junkEnergySkydives) do
         resolvedLocationsSet[resolvedLocationId] = i
     end
 
-    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwrecks) do
+    for i, junkEnergySkydiveGroup in ipairs(dailyCollectibles.junkEnergySkydives) do
+        local updatedName = removeFeatNameColorCodes(junkEnergySkydiveGroup.feat.name)
+
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
+            if has_junk_energy_skydive(resolvedLocationsSet[i] - 1) then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        junkEnergySkydiveGroup.feat.name = updatedName
+    end
+end
+
+local function update_feat_name__shipwreck__state(resolvedLocationsIds)
+    local resolvedLocationsSet = {}
+    for i, resolvedLocationId in pairs(resolvedLocationsIds.shipwreck) do
+        resolvedLocationsSet[resolvedLocationId] = i
+    end
+
+    for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
         local updatedName = removeFeatNameColorCodes(shipwreckGroup.feat.name)
 
         if
@@ -2908,7 +2995,7 @@ mainLoop_Thread = create_tick_handler(function()
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
         },
-        shipwrecks = {
+        shipwreck = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
             --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- I think R* originally planned 2, but for now it's /1 max.
         },
@@ -2923,6 +3010,18 @@ mainLoop_Thread = create_tick_handler(function()
             [8]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH7"), -1) + 1,
             [9]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH8"), -1) + 1,
             [10] = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH9"), -1) + 1
+        },
+        junkEnergySkydives = {
+            [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES0"), -1) + 1,
+            [2]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES1"), -1) + 1,
+            [3]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES2"), -1) + 1,
+            [4]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES3"), -1) + 1,
+            [5]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES4"), -1) + 1,
+            [6]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES5"), -1) + 1,
+            [7]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES6"), -1) + 1,
+            [8]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES7"), -1) + 1,
+            [9]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES8"), -1) + 1,
+            [10] = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SKYDIVES9"), -1) + 1
         },
         treasureChests = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE0"), -1) + 1,
@@ -2953,33 +3052,34 @@ mainLoop_Thread = create_tick_handler(function()
     }
 
     -- Known bug: in SP globals dont reset to 0 so... will have to fix that
-    actionFiguresMenu_Feat.name        = "Action Figures ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_ACTION_FIG_COLLECTED"),      -1)  .. "/100)"
-    ghostsExposedMenu_Feat.name        = "Ghosts Exposed ("      .. script.get_global_i(Global.numberOfGhostsExposedCollected)  ..                                        "/10)"
-    ldOrganicsProductMenu_Feat.name    = "LD Organics Product (" .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LDORGANICS_COLLECTED"),      -1)  .. "/100)"
-    moviePropsMenu_Feat.name           = "Movie Props ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_MOVIE_PROPS_COLLECTED"),     -1)  .. "/10)"
-    playingCardsMenu_Feat.name         = "Playing Cards ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
-    signalJammersMenu_Feat.name        = "Signal Jammers ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
-    snowmenMenu_Feat.name              = "Snowmen ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
+    actionFiguresMenu_Feat.name        = "Action Figures ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_ACTION_FIG_COLLECTED"),      -1)  .. "/100)"
+    ghostsExposedMenu_Feat.name        = "Ghosts Exposed ("       .. script.get_global_i(Global.numberOfGhostsExposedCollected)                                         .. "/10)"
+    ldOrganicsProductMenu_Feat.name    = "LD Organics Product ("  .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LDORGANICS_COLLECTED"),      -1)  .. "/100)"
+    moviePropsMenu_Feat.name           = "Movie Props ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_MOVIE_PROPS_COLLECTED"),     -1)  .. "/10)"
+    playingCardsMenu_Feat.name         = "Playing Cards ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
+    signalJammersMenu_Feat.name        = "Signal Jammers ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
+    snowmenMenu_Feat.name              = "Snowmen ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
 
-    stuntJumpsMenu_Feat.name           = "Stunt Jumps ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
-    epsilonRobesMenu_Feat.name         = "Epsilon Robes ("       .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("        .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
-    weaponComponentsMenu_Feat.name     = "Weapon Components ("   .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
-    metalDetectorsMenu_Feat.name       = "Metal Detectors ("     .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
-    sprayCansMenu_Feat.name            = "Spray Cans ("          .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
+    stuntJumpsMenu_Feat.name           = "Stunt Jumps ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
+    epsilonRobesMenu_Feat.name         = "Epsilon Robes ("        .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
+    mediaSticksMenu_Feat.name          = "Media Sticks ("         .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
+    weaponComponentsMenu_Feat.name     = "Weapon Components ("    .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
+    metalDetectorsMenu_Feat.name       = "Metal Detectors ("      .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
+    sprayCansMenu_Feat.name            = "Spray Cans ("           .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
-    buriedStashesMenu_Feat.name        = "Buried Stashes ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)" -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
-    shipwreckMenu_Feat.name            = "Shipwrecks ("          .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
-    hiddenCachesMenu_Feat.name         = "Hidden Caches ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
-    treasureChestsMenu_Feat.name       = "Treasure Chests ("     .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
-    trickOrTreatMenu_Feat.name         = "Trick Or Treat ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
-    lsTagsMenu_Feat.name               = "LS Tags ("             .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar),      -1) .. "/5)" --[[script.get_global_i(Global.numberOfLsTagCollected)]]
-    gCachesMenu_Feat.name              = "G's Cache ("           .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
-    madrazoHitsMenu_Feat.name          = "Madrazo Hits ("        .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
-    stashHousesMenu_Feat.name          = "Stash House ("         .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
+    buriedStashesMenu_Feat.name        = "Buried Stashes ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)" -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
+    hiddenCachesMenu_Feat.name         = "Hidden Caches ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
+    junkEnergySkydivesMenu_Feat.name   = "Junk Energy Skydives (" .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"),        -1)  .. "/10)" -- script.get_global_i(Global.numberOfJunkEnergySkydivesCollected)                                    .. "/10)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 10378, lastMpChar), -1) (not working when I tested it)
+    shipwreckMenu_Feat.name            = "Shipwreck ("           .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
+    treasureChestsMenu_Feat.name       = "Treasure Chests ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
+    trickOrTreatMenu_Feat.name         = "Trick Or Treat ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
+    lsTagsMenu_Feat.name               = "LS Tags ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar), -1) --[[script.get_global_i(Global.numberOfLsTagCollected)]]
+    gCachesMenu_Feat.name              = "G's Cache ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
+    madrazoHitsMenu_Feat.name          = "Madrazo Hits ("         .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+    stashHousesMenu_Feat.name          = "Stash House ("          .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
 
-    gunVansMenu_Feat.name              = "Gun Vans ("            .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
-    streetDealersMenu_Feat.name        = "Street Dealers ("      .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
+    gunVansMenu_Feat.name              = "Gun Vans ("             .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
+    streetDealersMenu_Feat.name        = "Street Dealers ("       .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
     update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
@@ -2998,7 +3098,8 @@ mainLoop_Thread = create_tick_handler(function()
 
     update_feat_name__buried_stashes__state(resolvedLocationsIds)
     update_feat_name__hidden_caches__state(resolvedLocationsIds)
-    update_feat_name__shipwrecks__state(resolvedLocationsIds)
+    update_feat_name__junk_energy_skydives__state(resolvedLocationsIds)
+    update_feat_name__shipwreck__state(resolvedLocationsIds)
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__collectibles__state(has_trick_or_treat,     dailyCollectibles.trickOrTreats)
@@ -3025,7 +3126,6 @@ end, 1000)
 
     Daily Collectibles:
     Junk Energy Time Trial
-    Junk Energy Skydives
     Casino Lucky Wheel
     RC Bandito Time Trial
     Time Trial
