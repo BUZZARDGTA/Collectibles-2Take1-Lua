@@ -1,7 +1,7 @@
 -- Author: IB_U_Z_Z_A_R_Dl
--- Credits:
--- Description:
+-- Description: Script to collect collectibles.
 -- GitHub Repository: https://github.com/Illegal-Services/Collectibles-2Take1-Lua
+-- Credits: https://github.com/Illegal-Services/Collectibles-2Take1-Lua/blob/main/README.md#credits
 
 
 -- Globals START
@@ -1276,6 +1276,7 @@ local dailyCollectibles = {
         [29] = {coords = v3(1.7607,6410.2383,33.779)},
         [30] = {coords = v3(1411.0867,3608.7688,37.0159)}
     },
+    -- Eclipse Blvd Garage Week: February 16, 2023
     gCaches = {
         [1] = {
             zone = v3(1095.4236,-677.9631,54.4793), spawns = {
@@ -1413,6 +1414,7 @@ local dailyCollectibles = {
             }
         }
     },
+    -- Eclipse Blvd Garage Week: February 16th, 2023
     stashHouses = {
         [1]  = {coords = v3(-156.345,6292.5244,30.6833)},
         [2]  = {coords = v3(-1101.3784,4940.878,217.3541)},
@@ -1440,26 +1442,118 @@ local dailyCollectibles = {
         [24] = {coords = v3(167.95,-2222.4854,6.2361)},
         [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
     },
+    -- Bottom Dollar Bounties: 25 June 2024 (continuation)
     madrazoHits = {
-        -- CREDIT: https://gtalens.com/map/madrazo-hits (`searchArea`)
-        [1]  = {coords = {eventTrigger = v3(1355.1779,3600.6501,33.9761),  searchArea = v3(1504.671,3680.395,33.601)}},
-        [2]  = {coords = {eventTrigger = v3(2258.5862,3146.8416,47.7513),  searchArea = v3(2385.852,3070.623,47.178)}},
-        [3]  = {coords = {eventTrigger = v3(2414.5872,4850.1777,37.2357),  searchArea = v3(2413.71,5004.968,45.654)}},
-        [4]  = {coords = {eventTrigger = v3(-306.0638,6248.7246,30.4665),  searchArea = v3(-113.07,6368.725,30.471)}},
-        [5]  = {coords = {eventTrigger = v3(924.7427,-2066.5093,29.5178),  searchArea = v3(954.914,-1893.672,30.198)}},
-        [6]  = {coords = {eventTrigger = v3(302.9755,-1860.7911,25.7811),  searchArea = v3(416.693,-1833.275,27.073)}},
-        [7]  = {coords = {eventTrigger = v3(-592.9996,-882.7405,24.918),   searchArea = v3(-692.822,-811.996,43.932)}},
-        [8]  = {coords = {eventTrigger = v3(-140.1684,-1534.7019,33.2548), searchArea = v3(-177.522,-1652.095,32.294)}},
-        [9]  = {coords = {eventTrigger = v3(1317.918,-1614.6876,51.3666),  searchArea = v3(1388.607,-1505.113,57.042)}},
-        [10] = {coords = {eventTrigger = v3(650.728,-2872.411,5.057),      searchArea = v3(493.08,-3024.28,5.063)}},
-        [11] = {coords = {eventTrigger = v3(-3137.5437,1055.0897,19.3245), searchArea = v3(-3252.282,967.669,10.431)}},
-        [12] = {coords = {eventTrigger = v3(-965.4027,-2608.117,12.981),   searchArea = v3(-1034.911,-2719.181,12.773)}},
-        [13] = {coords = {eventTrigger = v3(219.8501,284.7484,104.4699),   searchArea = v3(274.576,178.777,103.585)}},
-        [14] = {coords = {eventTrigger = v3(116.2243,3401.1082,36.7988),   searchArea = v3(52.146,3640.737,38.613)}},
-        [15] = {coords = {eventTrigger = v3(-559.1921,175.2093,67.6451),   searchArea = v3(-550.353,257.324,82.069)}},
+        -- CREDIT: https://gtalens.com/map/madrazo-hits (spawns)
+        [1]  = {
+            eventTrigger = v3(1355.1779,3600.6501,33.9761),  spawns = {
+                v3(1571.202,3687.559,33.736),
+                v3(1505.345,3696.325,38.064),
+                v3(1478.279,3677.749,33.269)
+            }
+        },
+        [2]  = {
+            eventTrigger = v3(2258.5862,3146.8416,47.7513),  spawns = {
+                v3(2407.565,3034.177,47.153),
+                v3(2424.757,3146.639,47.161),
+                v3(2333.051,3035.219,47.151)
+            }
+        },
+        [3]  = {
+            eventTrigger = v3(2414.5872,4850.1777,37.2357),  spawns = {
+                v3(2414.611,5003.911,45.671),
+                v3(2399.046,5021.555,45.094),
+                v3(2436.6,4977.404,45.576)
+            }
+        },
+        [4]  = {
+            eventTrigger = v3(-306.0638,6248.7246,30.4665),  spawns = {
+                v3(-132.3,6377.948,31.18),
+                v3(-113.825,6369.969,30.524),
+                v3(-108.241,6395.492,30.562)
+            }
+        },
+        [5]  = {
+            eventTrigger = v3(924.7427,-2066.5093,29.5178),  spawns = {
+                v3(932.552,-1906.909,30.049),
+                v3(964.806,-1868.257,30.238),
+                v3(970.11,-1932.773,30.134)
+            }
+        },
+        [6]  = {
+            eventTrigger = v3(302.9755,-1860.7911,25.7811),  spawns = {
+                v3(417.348,-1833.976,27.074),
+                v3(378.679,-1869.86,24.662),
+                v3(461.487,-1870.195,26.001)
+            }
+        },
+        [7]  = {
+            eventTrigger = v3(-592.9996,-882.7405,24.918),   spawns = {
+                v3(-692.072,-811.014,23.02),
+                v3(-718.762,-904.593,19.043),
+                v3(-712.497,-886.102,22.805)
+            }
+        },
+        [8]  = {
+            eventTrigger = v3(-140.1684,-1534.7019,33.2548), spawns = {
+                v3(-161.368,-1635.99,33.034),
+                v3(-209.592,-1592.747,33.869),
+                v3(-222.907,-1648.924,37.437)
+            }
+        },
+        [9]  = {
+            eventTrigger = v3(1317.918,-1614.6876,51.3666),  spawns = {
+                v3(1389.258,-1505.808,57.041),
+                v3(1347.077,-1554.153,52.649),
+                v3(1409.756,-1488.04,59.657)
+            }
+        },
+        [10] = {
+            eventTrigger = v3(650.728,-2872.411,5.057),      spawns = {
+                v3(468.922,-3063.352,10.086),
+                v3(481.943,-3009.374,5.08),
+                v3(551.216,-3050.597,12.289)
+            }
+        },
+        [11] = {
+            eventTrigger = v3(-3137.5437,1055.0897,19.3245), spawns = {
+                v3(-3282.778,958.951,7.352),
+                v3(-3265.664,1044.001,7.576),
+                v3(-3239.802,929.082,16.155)
+            }
+        },
+        [12] = {
+            eventTrigger = v3(-965.4027,-2608.117,12.981),   spawns = {
+                v3(-1080.298,-2724.85,13.403),
+                v3(-1034.329,-2732.601,19.169),
+                v3(-1042.707,-2767.282,3.64)
+            }
+        },
+        [13] = {
+            eventTrigger = v3(219.8501,284.7484,104.4699),   spawns = {
+                v3(300.654,200.117,103.343),
+                v3(331.197,180.506,102.145),
+                v3(286.791,139.467,103.304)
+            }
+        },
+        [14] = {
+            eventTrigger = v3(116.2243,3401.1082,36.7988),   spawns = {
+                v3(53.43,3635.643,38.684),
+                v3(65.875,3606.092,38.809),
+                v3(97.385,3602.565,38.764)
+            }
+        },
+        [15] = {
+            eventTrigger = v3(-559.1921,175.2093,67.6451),   spawns = {
+                v3(-597.305,244.634,81.202),
+                v3(-596.452,322.896,83.015),
+                v3(-510.926,301.11,82.315)
+            }
+        }
     }
 }
 local others = {
+    -- Gun Van Week: January 12, 2023
     gunVans = {
         [1]  = {coords = v3(-29.532,6435.136,31.162)},
         [2]  = {coords = v3(1705.214,4819.167,41.75)},
@@ -1492,6 +1586,7 @@ local others = {
         [29] = {coords = v3(1101.032,-335.172,66.944)},
         [30] = {coords = v3(149.683,-1655.674,29.028)}
     },
+    -- Eclipse Blvd Garage Week: February 16, 2023
     streetDealers = {
         [1] = {coords = v3(550.8953,-1774.5175,28.3121)},
         [2] = {coords = v3(-154.924,6434.428,30.916)},
@@ -1591,7 +1686,7 @@ local function has_hidden_cache(hiddenCacheId)
 end
 local function has_junk_energy_skydive(junkEnergySkydiveId)
     --[[
-    ChatGPT + decompiled script enginered, I have doen nothing but copy paste decompiled and asked GPT to make the working algorythm.
+    ChatGPT + decompiled script enginered, I have done nothing but copy paste decompiled and asked GPT to make the working algorythm.
     Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
     ]]
     if not is_in_range(junkEnergySkydiveId, 0, 9) then
@@ -1604,15 +1699,9 @@ local function has_junk_energy_skydive(junkEnergySkydiveId)
     local statId3 = 34838 + junkEnergySkydiveId * 4
 
     -- Check if any of the stats indicate the skydive has been collected
-    if
-        NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
+    return NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
         or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
         or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
-    then
-        return true
-    end
-
-    return false
 end
 local function has_shipwreck(shipwreckId)
     return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
@@ -2519,26 +2608,6 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         gCacheGroup.feat.max = #gCacheGroup.spawns
     end
 --
------------------------- Madrazo Hit (1)           ------------------------
-    local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hits (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
-
-    for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
-        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitsMenu_Feat.id, function(feat)
-            local selectedCoords = nil
-            if feat.value == 1 then
-                selectedCoords = madrazoHitGroup.coords.eventTrigger
-            elseif feat.value == 2 then
-                selectedCoords = madrazoHitGroup.coords.searchArea
-            end
-            if selectedCoords then
-                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
-            end
-        end)
-        madrazoHitGroup.feat.min = 1
-        madrazoHitGroup.feat.max = 2
-        madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hits" trigger event to spawn in the map.'
-    end
---
 ------------------------ Stash House (1)           ------------------------
     local stashHousesMenu_Feat = menu.add_feature("Stash House (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
@@ -2549,6 +2618,26 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     end)
     stashHouse_Feat.min = 1
     stashHouse_Feat.max = #dailyCollectibles.stashHouses
+--
+------------------------ Madrazo Hit (1)           ------------------------
+    local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hit (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
+        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitsMenu_Feat.id, function(feat)
+            local selectedCoords = nil
+            if feat.value == 1 then
+                selectedCoords = madrazoHitGroup.eventTrigger
+            elseif feat.value >= 2 and feat.value <= 4 then
+                selectedCoords = madrazoHitGroup.spawns[feat.value - 1]
+            end
+            if selectedCoords then
+                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
+            end
+        end)
+        madrazoHitGroup.feat.min = 1
+        madrazoHitGroup.feat.max = 1 + #madrazoHitGroup.spawns
+        madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hit" trigger event to spawn in the map.\n\n< 1 > Is the trigger event;\nthe following values are their possible spawns.'
+    end
 --
 ------------------------ Gun Van (1)               ------------------------
     local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
@@ -3070,13 +3159,13 @@ mainLoop_Thread = create_tick_handler(function()
     buriedStashesMenu_Feat.name        = "Buried Stashes ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)" -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
     hiddenCachesMenu_Feat.name         = "Hidden Caches ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
     junkEnergySkydivesMenu_Feat.name   = "Junk Energy Skydives (" .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"),        -1)  .. "/10)" -- script.get_global_i(Global.numberOfJunkEnergySkydivesCollected)                                    .. "/10)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 10378, lastMpChar), -1) (not working when I tested it)
-    shipwreckMenu_Feat.name            = "Shipwreck ("           .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
+    shipwreckMenu_Feat.name            = "Shipwreck ("           .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                    .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
     treasureChestsMenu_Feat.name       = "Treasure Chests ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name               = "LS Tags ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar), -1) --[[script.get_global_i(Global.numberOfLsTagCollected)]]
     gCachesMenu_Feat.name              = "G's Cache ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
-    madrazoHitsMenu_Feat.name          = "Madrazo Hits ("         .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
     stashHousesMenu_Feat.name          = "Stash House ("          .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
+    madrazoHitsMenu_Feat.name          = "Madrazo Hit ("          .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
 
     gunVansMenu_Feat.name              = "Gun Vans ("             .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
     streetDealersMenu_Feat.name        = "Street Dealers ("       .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
@@ -3105,7 +3194,6 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_trick_or_treat,     dailyCollectibles.trickOrTreats)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
-
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
