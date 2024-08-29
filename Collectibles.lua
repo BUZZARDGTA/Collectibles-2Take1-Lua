@@ -58,8 +58,6 @@ local Global <const> = {
                        --> "How to update after new build update"
     ]]
     numberOfGhostsExposedCollected = 2708057 + 534,
-    -- UNUSED numberOfJunkEnergySkydivesCollected = 2708057 + 519,
-    -- UNUSED numberOfLsTagCollected = 2708057 + 547,
     numberOfNightclubToiletAttendantTipped = 1579649,
     isGunVanAvailable = 262145 + 33232, --> Tunable: XM22_GUN_VAN_AVAILABLE
     areStreetDealersAvailable = 262145 + 33479, --> Tunable: ENABLE_STREETDEALERS_DLC22022
@@ -1736,7 +1734,7 @@ end
 -- (this function is not from R* source code)
 local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     --[[
-    There is a bug (with R* games) where collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
+    R* ISSUE: Collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
     After going to Singleplayer and going back online, it does not count that one as collected anymore.
     That's the reason I've made this function here.
     The following line is what I'd use if R* didn't fucked up:
@@ -1763,6 +1761,17 @@ local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local count = 0
     for i = 1, 5 do
         if has_weapon_component(i - 1) then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- (this function is not from R* source code)
+local function GET_LOCAL_PLAYER_NUM_JUNK_ENERGY_SKYDIVES_COLLECTED()
+    local count = 0
+    for i = 1, 10 do
+        if has_junk_energy_skydive(i - 1) then
             count = count + 1
         end
     end
@@ -3074,8 +3083,9 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
     local localPlayerNumEpsilonRobesCollected = GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
-    local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
+    local localPlayerNumJunkEnergySkydives = GET_LOCAL_PLAYER_NUM_JUNK_ENERGY_SKYDIVES_COLLECTED()
 
     local resolvedLocationsIds = {
         mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
@@ -3086,7 +3096,7 @@ mainLoop_Thread = create_tick_handler(function()
         },
         shipwreck = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
-            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- I think R* originally planned 2, but for now it's /1 max.
+            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- R* ISSUE: I think they originally planned 2, but for now it's 1 max.
         },
         hiddenCaches = {
             [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH0"), -1) + 1,
@@ -3156,13 +3166,13 @@ mainLoop_Thread = create_tick_handler(function()
     metalDetectorsMenu_Feat.name       = "Metal Detectors ("      .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
     sprayCansMenu_Feat.name            = "Spray Cans ("           .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
-    buriedStashesMenu_Feat.name        = "Buried Stashes ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)" -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
+    buriedStashesMenu_Feat.name        = "Buried Stashes ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"  -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
     hiddenCachesMenu_Feat.name         = "Hidden Caches ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
-    junkEnergySkydivesMenu_Feat.name   = "Junk Energy Skydives (" .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"),        -1)  .. "/10)" -- script.get_global_i(Global.numberOfJunkEnergySkydivesCollected)                                    .. "/10)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 10378, lastMpChar), -1) (not working when I tested it)
-    shipwreckMenu_Feat.name            = "Shipwreck ("           .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                    .. "/1)" -- This isn't working, it's the total number count from the begining lol: stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"),     -1)
+    junkEnergySkydivesMenu_Feat.name   = "Junk Energy Skydives (" .. localPlayerNumJunkEnergySkydives                                                                   .. "/10)" -- R* ISSUE (The stat updates only on session switch): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"), -1)
+    shipwreckMenu_Feat.name            = "Shipwreck ("            .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)"  -- R* ISSUE (total count from the begining I think?): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"), -1)
     treasureChestsMenu_Feat.name       = "Treasure Chests ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name         = "Trick Or Treat ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
-    lsTagsMenu_Feat.name               = "LS Tags ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)" -- stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 12310, lastMpChar), -1) --[[script.get_global_i(Global.numberOfLsTagCollected)]]
+    lsTagsMenu_Feat.name               = "LS Tags ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
     gCachesMenu_Feat.name              = "G's Cache ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
     stashHousesMenu_Feat.name          = "Stash House ("          .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
     madrazoHitsMenu_Feat.name          = "Madrazo Hit ("          .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
@@ -3203,7 +3213,7 @@ end, 1000)
 
 --[[ TODO:
     Collectibles:
-    Peyote Plants
+    Peyote Plants (unsure)
     Convenience Stores
     Gang Attacks
     Arm Wrestling
