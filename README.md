@@ -18,10 +18,15 @@ Script to collect collectibles. Is in development but here are stable commits on
 
 ## Credits
 
-- [GTALens.com Maps](https://gtalens.com/map):
+- [gta.fandom.com](https://gta.fandom.com/wiki/Main_Page) - Great website with tons of information, often super useful, great Wiki.
+- [root-cause/v-decompiled-scripts](https://github.com/root-cause/v-decompiled-scripts) - Where I reverse-engineer almost everything that I couldn't find elsewhere.
+- [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes I would copy-paste their code or check how they did things to save time on reverse engineering.
+- [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/RandomEvents) - Helped with debugging by force-starting some random events.
+- [GTALens.com Maps](https://gtalens.com/map) - The owner is really nice and updated the website on my requests. They often provided me with locations whenever I couldn't find them through reverse engineering by myself:
   - [Media Sticks Map](https://gtalens.com/map/media-sticks)
   - [Metal Detectors Map](https://gtalens.com/map/metal-detectors)
   - [Junk Energy Skydives Map](https://gtalens.com/map/junk-energy-skydives)
   - [Madrazo Hits Map](https://gtalens.com/map/madrazo-hits) (Possible Target Locations)
 
 Thanks to [@doctorflexochan](https://github.com/doctorflexochan) for the "Unique Stunt Jump" stat names.
+
