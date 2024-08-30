@@ -1723,8 +1723,8 @@ end
 -- (this function is not from R* source code)
 local function GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
     local count = 0
-    for i = 1, 3 do
-        if has_epsilon_robe(i - 1) then
+    for i = 0, 2 do
+        if has_epsilon_robe(i) then
             count = count + 1
         end
     end
@@ -1759,8 +1759,8 @@ end
 -- This is the same code as the leaked source code, couldn't find a stat for it.
 local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
     local count = 0
-    for i = 1, 5 do
-        if has_weapon_component(i - 1) then
+    for i = 0, 4 do
+        if has_weapon_component(i) then
             count = count + 1
         end
     end
@@ -1770,8 +1770,8 @@ end
 -- (this function is not from R* source code)
 local function GET_LOCAL_PLAYER_NUM_JUNK_ENERGY_SKYDIVES_COLLECTED()
     local count = 0
-    for i = 1, 10 do
-        if has_junk_energy_skydive(i - 1) then
+    for i = 0, 9 do
+        if has_junk_energy_skydive(i) then
             count = count + 1
         end
     end
@@ -2968,6 +2968,46 @@ local function update_feat_name__ls_tags__state(resolvedLocationsIds)
     end
 end
 
+local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
+    -- TODO: I should check if lanterns are enabled too so that it COLOR.FOUND even if the resolved locations are not set. (this scenario is possible using mods)
+    local function are__trick_or_treat__resolved_locations_enabled(resolvedLocationsIds)
+        --[[
+        If all locations are set to 1, they are disabled (return false).
+        Otherwise, return true.
+        ]]
+        for i = 1, 10 do
+            if resolvedLocationsIds.trickOrTreats[i] ~= 1 then
+                return true
+            end
+        end
+        return false
+    end
+
+    local resolvedLocationsSet = {}
+    if are__trick_or_treat__resolved_locations_enabled(resolvedLocationsIds) then
+        for i, resolvedLocationId in pairs(resolvedLocationsIds.trickOrTreats) do
+            resolvedLocationsSet[resolvedLocationId] = i
+        end
+    end
+
+    for i, trickOrTreatGroup in ipairs(dailyCollectibles.trickOrTreats) do
+        local updatedName = removeFeatNameColorCodes(trickOrTreatGroup.feat.name)
+
+        if
+            is_session_started()
+            and resolvedLocationsSet[i]
+        then
+            if has_trick_or_treat(resolvedLocationsSet[i] - 1) then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        trickOrTreatGroup.feat.name = updatedName
+    end
+end
+
 local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
         gCacheGroup.feat.name = removeFeatNameColorCodes(gCacheGroup.feat.name)
@@ -3095,7 +3135,7 @@ mainLoop_Thread = create_tick_handler(function()
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
         },
         shipwreck = {
-            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
+            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1
             --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- R* ISSUE: I think they originally planned 2, but for now it's 1 max.
         },
         hiddenCaches = {
@@ -3125,6 +3165,18 @@ mainLoop_Thread = create_tick_handler(function()
         treasureChests = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_TREASURE1"), -1) + 1
+        },
+        trickOrTreats = {
+            [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT0"), -1) + 1,
+            [2]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT1"), -1) + 1,
+            [3]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT2"), -1) + 1,
+            [4]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT3"), -1) + 1,
+            [5]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT4"), -1) + 1,
+            [6]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT5"), -1) + 1,
+            [7]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT6"), -1) + 1,
+            [8]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT7"), -1) + 1,
+            [9]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT8"), -1) + 1,
+            [10] = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_TRICKORTREAT9"), -1) + 1
         },
         lsTags = {
             [1] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51546, -1) + 1,
@@ -3158,7 +3210,6 @@ mainLoop_Thread = create_tick_handler(function()
     playingCardsMenu_Feat.name         = "Playing Cards ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
     signalJammersMenu_Feat.name        = "Signal Jammers ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
     snowmenMenu_Feat.name              = "Snowmen ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-
     stuntJumpsMenu_Feat.name           = "Stunt Jumps ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
     epsilonRobesMenu_Feat.name         = "Epsilon Robes ("        .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
     mediaSticksMenu_Feat.name          = "Media Sticks ("         .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
@@ -3187,7 +3238,6 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
-
     update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
     update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpChar)
     update_feat_name__media_sticks__state(resolvedLocationsIds)
@@ -3201,7 +3251,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__shipwreck__state(resolvedLocationsIds)
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
-    update_feat_name__collectibles__state(has_trick_or_treat,     dailyCollectibles.trickOrTreats)
+    update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
