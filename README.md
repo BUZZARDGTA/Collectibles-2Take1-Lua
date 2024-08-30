@@ -21,7 +21,7 @@ Script to collect collectibles. Is in development but here are stable commits on
 - [gta.fandom.com](https://gta.fandom.com/wiki/Main_Page) - Great website with tons of information, often super useful, great Wiki.
 - [root-cause/v-decompiled-scripts](https://github.com/root-cause/v-decompiled-scripts) - Where I reverse-engineer almost everything that I couldn't find elsewhere.
 - [www.rockstargames.com/gta-v](https://www.rockstargames.com/gta-v) - In September 2022, the GTA V source code was leaked, and I sometimes use it for reverse engineering.
-- [YimMenu-Lua/DailyCollectibles](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes I would copy-paste their code or check how they did things to save time on reverse engineering.
+- [YimMenu-Lua/DailyCollectibles](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes, I would copy and paste their code or review how they implemented things to save time on reverse engineering. Additionally, all three Time Trials are based on their code.
 - [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/RandomEvents) - Helped with debugging by force-starting some random events.
 - [@DurtyFree](https://github.com/DurtyFree) - Taught me where to find the accurate list of all multiplayer stats.
 - [@doctorflexochan](https://github.com/doctorflexochan) - Provided me with the "Unique Stunt Jump" stat name before @DurtyFree taught me...
@@ -29,4 +29,6 @@ Script to collect collectibles. Is in development but here are stable commits on
   - [Media Sticks](https://gtalens.com/map/media-sticks)
   - [Metal Detectors](https://gtalens.com/map/metal-detectors)
   - [Junk Energy Skydives](https://gtalens.com/map/junk-energy-skydives)
+  - [Time Trials](https://gtalens.com/map/time-trials)
   - [Madrazo Hits](https://gtalens.com/map/madrazo-hits) (Possible Target Locations)
+

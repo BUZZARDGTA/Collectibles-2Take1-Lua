@@ -67,6 +67,15 @@ local Global <const> = {
     activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
     activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1  --> Global_2738934.f_6813[iParam0 /*7*/]
 }
+local Local <const> = {
+    --[[
+    This is up-to-date for b3274
+                       --> "How to update after new build update"
+    ]]
+    activeTimeTrial = 14386 + 11, --> freemode.c
+    activeRCBanditoTimeTrial = 14436, --> freemode.c
+    activeJunkEnergyTimeTrial = 15239 + 3 --> freemode.c
+}
 ---- Global constants 2/2 END
 
 ---- Global functions 2/2 START
@@ -1274,6 +1283,42 @@ local dailyCollectibles = {
         [29] = {coords = v3(1.7607,6410.2383,33.779)},
         [30] = {coords = v3(1411.0867,3608.7688,37.0159)}
     },
+    -- Freemode Events Update: September 15, 2015
+    -- CREDIT: https://gtalens.com/map/time-trials-regular
+    timeTrials = {
+        [1]   = {name = "Del Perro Pier",        startCoords = v3(-1811.675,-1199.542,12.0174), endCoords = v3(1665.568,-13.891,172.7744),   parTime = "1:43.200", hint = "From its pristine beaches to its evaporating lakes, San Andreas takes water quality (if not quantity) seriously. See an epidemic waiting to happen on this time trial from the pier to the reservoir."},
+        [2]   = {name = "Observatory",           startCoords = v3(-377.166,1250.818,326.4899),  endCoords = v3(2168.589,4777.306,40.2251),   parTime = "2:04.400", hint = "Complex time trial that takes you from the glamorous peaks of the Vinewood Hills to the grimey troughs of the Grapeseed shoreline. Sober up fast - there's no easy route."},
+        [3]   = {name = "Great Ocean Highway",   startCoords = v3(-1253.24,-380.457,58.2873),   endCoords = v3(-2223.156,4254.68,45.4055),   parTime = "2:04.900", hint = "For once, let a low-T CEO on his daily commute scream at you instead of his executive assistant. Time trial our of LS along the one-percent-crammed Great Ocean Highway."},
+        [4]   = {name = "Mount Gordo",           startCoords = v3(2702.037,5145.717,42.8568),   endCoords = v3(2848.184,5945.502,355.2424),  parTime = "0:46.300", hint = "Short, technical time trial up to the most picturesque suicide spot in the county. Be a statistic that matters."},
+        [5]   = {name = "End to End",            startCoords = v3(1261.353,-3278.38,4.8335),    endCoords = v3(95.0126,6793.054,19.1916),    parTime = "4:09.500", hint = "Mix a large cocktail of Junk Energy Drink and amphetamines because this is going to be a long drive: epic time trial along the length of the Golden State."},
+        [6]   = {name = "Fort Zancudo",          startCoords = v3(-1554.312,2755.009,16.8004),  endCoords = v3(807.0756,1277.671,359.4458),  parTime = "1:44.000", hint = "Follow in the panicked footsteps of deserters, waterboarded detainees, and peace protesters who didn't think the wars would go on this long. Pacey time trial away from Fort Zancudo towards the city lights."},
+        [7]   = {name = "Storm Drain",           startCoords = v3(637.1439,-1845.855,8.2676),   endCoords = v3(1049.15,-264.0645,50.4311),   parTime = "0:38.500", hint = "On a rainy day a human body can float the length of the LS Storm Drain in just 12 minutes. Get up close to the Los Santos circle of life with this not-so-simple time trial: precision is your only chance."},
+        [8]   = {name = "Up Chiliad",            startCoords = v3(-552.626,5042.703,127.9448),  endCoords = v3(500.2789,5597.249,794.726),   parTime = "1:10.100", hint = "This time trial on one of Mount Chiliad's most perilous faces is a golden opportunity for show-offs and reconstructive surgeons alike. Remember to book a bed at Mount Zonah Medical Center before you set off."},
+        [9]   = {name = "Sawmill",               startCoords = v3(-579.1157,5324.664,69.2662),  endCoords = v3(2763.49,2756.706,42.2599),    parTime = "2:15.000", hint = "The death of American industry hasn't just provided rusty subject matter for your Snapmatic albums, it's created lots of edgy, supercar-friendly racetracks. Time trial from the sawmill to Davis Quartz."},
+        [10]  = {name = "Cypress Flats",         startCoords = v3(1067.343,-2448.237,28.0683),  endCoords = v3(2072.565,2342.533,93.5678),   parTime = "2:07.200", hint = "From the old economy to the new - escape the industrial wastes of south LS with this time trial out to turbine-covered hills, where global warming's being delayed one sliced up bird at a time."},
+        [11]  = {name = "Up-n-Atom",             startCoords = v3(1577.189,6439.966,23.6996),   endCoords = v3(-2422.939,4229.418,8.1163),   parTime = "1:41.300", hint = "Get a beach body the American way. Eat a four pound, microwave-fresh burger then hit a time trial from Up-n-Atom to North Chumash. Just hope catastrophic heart failure doesn't hit you 'til next year."},
+        [12]  = {name = "Maze Bank Arena",       startCoords = v3(-199.7486,-1973.311,26.6204), endCoords = v3(228.1437,1196.745,224.4599),  parTime = "1:17.800", hint = "Like every great American city, driving across Los Santos is a matter of one long, straight road, fender-deep in mangled pedestrians. Breakneck time trial from the Maze Bank Arena to the Sisyphus Theatre."},
+        [13]  = {name = "Tongva Valley",         startCoords = v3(-1504.541,1482.49,116.053),   endCoords = v3(-631.941,-371.4568,33.8127),  parTime = "0:58.800", hint = "Canoeists, hikers and eco-fascists have had dibs on the only breathable parts of San Andreas for too long. Strike back for fossil fuel enthusiasts with this short time trial through Tongva Valley."},
+        [14]  = {name = "Coast to Coast",        startCoords = v3(-1502.047,4940.611,63.8034),  endCoords = v3(3782.324,4464.408,5.0935),    parTime = "2:29.400", hint = "Use highways or head for the hills. Update Lifeinvader or watch the road. Shout at your kids in the back or crack one off to the fragance billboards. Welcome to a cross-state time trial in the land of the free."},
+        [15]  = {name = "Casino",                startCoords = v3(947.562,142.6773,79.8307),    endCoords = v3(-102.2509,854.2916,234.7128), parTime = "1:00.000", hint = "Start your day like a pro: play 8 hours of Casino blackjack with your remortgager and divorce attorney, then wash it all down with a time trial through North LS to a Vinewood Hills mansion you'll never own."},
+        [16]  = {name = "Route 68",              startCoords = v3(1246.225,2685.11,36.5944),    endCoords = v3(-2566.326,2330.098,32.06),    parTime = "1:19.000", hint = "Time trial along the classic route that has inspired generations of poets, pilgrims, rednecks and sex offenders with its connection remoteness and absence of meaningful law enforcement."},
+        [17]  = {name = "LSIA",                  startCoords = v3(-1021.146,-2580.291,33.6353), endCoords = v3(-1505.461,1485.94,115.6857),  parTime = "1:43.400", hint = "Like a driver for a ride share company whose lawyers insist they are definitely not employees, get across the whole city from LSIA like your star rating, future income, and whole self-worth depended on it."},
+        [18]  = {name = "Calafia Way",           startCoords = v3(231.9767,3301.489,39.5627),   endCoords = v3(995.3146,4459.696,49.8577),   parTime = "1:24.200", hint = "Like every post-hipster tourist with a camera phone, take a tour of crushed dreams in the Alamo Sea and think about what filter best captures the sadness. Time trial for the Snapmatic generation."},
+        [19]  = {name = "Vinewood Bowl",         startCoords = v3(860.353,536.8055,124.7803),   endCoords = v3(-1578.38,5170.146,18.5865),   parTime = "2:58.800", hint = "Nothing violates the tranquility of green hills or lonely desert roads as efficiently as competitive motorsport. Kill two birds with one time trial all the way from the Vinewood Bowl to Paleto Cove."},
+        [20]  = {name = "Power Station",         startCoords = v3(2820.651,1642.276,23.668),    endCoords = v3(1365.989,-578.5997,73.3803),  parTime = "1:26.600", hint = "From the Palmer-Taylor Power Station to the suburbs of LS, this is a time trial for anyone who's taken a big lungful of Los Santos smog and thought \"couldn't this air be just a little bit more polluted\"."},
+        [21]  = {name = "Raton Canyon",          startCoords = v3(-2257.799,4315.927,44.5551),  endCoords = v3(-243.3874,4084.597,36.0077),  parTime = "1:16.600", hint = "Like a wild-eyed junior exec trying to impress on an extreme-sports team builder, risk soiling yourself all the way along the Raton Canyon rapids. Time trial from the Pacific shoreline to the Alamo Sea."},
+        [22]  = {name = "Down Chiliad",          startCoords = v3(526.397,5624.461,779.3564),   endCoords = v3(2278.745,5788.454,154.0056),  parTime = "0:54.200", hint = "Brutal time trial down the slopes of Mt. Chiliad: if you're going slower than a freefall, you're probably a coward."},
+        [23]  = {name = "Elysian Island",        startCoords = v3(175.2847,-3042.075,4.7734),   endCoords = v3(2782.971,-711.3731,4.0575),   parTime = "1:40.000", hint = "There will come a day when you need to get the hell out of town and lose yourself in the Palomino Highlands for a while. And on that day every practice run is going to count."},
+        [24]  = {name = "Galileo Park",          startCoords = v3(813.3556,1274.954,359.511),   endCoords = v3(-2306.769,439.64,173.4667),   parTime = "2:05.000", hint = "Social mobility, Los Santos style: how fast can you get an SUV across the Vinewood Hills to the new installation at the Kortz Center?"},
+        [25]  = {name = "Stab City",             startCoords = v3(77.5248,3629.915,38.6907),    endCoords = v3(-537.2578,281.2907,82.0704),  parTime = "2:00.000", hint = "Stick a turbo charger under the hood of the American dream, and see how long it takes you to make it from Stab City to the Vinewood Hills."},
+        [26]  = {name = "Vinewood Hills",        startCoords = v3(1004.657,898.837,209.0257),   endCoords = v3(-3140.729,1180.876,19.309),   parTime = "2:35.000", hint = "It's a young professional rite of passage: leave work, and get from the Vinewood Hills to the beach at Chumash fast enough to catch the sunset and bask in the illusion of a meaningful existence."},
+        [27]  = {name = "Grove Street",          startCoords = v3(104.8058,-1938.982,19.8037),  endCoords = v3(-931.7014,174.1591,65.2086),  parTime = "1:20.000", hint = "You can go a long way real fast coming out of this neighborhood..."},
+        [28]  = {name = "LSIA II",               startCoords = v3(-985.2776,-2698.696,12.8307), endCoords = v3(-408.1892,1184.952,324.5297), parTime = "2:24.000", hint = "Los Santos loves a social climber: in this case, off the tarmac at LSIA to the highest point in Galileo Park in less time than it takes to buy your degree online."},
+        [29]  = {name = "Pillbox Hill",          startCoords = v3(230.6618,-1399.026,29.4856),  endCoords = v3(-319.9582,2729.578,67.8719),  parTime = "2:16.000", hint = "The fastest route from the ICU to the Hill Valley Cemetery has been a point of long-standing debate among the emergency services of Los Santos. Time to settle it once and for all."},
+        [30]  = {name = "Elysian Island II",     startCoords = v3(-546.6672,-2857.928,5.0004),  endCoords = v3(-1605.27,-953.8167,12.0174),  parTime = "1:50.000", hint = "A breakneck tour of the most polluted docks, marinas, canals and rivers in the state, finishing with some almost certainly toxic candy floss at the pier."},
+        [31]  = {name = "Lake Vinewood Estates", startCoords = v3(-172.8944,1034.826,231.2332), endCoords = v3(-1580.673,3060.978,31.1954),  parTime = "1:26.000", hint = "If you want to stay under the radar coming into Fort Zancudo this hot, you better be prepared to take it off road."},
+        [32]  = {name = "El Burro Heights",      startCoords = v3(1691.47,-1458.635,111.7033),  endCoords = v3(-408.4781,1184.1,324.5365),   parTime = "2:10.000", hint = "We're all in the gutter, but some of us are getting a PB en route to the stars..."}
+    },
     -- Eclipse Blvd Garage Week: February 16, 2023
     gCaches = {
         [1] = {
@@ -1439,6 +1484,42 @@ local dailyCollectibles = {
         [23] = {coords = v3(1124.7676,-1010.5512,43.6728)},
         [24] = {coords = v3(167.95,-2222.4854,6.2361)},
         [25] = {coords = v3(-559.2866,-1803.9038,21.6104)}
+    },
+    -- San Andreas Mercenaries event: June 13, 2023
+    -- CREDIT: https://gtalens.com/map/time-trials-rc (name)
+    RCBanditoTimeTrials = {
+        [1]  = {name = "Construction Site I",    coords = v3(-486.1165,-916.59,22.964)},
+        [2]  = {name = "Cypress Flats",          coords = v3(854.8221,-2189.789,29.679604)},
+        [3]  = {name = "Cemetery",               coords = v3(-1730.7411,-188.57533,57.337273)},
+        [4]  = {name = "La Fuente Blanca",       coords = v3(1409.3899,1084.5609,113.33391)},
+        [5]  = {name = "Little Seoul Park",      coords = v3(-901.63,-779.377,14.859)},
+        [6]  = {name = "Davis Quartz",           coords = v3(2562.03,2707.7473,41.071)},
+        [7]  = {name = "Vespucci Beach",         coords = v3(-1194.2417,-1456.5526,3.379667)},
+        [8]  = {name = "Construction Site II",   coords = v3(-216.2158,-1109.7155,21.9008)},
+        [9]  = {name = "Vespucci Canals",        coords = v3(-889.356,-1071.848,1.163)},
+        [10] = {name = "East Vinewood Park",     coords = v3(885.3417,-255.1916,68.4006)},
+        [11] = {name = "Backlot City",           coords = v3(-948.3436,-491.1428,35.8333)},
+        [12] = {name = "Vinewood Bowl",          coords = v3(750.3155,597.0025,124.9241)},
+        [13] = {name = "Rogers Salvage & Scrap", coords = v3(-402.4602,-1701.4429,17.8213)},
+        [14] = {name = "Paleto Forest Sawmill",  coords = v3(-601.3092,5295.396,69.2145)}
+    },
+    -- San Andreas Mercenaries (La Coureuse Week event): July 20, 2023
+    -- CREDIT: https://gtalens.com/map/time-trials-junk-energy
+    junkEnergyTimeTrials = {
+        [1]  = {name = "Mount Chiliad East",   coords = v3(523.662, 5602.403, 779.946)},
+        [2]  = {name = "Mount Chiliad West",   coords = v3(486.071, 5524.251, 776.579)},
+        [3]  = {name = "Mount Gordo",          coords = v3(2832.876, 5963.337, 350.886)},
+        [4]  = {name = "Mountain State",       coords = v3(-878.705, 4790.433, 298.926)},
+        [5]  = {name = "Marlowe Vineyards",    coords = v3(-1976.082, 1819.76, 181.008)},
+        [6]  = {name = "West Vinewood",        coords = v3(-183.38, 308.972, 96.8)},
+        [7]  = {name = "Sewer System",         coords = v3(1262.078, -273.589, 77.68)},
+        [8]  = {name = "Redwood Lights Track", coords = v3(751.921, 2564.83, 74.927)},
+        [9]  = {name = "El Burro Heights",     coords = v3(1802.894, -1459.869, 118.342)},
+        [10] = {name = "Alta",                 coords = v3(41.675, 193.992, 104.605)},
+        [11] = {name = "Pillbox Hill",         coords = v3(162.053, -616.858, 46.077)},
+        [12] = {name = "Vinewood Hills",       coords = v3(-464.064, 1529.393, 389.808)},
+        [13] = {name = "Kortz Center",         coords = v3(-2205.37, 189.516, 173.602)},
+        [14] = {name = "Mirror Park",          coords = v3(1583.986, -614.814, 150.526)}
     },
     -- Bottom Dollar Bounties: 25 June 2024 (continuation)
     madrazoHits = {
@@ -2223,7 +2304,7 @@ local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectibl
 
 local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent", collectiblesOnlineParentMenu_Feat.id)
 
------------------------- Action Figures (100)      ------------------------
+------------------------ Action Figures (100)       ------------------------
     local actionFiguresMenu_Feat = menu.add_feature("Action Figures (-1/100)", "parent", collectiblesOnlineMenu_Feat.id, function()
         menu.notify("99 and 100 will only appear after you've collected all the others.", SCRIPT_TITLE, 8, COLOR.BLUE.int)
     end)
@@ -2255,7 +2336,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end
     end
 --
------------------------- Ghosts Exposed (10)       ------------------------
+------------------------ Ghosts Exposed (10)        ------------------------
     local ghostsExposedMenu_Feat = menu.add_feature("Ghosts Exposed (-1/25)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local ghostsExposedTimeOverride_Feat = menu.add_feature("Override Time On Teleport", "toggle", ghostsExposedMenu_Feat.id)
@@ -2292,7 +2373,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         ghostExposed.feat.hint = ghostExposed.hint
     end
 --
------------------------- LD Organics Product (100) ------------------------
+------------------------ LD Organics Product (100)  ------------------------
     local ldOrganicsProductMenu_Feat = menu.add_feature("LD Organics Product (-1/25)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoLdOrganicsProduct_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", ldOrganicsProductMenu_Feat.id, function(feat)
@@ -2312,7 +2393,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Movie Props (10)          ------------------------
+------------------------ Movie Props (10)           ------------------------
     local moviePropsMenu_Feat = menu.add_feature("Movie Props (-1/10)", "parent", collectiblesOnlineMenu_Feat.id, function()
         menu.notify("There are 10 movie props in total, but 7 of them are fixed.\nThe remaining 3 are random events, such as cars spawning randomly, so I can't assist you with those.", SCRIPT_TITLE, 10, COLOR.BLUE.int)
     end)
@@ -2350,7 +2431,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end
     end
 --
------------------------- Playing Cards (54)        ------------------------
+------------------------ Playing Cards (54)         ------------------------
     local playingCardsMenu_Feat = menu.add_feature("Playing Cards (-1/54)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoPlayingCards_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", playingCardsMenu_Feat.id, function(feat)
@@ -2371,7 +2452,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Signal Jammers (50)       ------------------------
+------------------------ Signal Jammers (50)        ------------------------
     local signalJammersMenu_Feat = menu.add_feature("Signal Jammers (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoSignalJammers_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", signalJammersMenu_Feat.id, function(feat)
@@ -2391,7 +2472,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Snowmen (25)              ------------------------
+------------------------ Snowmen (25)               ------------------------
     local snowmenMenu_Feat = menu.add_feature("Snowmen (-1/25)", "parent", seasonalCollectiblesOnlineMenu_Feat.id)
 
     local autoSnowmen_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", snowmenMenu_Feat.id, function(feat)
@@ -2413,7 +2494,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Stunt Jumps (50)          ------------------------
+------------------------ Stunt Jumps (50)           ------------------------
     local stuntJumpsMenu_Feat = menu.add_feature("Stunt Jumps (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
     for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
         stuntJumpGroup.feat = menu.add_feature("Stunt Jump " .. i, "action_value_i", stuntJumpsMenu_Feat.id, function(feat)
@@ -2431,7 +2512,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         stuntJumpGroup.feat.max = 2
     end
 --
------------------------- Epsilon Robes (3)         ------------------------
+------------------------ Epsilon Robes (3)          ------------------------
     local epsilonRobesMenu_Feat = menu.add_feature("Epsilon Robes (-1/3)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoEpsilonRobesMenu_Feat = menu.add_feature("Auto Mode", "toggle", epsilonRobesMenu_Feat.id, function(feat)
@@ -2467,7 +2548,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         epsilonRobeGroup.feat.hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes"
     end
 --
------------------------- Media Sticks (9)          ------------------------
+------------------------ Media Sticks (9)           ------------------------
     local mediaSticksMenu_Feat = menu.add_feature("Media Sticks (-1/9)", "parent", collectiblesOnlineMenu_Feat.id)
 
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
@@ -2480,7 +2561,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end
     end
 --
------------------------- Metal Detectors (1)       ------------------------
+------------------------ Metal Detectors (1)        ------------------------
     local metalDetectorsMenu_Feat = menu.add_feature("Metal Detectors (-1/10)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
     local metalDetectors_Feat = menu.add_feature("Metal Detector", "action_value_i", metalDetectorsMenu_Feat.id, function(feat)
@@ -2492,7 +2573,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     metalDetectors_Feat.max = #collectibles.metalDetectors
     metalDetectors_Feat.hint = 'Note:\nOnce you collect a "Metal Detector", it will no longer appear on Skeletons. However, you\'ll unlock the "Burried Stashes" Daily Collectible in Cayo Perico.'
 --
------------------------- Weapon Components (5)     ------------------------
+------------------------ Weapon Components (5)      ------------------------
     local weaponComponentsMenu_Feat = menu.add_feature("Weapon Components (-1/5)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
     local weaponComponents_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
@@ -2503,7 +2584,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     weaponComponents_Feat.min = 1
     weaponComponents_Feat.max = #collectibles.weaponComponents
 --
------------------------- Spray Cans (1)            ------------------------
+------------------------ Spray Cans (1)             ------------------------
     local sprayCansMenu_Feat = menu.add_feature("Spray Can (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local sprayCans_Feat = menu.add_feature("Spray Can", "action_value_i", sprayCansMenu_Feat.id, function(feat)
@@ -2516,7 +2597,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     sprayCans_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
 --
 
------------------------- Buried Stashes (2)        ------------------------
+------------------------ Buried Stashes (2)         ------------------------
     local buriedStashesMenu_Feat = menu.add_feature("Buried Stashes (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
@@ -2525,7 +2606,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Hidden Caches (10)        ------------------------
+------------------------ Hidden Caches (10)         ------------------------
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
@@ -2534,7 +2615,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Junk Energy Skydives (10) ------------------------
+------------------------ Junk Energy Skydives (10)  ------------------------
     local junkEnergySkydivesMenu_Feat = menu.add_feature("Junk Energy Skydives (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, junkEnergySkydiveGroup in ipairs(dailyCollectibles.junkEnergySkydives) do
@@ -2543,7 +2624,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Shipwreck (1)             ------------------------
+------------------------ Shipwreck (1)              ------------------------
     local shipwreckMenu_Feat = menu.add_feature("Shipwreck (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
@@ -2552,7 +2633,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- Treasure Chests (2)       ------------------------
+------------------------ Treasure Chests (2)        ------------------------
     local treasureChestsMenu_Feat = menu.add_feature("Treasure Chests (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, treasureChestGroup in ipairs(dailyCollectibles.treasureChests) do
@@ -2572,7 +2653,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end
     end
 --
------------------------- Trick Or Treat (10)       ------------------------
+------------------------ Trick Or Treat (10)        ------------------------
     local trickOrTreatMenu_Feat = menu.add_feature("Trick Or Treat (-1/10)", "parent", seasonalDailyCollectiblesOnlineMenu_Feat.id)
 
     --local autoTrickOrTreat_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", trickOrTreatMenu_Feat.id, function(feat)
@@ -2594,7 +2675,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         end)
     end
 --
------------------------- LS Tags (5)               ------------------------
+------------------------ LS Tags (5)                ------------------------
     local lsTagsMenu_Feat = menu.add_feature("LS Tags (-1/5)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, lsTagGroup in ipairs(dailyCollectibles.lsTags) do
@@ -2604,7 +2685,23 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         lsTagGroup.feat.hint = "Note:\nYou must first collect a spray can in order to spray tags around Los Santos."
     end
 --
------------------------- G's Cache (1)             ------------------------
+------------------------ Time Trial (1)             ------------------------
+local timeTrialMenu_Feat = menu.add_feature("Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+    timeTrialGroup.feat = menu.add_feature("Time Trial " .. i .. " (" .. timeTrialGroup.name .. ")", "action_value_i", timeTrialMenu_Feat.id, function(feat)
+        if feat.value == 1 then
+            teleport_myself(timeTrialGroup.startCoords.x, timeTrialGroup.startCoords.y, timeTrialGroup.startCoords.z)
+        elseif feat.value == 2 then
+            teleport_myself(timeTrialGroup.endCoords.x, timeTrialGroup.endCoords.y, timeTrialGroup.endCoords.z)
+        end
+    end)
+    timeTrialGroup.feat.min = 1
+    timeTrialGroup.feat.max = 2
+    timeTrialGroup.feat.hint = timeTrialGroup.hint .. "\n\nPar Time: " .. timeTrialGroup.parTime
+end
+--
+------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
@@ -2617,7 +2714,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         gCacheGroup.feat.max = #gCacheGroup.spawns
     end
 --
------------------------- Stash House (1)           ------------------------
+------------------------ Stash House (1)            ------------------------
     local stashHousesMenu_Feat = menu.add_feature("Stash House (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     local stashHouse_Feat = menu.add_feature("Stash House", "action_value_i", stashHousesMenu_Feat.id, function(feat)
@@ -2628,7 +2725,25 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     stashHouse_Feat.min = 1
     stashHouse_Feat.max = #dailyCollectibles.stashHouses
 --
------------------------- Madrazo Hit (1)           ------------------------
+------------------------ RC Bandito Time Trial (1)  ------------------------
+    local RCBanditoTimeTrialMenu_Feat = menu.add_feature("RC Bandito Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, RCBanditoTimeTrialGroup in ipairs(dailyCollectibles.RCBanditoTimeTrials) do
+        RCBanditoTimeTrialGroup.feat = menu.add_feature("RC Bandito Time Trial " .. i .. " (" .. RCBanditoTimeTrialGroup.name .. ")", "action", RCBanditoTimeTrialMenu_Feat.id, function()
+            teleport_myself(RCBanditoTimeTrialGroup.coords.x, RCBanditoTimeTrialGroup.coords.y, RCBanditoTimeTrialGroup.coords.z)
+        end)
+    end
+--
+------------------------ Junk Energy Time Trial (1) ------------------------
+    local junkEnergyTimeTrialMenu_Feat = menu.add_feature("Junk Energy Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    for i, junkEnergyTimeTrialGroup in ipairs(dailyCollectibles.junkEnergyTimeTrials) do
+        junkEnergyTimeTrialGroup.feat = menu.add_feature("Junk Energy Time Trial " .. i .. " (" .. junkEnergyTimeTrialGroup.name .. ")", "action", junkEnergyTimeTrialMenu_Feat.id, function()
+            teleport_myself(junkEnergyTimeTrialGroup.coords.x, junkEnergyTimeTrialGroup.coords.y, junkEnergyTimeTrialGroup.coords.z)
+        end)
+    end
+--
+------------------------ Madrazo Hit (1)            ------------------------
     local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hit (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
@@ -2648,7 +2763,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hit" trigger event to spawn in the map.\n\n< 1 > Is the trigger event;\nthe following values are their possible spawns.'
     end
 --
------------------------- Gun Van (1)               ------------------------
+------------------------ Gun Van (1)                ------------------------
     local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
 
     local gunVan_Feat = menu.add_feature("Gun Van", "action_value_i", gunVansMenu_Feat.id, function(feat)
@@ -2659,7 +2774,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     gunVan_Feat.min = 1
     gunVan_Feat.max = #others.gunVans
 --
------------------------- Street Dealers (3)        ------------------------
+------------------------ Street Dealers (3)         ------------------------
     local streetDealersMenu_Feat = menu.add_feature("Street Dealers (-1/3)", "parent", streetDealersOnlineMenu_Feat.id)
 
     local streetDealers_Feat = menu.add_feature("Street Dealer", "action_value_i", streetDealersMenu_Feat.id, function(feat)
@@ -3008,6 +3123,25 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
+local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
+    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+        local updatedName = removeFeatNameColorCodes(timeTrialGroup.feat.name)
+
+        if
+            is_session_started()
+            and i == resolvedLocationsIds.timeTrial.spawn
+        then
+            if hasPlayerCollectedTimeTrial then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        timeTrialGroup.feat.name = updatedName
+    end
+end
+
 local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
         gCacheGroup.feat.name = removeFeatNameColorCodes(gCacheGroup.feat.name)
@@ -3049,6 +3183,44 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
             stashHouse_Feat.name = COLOR.FOUND.hex .. stashHouse_Feat.name .. "#DEFAULT#"
             stashHouse_Feat.hint = "Found at:\n< " .. resolvedLocationsIds.stashHouse.marker .. " >"
         end
+    end
+end
+
+local function update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
+    for i, RCBanditoTimeTrialGroup in ipairs(dailyCollectibles.RCBanditoTimeTrials) do
+        local updatedName = removeFeatNameColorCodes(RCBanditoTimeTrialGroup.feat.name)
+
+        if
+            is_session_started()
+            and i == resolvedLocationsIds.RCBanditoTimeTrial.spawn
+        then
+            if hasPlayerCollectedRCBanditoTimeTrial then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        RCBanditoTimeTrialGroup.feat.name = updatedName
+    end
+end
+
+local function update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCollectedJunkEnergyTimeTrial)
+    for i, junkEnergyTimeTrialGroup in ipairs(dailyCollectibles.junkEnergyTimeTrials) do
+        local updatedName = removeFeatNameColorCodes(junkEnergyTimeTrialGroup.feat.name)
+
+        if
+            is_session_started()
+            and i == resolvedLocationsIds.junkEnergyTimeTrial.spawn
+        then
+            if hasPlayerCollectedJunkEnergyTimeTrial then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        junkEnergyTimeTrialGroup.feat.name = updatedName
     end
 end
 
@@ -3114,14 +3286,23 @@ end
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
 
+    --print(script.get_global_i(262145 + 27196)) -- 3270 (When Spinned)
+    --print(script.get_global_i(262145 + 27197)) -- 2780 (When Spinned)
+    --print(stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LUCKY_WHEEL_NUM_SPIN"), -1)) -- 1 (When Spinned)
+
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
     local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
+
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
+    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1
+    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1
+    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
+
     local localPlayerNumEpsilonRobesCollected = GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
@@ -3185,10 +3366,8 @@ mainLoop_Thread = create_tick_handler(function()
             [4] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51549, -1) + 1,
             [5] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51550, -1) + 1
         },
-        streetDealers = {
-            [1] = script.get_global_i(Global.activeStreetDealer1) + 1,
-            [2] = script.get_global_i(Global.activeStreetDealer2) + 1,
-            [3] = script.get_global_i(Global.activeStreetDealer3) + 1
+        timeTrial = {
+            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeTimeTrial) + 1
         },
         gCache = {
             searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
@@ -3197,39 +3376,53 @@ mainLoop_Thread = create_tick_handler(function()
         stashHouse = {
             marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1
         },
+        RCBanditoTimeTrial = {
+            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeRCBanditoTimeTrial) + 1
+        },
+        junkEnergyTimeTrial = {
+            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeJunkEnergyTimeTrial) + 1
+        },
         gunVan = {
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1
+        },
+        streetDealers = {
+            [1] = script.get_global_i(Global.activeStreetDealer1) + 1,
+            [2] = script.get_global_i(Global.activeStreetDealer2) + 1,
+            [3] = script.get_global_i(Global.activeStreetDealer3) + 1
         }
     }
 
     -- Known bug: in SP globals dont reset to 0 so... will have to fix that
-    actionFiguresMenu_Feat.name        = "Action Figures ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_ACTION_FIG_COLLECTED"),      -1)  .. "/100)"
-    ghostsExposedMenu_Feat.name        = "Ghosts Exposed ("       .. script.get_global_i(Global.numberOfGhostsExposedCollected)                                         .. "/10)"
-    ldOrganicsProductMenu_Feat.name    = "LD Organics Product ("  .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LDORGANICS_COLLECTED"),      -1)  .. "/100)"
-    moviePropsMenu_Feat.name           = "Movie Props ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_MOVIE_PROPS_COLLECTED"),     -1)  .. "/10)"
-    playingCardsMenu_Feat.name         = "Playing Cards ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
-    signalJammersMenu_Feat.name        = "Signal Jammers ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
-    snowmenMenu_Feat.name              = "Snowmen ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    stuntJumpsMenu_Feat.name           = "Stunt Jumps ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
-    epsilonRobesMenu_Feat.name         = "Epsilon Robes ("        .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
-    mediaSticksMenu_Feat.name          = "Media Sticks ("         .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
-    weaponComponentsMenu_Feat.name     = "Weapon Components ("    .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
-    metalDetectorsMenu_Feat.name       = "Metal Detectors ("      .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
-    sprayCansMenu_Feat.name            = "Spray Cans ("           .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
+    actionFiguresMenu_Feat.name         = "Action Figures ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_ACTION_FIG_COLLECTED"),      -1)  .. "/100)"
+    ghostsExposedMenu_Feat.name         = "Ghosts Exposed ("         .. script.get_global_i(Global.numberOfGhostsExposedCollected)                                         .. "/10)"
+    ldOrganicsProductMenu_Feat.name     = "LD Organics Product ("    .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LDORGANICS_COLLECTED"),      -1)  .. "/100)"
+    moviePropsMenu_Feat.name            = "Movie Props ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_MOVIE_PROPS_COLLECTED"),     -1)  .. "/10)"
+    playingCardsMenu_Feat.name          = "Playing Cards ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
+    signalJammersMenu_Feat.name         = "Signal Jammers ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
+    snowmenMenu_Feat.name               = "Snowmen ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
+    stuntJumpsMenu_Feat.name            = "Stunt Jumps ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
+    epsilonRobesMenu_Feat.name          = "Epsilon Robes ("          .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
+    mediaSticksMenu_Feat.name           = "Media Sticks ("           .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
+    weaponComponentsMenu_Feat.name      = "Weapon Components ("      .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
+    metalDetectorsMenu_Feat.name        = "Metal Detectors ("        .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
+    sprayCansMenu_Feat.name             = "Spray Cans ("             .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
 
-    buriedStashesMenu_Feat.name        = "Buried Stashes ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"  -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
-    hiddenCachesMenu_Feat.name         = "Hidden Caches ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
-    junkEnergySkydivesMenu_Feat.name   = "Junk Energy Skydives (" .. localPlayerNumJunkEnergySkydives                                                                   .. "/10)" -- R* ISSUE (The stat updates only on session switch): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"), -1)
-    shipwreckMenu_Feat.name            = "Shipwreck ("            .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)"  -- R* ISSUE (total count from the begining I think?): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"), -1)
-    treasureChestsMenu_Feat.name       = "Treasure Chests ("      .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
-    trickOrTreatMenu_Feat.name         = "Trick Or Treat ("       .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
-    lsTagsMenu_Feat.name               = "LS Tags ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
-    gCachesMenu_Feat.name              = "G's Cache ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
-    stashHousesMenu_Feat.name          = "Stash House ("          .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
-    madrazoHitsMenu_Feat.name          = "Madrazo Hit ("          .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+    buriedStashesMenu_Feat.name         = "Buried Stashes ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"  -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
+    hiddenCachesMenu_Feat.name          = "Hidden Caches ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
+    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("   .. localPlayerNumJunkEnergySkydives                                                                   .. "/10)" -- R* ISSUE (The stat updates only on session switch): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"), -1)
+    shipwreckMenu_Feat.name             = "Shipwreck ("              .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)"  -- R* ISSUE (total count from the begining I think?): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"), -1)
+    treasureChestsMenu_Feat.name        = "Treasure Chests ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
+    trickOrTreatMenu_Feat.name          = "Trick Or Treat ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
+    lsTagsMenu_Feat.name                = "LS Tags ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
+    timeTrialMenu_Feat.name             = "Time Trial ("             .. tostring(hasPlayerCollectedTimeTrial and 1 or 0)                                                   .. "/1)"
+    gCachesMenu_Feat.name               = "G's Cache ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
+    stashHousesMenu_Feat.name           = "Stash House ("            .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
+    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("  .. tostring(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)                                          .. "/1)"
+    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial (" .. tostring(hasPlayerCollectedJunkEnergyTimeTrial and 1 or 0)                                         .. "/1)"
+    madrazoHitsMenu_Feat.name           = "Madrazo Hit ("            .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
 
-    gunVansMenu_Feat.name              = "Gun Vans ("             .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
-    streetDealersMenu_Feat.name        = "Street Dealers ("       .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
+    gunVansMenu_Feat.name               = "Gun Vans ("               .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
+    streetDealersMenu_Feat.name         = "Street Dealers ("         .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
     update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
@@ -3252,8 +3445,11 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
+    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
+    update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
+    update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCollectedJunkEnergyTimeTrial)
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
@@ -3271,12 +3467,13 @@ end, 1000)
     Tenis (unsure)
     Golf  (unsure)
     San Andreas Flight School
+    https://gta.fandom.com/wiki/Navy_Revolver
+    https://gta.fandom.com/wiki/Los_Santos_Slasher
+    https://gta.fandom.com/wiki/Stone_Hatchet
+    https://gta.fandom.com/wiki/Double-Action_Revolver
 
     Daily Collectibles:
-    Junk Energy Time Trial
     Casino Lucky Wheel
-    RC Bandito Time Trial
-    Time Trial
 
     Add Green color to all collected MenuFeat's
     make snowmens, jack o lanters etc .. blue when they are available otherwite remove color
