@@ -1506,20 +1506,20 @@ local dailyCollectibles = {
     -- San Andreas Mercenaries (La Coureuse Week event): July 20, 2023
     -- CREDIT: https://gtalens.com/map/time-trials-junk-energy
     junkEnergyTimeTrials = {
-        [1]  = {name = "Mount Chiliad East",   coords = v3(523.662, 5602.403, 779.946)},
-        [2]  = {name = "Mount Chiliad West",   coords = v3(486.071, 5524.251, 776.579)},
-        [3]  = {name = "Mount Gordo",          coords = v3(2832.876, 5963.337, 350.886)},
-        [4]  = {name = "Mountain State",       coords = v3(-878.705, 4790.433, 298.926)},
-        [5]  = {name = "Marlowe Vineyards",    coords = v3(-1976.082, 1819.76, 181.008)},
-        [6]  = {name = "West Vinewood",        coords = v3(-183.38, 308.972, 96.8)},
-        [7]  = {name = "Sewer System",         coords = v3(1262.078, -273.589, 77.68)},
-        [8]  = {name = "Redwood Lights Track", coords = v3(751.921, 2564.83, 74.927)},
-        [9]  = {name = "El Burro Heights",     coords = v3(1802.894, -1459.869, 118.342)},
-        [10] = {name = "Alta",                 coords = v3(41.675, 193.992, 104.605)},
-        [11] = {name = "Pillbox Hill",         coords = v3(162.053, -616.858, 46.077)},
-        [12] = {name = "Vinewood Hills",       coords = v3(-464.064, 1529.393, 389.808)},
-        [13] = {name = "Kortz Center",         coords = v3(-2205.37, 189.516, 173.602)},
-        [14] = {name = "Mirror Park",          coords = v3(1583.986, -614.814, 150.526)}
+        [1]  = {name = "Mount Chiliad East",   coords = v3(501.6576,5598.3604,795.1221)},
+        [2]  = {name = "Mount Chiliad West",   coords = v3(493.7987,5528.249,777.3241)},
+        [3]  = {name = "Mount Gordo",          coords = v3(2820.5623,5972.031,349.5339)},
+        [4]  = {name = "Mountain State",       coords = v3(-1031.3934,4721.9556,235.3456)},
+        [5]  = {name = "Marlowe Vineyards",    coords = v3(-1932.808,1782.2681,172.2726)},
+        [6]  = {name = "West Vinewood",        coords = v3(-182.0154,319.3242,96.7999)},
+        [7]  = {name = "Sewer System",         coords = v3(1100.4553,-264.2758,68.268)},
+        [8]  = {name = "Redwood Lights Track", coords = v3(736.0028,2574.1477,74.2793)},
+        [9]  = {name = "El Burro Heights",     coords = v3(1746.0431,-1474.762,111.8385)},
+        [10] = {name = "Alta",                 coords = v3(30.5142,197.473,104.6073)},
+        [11] = {name = "Pillbox Hill",         coords = v3(145.0902,-605.9424,46.0762)},
+        [12] = {name = "Vinewood Hills",       coords = v3(-447.3499,1600.9911,357.3483)},
+        [13] = {name = "Kortz Center",         coords = v3(-2205.15,199.7418,173.6018)},
+        [14] = {name = "Mirror Park",          coords = v3(1321.0515,-505.2507,70.4208)}
     },
     -- Bottom Dollar Bounties: 25 June 2024 (continuation)
     madrazoHits = {
@@ -2300,6 +2300,8 @@ local dailyCollectiblesOnlineMenu_Feat = menu.add_feature("Daily Collectibles", 
 
 local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Daily Collectibles]", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
+local weeklyCollectiblesOnlineMenu_Feat = menu.add_feature("Weekly Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
+
 local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectiblesOnlineParentMenu_Feat.id)
 
 local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent", collectiblesOnlineParentMenu_Feat.id)
@@ -2685,22 +2687,6 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         lsTagGroup.feat.hint = "Note:\nYou must first collect a spray can in order to spray tags around Los Santos."
     end
 --
------------------------- Time Trial (1)             ------------------------
-local timeTrialMenu_Feat = menu.add_feature("Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
-
-for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
-    timeTrialGroup.feat = menu.add_feature("Time Trial " .. i .. " (" .. timeTrialGroup.name .. ")", "action_value_i", timeTrialMenu_Feat.id, function(feat)
-        if feat.value == 1 then
-            teleport_myself(timeTrialGroup.startCoords.x, timeTrialGroup.startCoords.y, timeTrialGroup.startCoords.z)
-        elseif feat.value == 2 then
-            teleport_myself(timeTrialGroup.endCoords.x, timeTrialGroup.endCoords.y, timeTrialGroup.endCoords.z)
-        end
-    end)
-    timeTrialGroup.feat.min = 1
-    timeTrialGroup.feat.max = 2
-    timeTrialGroup.feat.hint = timeTrialGroup.hint .. "\n\nPar Time: " .. timeTrialGroup.parTime
-end
---
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
@@ -2763,6 +2749,24 @@ end
         madrazoHitGroup.feat.hint = 'Note:\nYou must first buy a "Bail Office", for the "Madrazo Hit" trigger event to spawn in the map.\n\n< 1 > Is the trigger event;\nthe following values are their possible spawns.'
     end
 --
+
+------------------------ Time Trial (1)             ------------------------
+    local timeTrialMenu_Feat = menu.add_feature("Time Trial (-1/1)", "parent", weeklyCollectiblesOnlineMenu_Feat.id)
+
+    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+        timeTrialGroup.feat = menu.add_feature("Time Trial " .. i .. " (" .. timeTrialGroup.name .. ")", "action_value_i", timeTrialMenu_Feat.id, function(feat)
+            if feat.value == 1 then
+                teleport_myself(timeTrialGroup.startCoords.x, timeTrialGroup.startCoords.y, timeTrialGroup.startCoords.z)
+            elseif feat.value == 2 then
+                teleport_myself(timeTrialGroup.endCoords.x, timeTrialGroup.endCoords.y, timeTrialGroup.endCoords.z)
+            end
+        end)
+        timeTrialGroup.feat.min = 1
+        timeTrialGroup.feat.max = 2
+        timeTrialGroup.feat.hint = timeTrialGroup.hint .. "\n\nPar Time: " .. timeTrialGroup.parTime
+    end
+--
+
 ------------------------ Gun Van (1)                ------------------------
     local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
 
@@ -3286,17 +3290,15 @@ end
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
 
-    --print(script.get_global_i(262145 + 27196)) -- 3270 (When Spinned)
-    --print(script.get_global_i(262145 + 27197)) -- 2780 (When Spinned)
     --print(stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LUCKY_WHEEL_NUM_SPIN"), -1)) -- 1 (When Spinned)
 
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
     local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
 
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1
     local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1
     local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1
+    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1 -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for)
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
@@ -3366,9 +3368,6 @@ mainLoop_Thread = create_tick_handler(function()
             [4] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51549, -1) + 1,
             [5] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51550, -1) + 1
         },
-        timeTrial = {
-            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeTimeTrial) + 1
-        },
         gCache = {
             searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
@@ -3381,6 +3380,9 @@ mainLoop_Thread = create_tick_handler(function()
         },
         junkEnergyTimeTrial = {
             spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeJunkEnergyTimeTrial) + 1
+        },
+        timeTrial = {
+            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeTimeTrial) + 1
         },
         gunVan = {
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1
@@ -3414,12 +3416,13 @@ mainLoop_Thread = create_tick_handler(function()
     treasureChestsMenu_Feat.name        = "Treasure Chests ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name          = "Trick Or Treat ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name                = "LS Tags ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
-    timeTrialMenu_Feat.name             = "Time Trial ("             .. tostring(hasPlayerCollectedTimeTrial and 1 or 0)                                                   .. "/1)"
     gCachesMenu_Feat.name               = "G's Cache ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
     stashHousesMenu_Feat.name           = "Stash House ("            .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
     RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("  .. tostring(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)                                          .. "/1)"
     junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial (" .. tostring(hasPlayerCollectedJunkEnergyTimeTrial and 1 or 0)                                         .. "/1)"
     madrazoHitsMenu_Feat.name           = "Madrazo Hit ("            .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+
+    timeTrialMenu_Feat.name             = "Time Trial ("             .. tostring(hasPlayerCollectedTimeTrial and 1 or 0)                                                   .. "/1)"
 
     gunVansMenu_Feat.name               = "Gun Vans ("               .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
     streetDealersMenu_Feat.name         = "Street Dealers ("         .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
@@ -3445,12 +3448,13 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
     update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCollectedJunkEnergyTimeTrial)
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
+
+    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
     update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
