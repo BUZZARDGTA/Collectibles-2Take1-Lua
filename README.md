@@ -20,7 +20,7 @@ Script to collect collectibles. Is in development but here are stable commits on
 
 - [gta.fandom.com](https://gta.fandom.com/wiki/Main_Page) - Great website with tons of information, often super useful, great Wiki.
 - [root-cause/v-decompiled-scripts](https://github.com/root-cause/v-decompiled-scripts) - Where I reverse-engineer almost everything that I couldn't find elsewhere.
-- [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes I would copy-paste their code or check how they did things to save time on reverse engineering.
+- [YimMenu-Lua/DailyCollectibles](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes I would copy-paste their code or check how they did things to save time on reverse engineering.
 - [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/RandomEvents) - Helped with debugging by force-starting some random events.
 - [@DurtyFree](https://github.com/DurtyFree) - Taught me where to find the accurate list of all multiplayer stats.
 - [@doctorflexochan](https://github.com/doctorflexochan) - Provided me with the "Unique Stunt Jump" stat name before @DurtyFree taught me...
