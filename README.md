@@ -26,7 +26,7 @@ Script to collect collectibles. Is in development but here are stable commits on
 - [@DurtyFree](https://github.com/DurtyFree) - Taught me where to find the accurate list of all multiplayer stats.
 - [@doctorflexochan](https://github.com/doctorflexochan) - Provided me with the "Unique Stunt Jump" stat name before @DurtyFree taught me...
 - [GTALens.com Maps](https://gtalens.com/map) - The owner is really nice and updated the website on my requests. They often provided me with locations whenever I couldn't find them through reverse engineering by myself:
-  - [Media Sticks Map](https://gtalens.com/map/media-sticks)
-  - [Metal Detectors Map](https://gtalens.com/map/metal-detectors)
-  - [Junk Energy Skydives Map](https://gtalens.com/map/junk-energy-skydives)
-  - [Madrazo Hits Map](https://gtalens.com/map/madrazo-hits) (Possible Target Locations)
+  - [Media Sticks](https://gtalens.com/map/media-sticks)
+  - [Metal Detectors](https://gtalens.com/map/metal-detectors)
+  - [Junk Energy Skydives](https://gtalens.com/map/junk-energy-skydives)
+  - [Madrazo Hits](https://gtalens.com/map/madrazo-hits) (Possible Target Locations)
