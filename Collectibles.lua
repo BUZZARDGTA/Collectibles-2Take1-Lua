@@ -1319,6 +1319,10 @@ local dailyCollectibles = {
         [31]  = {name = "Lake Vinewood Estates", startCoords = v3(-172.8944,1034.826,231.2332), endCoords = v3(-1580.673,3060.978,31.1954),  parTime = "1:26.000", hint = "If you want to stay under the radar coming into Fort Zancudo this hot, you better be prepared to take it off road."},
         [32]  = {name = "El Burro Heights",      startCoords = v3(1691.47,-1458.635,111.7033),  endCoords = v3(-408.4781,1184.1,324.5365),   parTime = "2:10.000", hint = "We're all in the gutter, but some of us are getting a PB en route to the stars..."}
     },
+    -- The Diamond Casino & Resort update: July 23, 2019
+    luckyWheel = {
+        coords = v3(925.04,46.48,80.096)
+    },
     -- Eclipse Blvd Garage Week: February 16, 2023
     gCaches = {
         [1] = {
@@ -1504,7 +1508,7 @@ local dailyCollectibles = {
         [14] = {name = "Paleto Forest Sawmill",  coords = v3(-601.3092,5295.396,69.2145)}
     },
     -- San Andreas Mercenaries (La Coureuse Week event): July 20, 2023
-    -- CREDIT: https://gtalens.com/map/time-trials-junk-energy
+    -- CREDIT: https://gtalens.com/map/time-trials-junk-energy (name)
     junkEnergyTimeTrials = {
         [1]  = {name = "Mount Chiliad East",   coords = v3(501.6576,5598.3604,795.1221)},
         [2]  = {name = "Mount Chiliad West",   coords = v3(493.7987,5528.249,777.3241)},
@@ -2687,6 +2691,14 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
         lsTagGroup.feat.hint = "Note:\nYou must first collect a spray can in order to spray tags around Los Santos."
     end
 --
+------------------------ Lucky Wheel (1)            ------------------------
+    local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel" .. COLOR.RED.hex .. "[BROKEN] (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
+    dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action", luckyWheelMenu_Feat.id, function()
+        teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
+    end)
+    dailyCollectibles.luckyWheel.feat.hint = "Note:\nYou must first complete the cutscene before entering the casino for the first time."
+--
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
 
@@ -3127,22 +3139,20 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
-    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
-        local updatedName = removeFeatNameColorCodes(timeTrialGroup.feat.name)
+local function update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerCollectedLuckyWheel)
+    local feat = dailyCollectibles.luckyWheel.feat
 
-        if
-            is_session_started()
-            and i == resolvedLocationsIds.timeTrial.spawn
-        then
-            if hasPlayerCollectedTimeTrial then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+    feat.name = removeFeatNameColorCodes(feat.name)
+    feat.hint = ""
+
+    if
+        is_session_started()
+    then
+        if hasPlayerCollectedLuckyWheel then
+            feat.name = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
+        else
+            feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
         end
-
-        timeTrialGroup.feat.name = updatedName
     end
 end
 
@@ -3247,6 +3257,25 @@ local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPl
     end
 end
 
+local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
+    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+        local updatedName = removeFeatNameColorCodes(timeTrialGroup.feat.name)
+
+        if
+            is_session_started()
+            and i == resolvedLocationsIds.timeTrial.spawn
+        then
+            if hasPlayerCollectedTimeTrial then
+                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            else
+                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+            end
+        end
+
+        timeTrialGroup.feat.name = updatedName
+    end
+end
+
 local function update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
     gunVan_Feat.name = removeFeatNameColorCodes(gunVan_Feat.name)
     gunVan_Feat.hint = ""
@@ -3290,17 +3319,16 @@ end
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
 
-    --print(stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LUCKY_WHEEL_NUM_SPIN"), -1)) -- 1 (When Spinned)
-
     local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
     local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
 
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1
-    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1
-    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1 -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for)
+    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/
+    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1     -- TODO: Add user personal best -- BUG: \/
+    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1   -- TODO: Add user personal best -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for)
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
+    local hasPlayerCollectedLuckyWheel = stats.stat_get_int(gameplay.get_hash_key("MP0_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 or stats.stat_get_int(gameplay.get_hash_key("MP1_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 -- BUG: Only updates on enter in the casino (It's likely just not the stat I'm looking for)
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
@@ -3416,6 +3444,7 @@ mainLoop_Thread = create_tick_handler(function()
     treasureChestsMenu_Feat.name        = "Treasure Chests ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
     trickOrTreatMenu_Feat.name          = "Trick Or Treat ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
     lsTagsMenu_Feat.name                = "LS Tags ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
+    luckyWheelMenu_Feat.name            = "Lucky Wheel" .. COLOR.RED.hex .. " [BROKEN] (" .. tostring(hasPlayerCollectedLuckyWheel and 1 or 0)                                                  .. "/1)"
     gCachesMenu_Feat.name               = "G's Cache ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
     stashHousesMenu_Feat.name           = "Stash House ("            .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
     RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("  .. tostring(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)                                          .. "/1)"
@@ -3448,6 +3477,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
+    update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerCollectedLuckyWheel)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
