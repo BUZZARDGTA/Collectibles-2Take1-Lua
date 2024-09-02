@@ -76,13 +76,31 @@ local Local <const> = {
     activeRCBanditoTimeTrial = 14436, --> freemode.c
     activeJunkEnergyTimeTrial = 15239 + 3 --> freemode.c
 }
+local STAT_VIEWER_NAMES__LIST <const> = {
+    "MPx_SNOWMEN_COLLECTED",
+    "MPx_USB_RADIO_COLLECTED",
+    "MPx_ACTION_FIG_COLLECTED",
+    "MPx_LDORGANICS_COLLECTED",
+    "MPx_MOVIE_PROPS_COLLECTED",
+    "MPx_PLAYING_CARD_COLLECTED",
+    "MPx_SIGNAL_JAMMERS_COLLECTED",
+    "MPx_USJS_COMPLETED",
+    "MPPLY_RCTTCOMPLETEDWEEK",
+    "MPPLY_BTTCOMPLETED",
+    "MPPLY_TIMETRIAL_COMPLETED_WEEK",
+    "MPx_LUCKY_WHEEL_NUM_SPIN",
+    "MPx_BURIED_STASH_COLLECTED",
+    "MPx_UNDERWATRPACK_COLLECTED",
+    "MPx_SKYDIVES_COLLECTED", -- R* ISSUE (The stat updates only on session switch)
+    "MPx_SHIPWRECKED_COLLECTED", -- R* ISSUE (total count from the begining I think?)
+    "MPx_TREASURECHEST_COLLECTED",
+    "MPx_TRICKORTREAT_COLLECTED",
+    "MPx_TAGGING_COLLECTED",
+    "MPx_DAILYDEADDROP_COLLECTED"
+}
 ---- Global constants 2/2 END
 
 ---- Global functions 2/2 START
-local function startswith(str, prefix)
-    return str:sub(1, #prefix) == prefix
-end
-
 local function pluralize(word, count)
     return word .. (count > 1 and "s" or "")
 end
@@ -91,7 +109,7 @@ local function ensure_float(value)
     return math.type(value) == "integer" and value * 1.0 or value
 end
 
-function table_contains(tbl, value)
+local function table_contains(tbl, value)
     for _, v in ipairs(tbl) do
         if v == value then
             return true
@@ -302,106 +320,106 @@ local nightclubs = {
 
 local collectibles = {
     actionFigures = {
-        {-2557.4053,2315.502,33.742,    name="Pogo"},
-        {2487.128,3759.327,42.317,      name="Alien"},
-        {457.198,5573.861,780.184,      name="Alien"},
-        {-1280.407,2549.743,17.534,     name="Alien"},
-        {-107.722,-856.981,38.261,      name="Alien"},
-        {-1050.513,-522.612,36.634,     name="Alien"},
-        {693.306,1200.583,344.524,      name="Alien"},
-        {2500.654,-389.482,94.245,      name="Alien"},
-        {483.4,-3110.621,6.627,         name="Alien"},
-        {-2169.277,5192.986,16.295,     name="Impotent Rage"},
-        {177.674,6394.054,31.376,       name="Impotent Rage"},
-        {2416.9421,4994.557,45.239,     name="Impotent Rage"},
-        {1702.9,3291,48.72,             name="Impotent Rage"},
-        {-600.813,2088.011,132.336,     name="Impotent Rage"},
-        {-3019.7935,41.9486,10.2924,    name="Impotent Rage"},
-        {-485.4648,-54.441,38.9945,     name="Impotent Rage"},
-        {-1350.785,-1547.089,4.675,     name="Impotent Rage"},
-        {379.535,-1509.398,29.34,       name="Impotent Rage"},
-        {2548.713,385.386,108.423,      name="Impotent Rage"},
-        {-769.346,877.307,203.424,      name="Impotent Rage"},
-        {-1513.54,1517.184,111.305,     name="Impotent Rage"},
-        {-1023.899,190.912,61.282,      name="Impotent Rage"},
-        {1136.355,-666.404,57.044,      name="Impotent Rage"},
-        {3799.76,4473.048,6.032,        name="Impotent Rage"},
-        {1243.588,-2572.136,42.603,     name="Impotent Rage"},
-        {219.811,97.162,96.336,         name="Impotent Rage"},
-        {-1545.826,-449.397,40.318,     name="Impotent Rage"},
-        {-928.683,-2938.691,13.059,     name="Princess Robot Bubblegum"},
-        {-1647.926,-1094.716,12.736,    name="Princess Robot Bubblegum"},
-        {-2185.939,4249.814,48.803,     name="Princess Robot Bubblegum"},
-        {-262.339,4729.229,137.329,     name="Princess Robot Bubblegum"},
-        {-311.701,6315.024,31.978,      name="Princess Robot Bubblegum"},
-        {3306.444,5194.742,17.432,      name="Princess Robot Bubblegum"},
-        {1389.886,3608.834,35.06,       name="Princess Robot Bubblegum"},
-        {852.846,2166.327,52.717,       name="Princess Robot Bubblegum"},
-        {-1501.96,814.071,181.433,      name="Princess Robot Bubblegum"},
-        {2634.972,2931.061,44.608,      name="Princess Robot Bubblegum"},
-        {660.57,549.947,129.157,        name="Princess Robot Bubblegum"},
-        {-710.626,-905.881,19.015,      name="Princess Robot Bubblegum"},
-        {1207.701,-1479.537,35.166,     name="Princess Robot Bubblegum"},
-        {-90.151,939.849,232.515,       name="Princess Robot Bubblegum"},
-        {-180.059,-631.866,48.534,      name="Princess Robot Bubblegum"},
-        {-299.634,2847.173,55.485,      name="Princess Robot Bubblegum"},
-        {621.365,-409.254,-1.308,       name="Princess Robot Bubblegum"},
-        {-988.92,-102.669,40.157,       name="Princess Robot Bubblegum"},
-        {63.999,3683.868,39.763,        name="Pogo"},
-        {-688.668,5829.006,16.775,      name="Pogo"},
-        {1540.435,6323.453,23.519,      name="Pogo"},
-        {2725.806,4142.14,43.293,       name="Pogo"},
-        {1297.977,4306.744,37.897,      name="Pogo"},
-        {1189.579,2641.222,38.413,      name="Pogo"},
-        {-440.796,1596.48,358.648,      name="Pogo"},
-        {-2237.557,249.282,175.352,     name="Pogo"},
-        {-1211.932,-959.965,0.393,      name="Pogo"},
-        {153.845,-3077.341,6.744,       name="Pogo"},
-        {-66.231,-1451.825,31.164,      name="Pogo"},
-        {987.982,-136.863,73.454,       name="Pogo"},
-        {-507.032,393.905,96.411,       name="Pogo"},
-        {172.1275,-564.1393,22.145,     name="Pogo"},
-        {1497.202,-2133.147,76.302,     name="Pogo"},
-        {-2958.706,386.41,14.434,       name="Pogo"},
-        {1413.963,1162.483,114.351,     name="Pogo"},
-        {-1648.058,3018.313,31.25,      name="R. Space Ranger (Commander)"},
-        {-1120.2,4977.292,185.445,      name="R. Space Ranger (Commander)"},
-        {1310.683,6545.917,4.798,       name="R. Space Ranger (Commander)"},
-        {1714.573,4790.844,41.539,      name="R. Space Ranger (Commander)"},
-        {1886.6438,3913.7578,32.039,    name="R. Space Ranger (Commander)"},
-        {543.476,3074.79,40.324,        name="R. Space Ranger (Commander)"},
-        {1408.045,2157.34,97.575,       name="R. Space Ranger (Commander)"},
-        {-3243.858,996.179,12.486,      name="R. Space Ranger (Commander)"},
-        {-1905.566,-709.6311,8.766,     name="R. Space Ranger (Commander)"},
-        {-1462.089,182.089,54.953,      name="R. Space Ranger (Commander)"},
-        {86.997,812.619,211.062,        name="R. Space Ranger (Commander)"},
-        {-886.554,-2096.579,8.699,      name="R. Space Ranger (Commander)"},
-        {367.684,-2113.475,16.274,      name="R. Space Ranger (Commander)"},
-        {679.009,-1522.824,8.834,       name="R. Space Ranger (Commander)"},
-        {1667.377,0.119,165.118,        name="R. Space Ranger (Commander)"},
-        {-293.486,-342.485,9.481,       name="R. Space Ranger (Commander)"},
-        {462.664,-765.675,26.358,       name="R. Space Ranger (Commander)"},
-        {-57.784,1939.74,189.655,       name="R. Space Ranger (Commander)"},
-        {2618.4114,1692.3947,31.9462,   name="R. Space Ranger (Generic)"},
-        {-1894.5538,2043.5173,140.9093, name="R. Space Ranger (Generic)"},
-        {2221.8577,5612.785,54.0631,    name="R. Space Ranger (Generic)"},
-        {-551.3712,5330.728,73.9861,    name="R. Space Ranger (Generic)"},
-        {-2171.4058,3441.188,32.175,    name="R. Space Ranger (Generic)"},
-        {1848.131,2700.702,63.008,      name="R. Space Ranger (Generic)"},
-        {-1719.6017,-232.886,54.4441,   name="R. Space Ranger (Generic)"},
-        {-55.3785,-2519.7546,7.2875,    name="R. Space Ranger (Generic)"},
-        {874.8454,-2163.9976,32.3688,   name="R. Space Ranger (Generic)"},
-        {-43.6983,-1747.9608,29.2778,   name="R. Space Ranger (Generic)"},
-        {173.324,-1208.43,29.6564,      name="R. Space Ranger (Generic)"},
-        {2936.3228,4620.4834,48.767,    name="R. Space Ranger (Generic)"},
-        {3514.6545,3754.6873,34.4766,   name="R. Space Ranger (Generic)"},
-        {656.9,-1046.9314,21.5745,      name="R. Space Ranger (Generic)"},
-        {-141.1536,234.8366,99.0008,    name="R. Space Ranger (Generic)"},
-        {-1806.68,427.6159,131.765,     name="R. Space Ranger (Generic)"},
-        {-908.9565,-1148.9175,2.3868,   name="R. Space Ranger (Generic)"},
-        {387.9323,2570.408,43.299,      name="R. Space Ranger (Generic)"},
-        {2399.5054,3062.7463,53.4703,   name="Beast", hint="99 and 100 will only appear after you've collected all the others."},
-        {2394.7214,3062.6895,51.2379,   name="Sasquatch (Bigfoot)", hint="99 and 100 will only appear after you've collected all the others."}
+        [1]    = {coords = v3(-2557.4053,2315.502,33.742),    name="Pogo"},
+        [2]    = {coords = v3(2487.128,3759.327,42.317),      name="Alien"},
+        [3]    = {coords = v3(457.198,5573.861,780.184),      name="Alien"},
+        [4]    = {coords = v3(-1280.407,2549.743,17.534),     name="Alien"},
+        [5]    = {coords = v3(-107.722,-856.981,38.261),      name="Alien"},
+        [6]    = {coords = v3(-1050.513,-522.612,36.634),     name="Alien"},
+        [7]    = {coords = v3(693.306,1200.583,344.524),      name="Alien"},
+        [8]    = {coords = v3(2500.654,-389.482,94.245),      name="Alien"},
+        [9]    = {coords = v3(483.4,-3110.621,6.627),         name="Alien"},
+        [10]   = {coords = v3(-2169.277,5192.986,16.295),     name="Impotent Rage"},
+        [11]   = {coords = v3(177.674,6394.054,31.376),       name="Impotent Rage"},
+        [12]   = {coords = v3(2416.9421,4994.557,45.239),     name="Impotent Rage"},
+        [13]   = {coords = v3(1702.9,3291,48.72),             name="Impotent Rage"},
+        [14]   = {coords = v3(-600.813,2088.011,132.336),     name="Impotent Rage"},
+        [15]   = {coords = v3(-3019.7935,41.9486,10.2924),    name="Impotent Rage"},
+        [16]   = {coords = v3(-485.4648,-54.441,38.9945),     name="Impotent Rage"},
+        [17]   = {coords = v3(-1350.785,-1547.089,4.675),     name="Impotent Rage"},
+        [18]   = {coords = v3(379.535,-1509.398,29.34),       name="Impotent Rage"},
+        [19]   = {coords = v3(2548.713,385.386,108.423),      name="Impotent Rage"},
+        [20]   = {coords = v3(-769.346,877.307,203.424),      name="Impotent Rage"},
+        [21]   = {coords = v3(-1513.54,1517.184,111.305),     name="Impotent Rage"},
+        [22]   = {coords = v3(-1023.899,190.912,61.282),      name="Impotent Rage"},
+        [23]   = {coords = v3(1136.355,-666.404,57.044),      name="Impotent Rage"},
+        [24]   = {coords = v3(3799.76,4473.048,6.032),        name="Impotent Rage"},
+        [25]   = {coords = v3(1243.588,-2572.136,42.603),     name="Impotent Rage"},
+        [26]   = {coords = v3(219.811,97.162,96.336),         name="Impotent Rage"},
+        [27]   = {coords = v3(-1545.826,-449.397,40.318),     name="Impotent Rage"},
+        [28]   = {coords = v3(-928.683,-2938.691,13.059),     name="Princess Robot Bubblegum"},
+        [29]   = {coords = v3(-1647.926,-1094.716,12.736),    name="Princess Robot Bubblegum"},
+        [30]   = {coords = v3(-2185.939,4249.814,48.803),     name="Princess Robot Bubblegum"},
+        [31]   = {coords = v3(-262.339,4729.229,137.329),     name="Princess Robot Bubblegum"},
+        [32]   = {coords = v3(-311.701,6315.024,31.978),      name="Princess Robot Bubblegum"},
+        [33]   = {coords = v3(3306.444,5194.742,17.432),      name="Princess Robot Bubblegum"},
+        [34]   = {coords = v3(1389.886,3608.834,35.06),       name="Princess Robot Bubblegum"},
+        [35]   = {coords = v3(852.846,2166.327,52.717),       name="Princess Robot Bubblegum"},
+        [36]   = {coords = v3(-1501.96,814.071,181.433),      name="Princess Robot Bubblegum"},
+        [37]   = {coords = v3(2634.972,2931.061,44.608),      name="Princess Robot Bubblegum"},
+        [38]   = {coords = v3(660.57,549.947,129.157),        name="Princess Robot Bubblegum"},
+        [39]   = {coords = v3(-710.626,-905.881,19.015),      name="Princess Robot Bubblegum"},
+        [40]   = {coords = v3(1207.701,-1479.537,35.166),     name="Princess Robot Bubblegum"},
+        [41]   = {coords = v3(-90.151,939.849,232.515),       name="Princess Robot Bubblegum"},
+        [42]   = {coords = v3(-180.059,-631.866,48.534),      name="Princess Robot Bubblegum"},
+        [43]   = {coords = v3(-299.634,2847.173,55.485),      name="Princess Robot Bubblegum"},
+        [44]   = {coords = v3(621.365,-409.254,-1.308),       name="Princess Robot Bubblegum"},
+        [45]   = {coords = v3(-988.92,-102.669,40.157),       name="Princess Robot Bubblegum"},
+        [46]   = {coords = v3(63.999,3683.868,39.763),        name="Pogo"},
+        [47]   = {coords = v3(-688.668,5829.006,16.775),      name="Pogo"},
+        [48]   = {coords = v3(1540.435,6323.453,23.519),      name="Pogo"},
+        [49]   = {coords = v3(2725.806,4142.14,43.293),       name="Pogo"},
+        [50]   = {coords = v3(1297.977,4306.744,37.897),      name="Pogo"},
+        [51]   = {coords = v3(1189.579,2641.222,38.413),      name="Pogo"},
+        [52]   = {coords = v3(-440.796,1596.48,358.648),      name="Pogo"},
+        [53]   = {coords = v3(-2237.557,249.282,175.352),     name="Pogo"},
+        [54]   = {coords = v3(-1211.932,-959.965,0.393),      name="Pogo"},
+        [55]   = {coords = v3(153.845,-3077.341,6.744),       name="Pogo"},
+        [56]   = {coords = v3(-66.231,-1451.825,31.164),      name="Pogo"},
+        [57]   = {coords = v3(987.982,-136.863,73.454),       name="Pogo"},
+        [58]   = {coords = v3(-507.032,393.905,96.411),       name="Pogo"},
+        [59]   = {coords = v3(172.1275,-564.1393,22.145),     name="Pogo"},
+        [60]   = {coords = v3(1497.202,-2133.147,76.302),     name="Pogo"},
+        [61]   = {coords = v3(-2958.706,386.41,14.434),       name="Pogo"},
+        [62]   = {coords = v3(1413.963,1162.483,114.351),     name="Pogo"},
+        [63]   = {coords = v3(-1648.058,3018.313,31.25),      name="R. Space Ranger (Commander)"},
+        [64]   = {coords = v3(-1120.2,4977.292,185.445),      name="R. Space Ranger (Commander)"},
+        [65]   = {coords = v3(1310.683,6545.917,4.798),       name="R. Space Ranger (Commander)"},
+        [66]   = {coords = v3(1714.573,4790.844,41.539),      name="R. Space Ranger (Commander)"},
+        [67]   = {coords = v3(1886.6438,3913.7578,32.039),    name="R. Space Ranger (Commander)"},
+        [68]   = {coords = v3(543.476,3074.79,40.324),        name="R. Space Ranger (Commander)"},
+        [69]   = {coords = v3(1408.045,2157.34,97.575),       name="R. Space Ranger (Commander)"},
+        [70]   = {coords = v3(-3243.858,996.179,12.486),      name="R. Space Ranger (Commander)"},
+        [71]   = {coords = v3(-1905.566,-709.6311,8.766),     name="R. Space Ranger (Commander)"},
+        [72]   = {coords = v3(-1462.089,182.089,54.953),      name="R. Space Ranger (Commander)"},
+        [73]   = {coords = v3(86.997,812.619,211.062),        name="R. Space Ranger (Commander)"},
+        [74]   = {coords = v3(-886.554,-2096.579,8.699),      name="R. Space Ranger (Commander)"},
+        [75]   = {coords = v3(367.684,-2113.475,16.274),      name="R. Space Ranger (Commander)"},
+        [76]   = {coords = v3(679.009,-1522.824,8.834),       name="R. Space Ranger (Commander)"},
+        [77]   = {coords = v3(1667.377,0.119,165.118),        name="R. Space Ranger (Commander)"},
+        [78]   = {coords = v3(-293.486,-342.485,9.481),       name="R. Space Ranger (Commander)"},
+        [79]   = {coords = v3(462.664,-765.675,26.358),       name="R. Space Ranger (Commander)"},
+        [80]   = {coords = v3(-57.784,1939.74,189.655),       name="R. Space Ranger (Commander)"},
+        [81]   = {coords = v3(2618.4114,1692.3947,31.9462),   name="R. Space Ranger (Generic)"},
+        [82]   = {coords = v3(-1894.5538,2043.5173,140.9093), name="R. Space Ranger (Generic)"},
+        [83]   = {coords = v3(2221.8577,5612.785,54.0631),    name="R. Space Ranger (Generic)"},
+        [84]   = {coords = v3(-551.3712,5330.728,73.9861),    name="R. Space Ranger (Generic)"},
+        [85]   = {coords = v3(-2171.4058,3441.188,32.175),    name="R. Space Ranger (Generic)"},
+        [86]   = {coords = v3(1848.131,2700.702,63.008),      name="R. Space Ranger (Generic)"},
+        [87]   = {coords = v3(-1719.6017,-232.886,54.4441),   name="R. Space Ranger (Generic)"},
+        [88]   = {coords = v3(-55.3785,-2519.7546,7.2875),    name="R. Space Ranger (Generic)"},
+        [89]   = {coords = v3(874.8454,-2163.9976,32.3688),   name="R. Space Ranger (Generic)"},
+        [90]   = {coords = v3(-43.6983,-1747.9608,29.2778),   name="R. Space Ranger (Generic)"},
+        [91]   = {coords = v3(173.324,-1208.43,29.6564),      name="R. Space Ranger (Generic)"},
+        [92]   = {coords = v3(2936.3228,4620.4834,48.767),    name="R. Space Ranger (Generic)"},
+        [93]   = {coords = v3(3514.6545,3754.6873,34.4766),   name="R. Space Ranger (Generic)"},
+        [94]   = {coords = v3(656.9,-1046.9314,21.5745),      name="R. Space Ranger (Generic)"},
+        [95]   = {coords = v3(-141.1536,234.8366,99.0008),    name="R. Space Ranger (Generic)"},
+        [96]   = {coords = v3(-1806.68,427.6159,131.765),     name="R. Space Ranger (Generic)"},
+        [97]   = {coords = v3(-908.9565,-1148.9175,2.3868),   name="R. Space Ranger (Generic)"},
+        [98]   = {coords = v3(387.9323,2570.408,43.299),      name="R. Space Ranger (Generic)"},
+        [99]   = {coords = v3(2399.5054,3062.7463,53.4703),   name="Beast",               hint="99 and 100 will only appear after you've collected all the others."},
+        [100]  = {coords = v3(2394.7214,3062.6895,51.2379),   name="Sasquatch (Bigfoot)", hint="99 and 100 will only appear after you've collected all the others."}
     },
     ghostsExposed = {
         {63.7611,6664.9165,30.7754,    56.4365,6648.026,35.202,     name="Salton",         hint="Spawns at: [03:00 - 04:00]"},
@@ -518,72 +536,72 @@ local collectibles = {
         {-117.05,-1025.36,27.318}
     },
     movieProps = {
-        {94.202,-1294.965,29.067,     name="Meltdown Film Reel"},
-        {-1010.051,-502.175,36.493,   name="WIFA Award"},
-        {2517.254,3789.326,53.698,    name="Indian Headdress"},
-        {-2349.036,3270.785,32.968,   name="Alien Head"},
-        {1165.416,247.5531,-50.73,    name="Mummy Head", extraWait_Time=8},
-        {-41.795,2873.231,59.625,     name="Clapperboard"},
-        {-1169.573,4926.988,223.7279, name="Monster Mask"},
-        {744.011,-971.328,24.57,  463.492,-737.44,27.35,    514.737,-859.692,25.13,  name="Tiger Rug",   hint="Random Event: Vehicle Prop (Pony)"},
-        {-667.25,80.216,51.14,    -2316.255,280.381,169.48, -1861.402,150.232,80.22, name="Sarcophagus", hint="Random Event: Vehicle Prop (Rumpo)"},
-        {-290.654,6303.431,31.47, -77.11,6537.942,31.50,    1254.091,6483.862,20.62, name="Globe",       hint="Random Event: Vehicle Prop (Rebel)"}
+        [1]  = {coords = v3(94.202,-1294.965,29.067),     name="Meltdown Film Reel"},
+        [2]  = {coords = v3(-1010.051,-502.175,36.493),   name="WIFA Award"},
+        [3]  = {coords = v3(2517.254,3789.326,53.698),    name="Indian Headdress"},
+        [4]  = {coords = v3(-2349.036,3270.785,32.968),   name="Alien Head"},
+        [5]  = {coords = v3(1165.416,247.5531,-50.73),    name="Mummy Head", extraWait_Time=8},
+        [6]  = {coords = v3(-41.795,2873.231,59.625),     name="Clapperboard"},
+        [7]  = {coords = v3(-1169.573,4926.988,223.7279), name="Monster Mask"},
+        [8]  = {eventCoords = { v3(744.011,-971.328,24.57),  v3(463.492,-737.44,27.35),    v3(514.737,-859.692,25.13)  }, name="Tiger Rug",   hint="Random Event: Vehicle Prop (Pony)"},
+        [9]  = {eventCoords = { v3(-667.25,80.216,51.14),    v3(-2316.255,280.381,169.48), v3(-1861.402,150.232,80.22) }, name="Sarcophagus", hint="Random Event: Vehicle Prop (Rumpo)"},
+        [10] = {eventCoords = { v3(-290.654,6303.431,31.47), v3(-77.11,6537.942,31.50),    v3(1254.091,6483.862,20.62) }, name="Globe",       hint="Random Event: Vehicle Prop (Rebel)"}
     },
     playingCards = {
-        {1992.183,3046.28,47.125},
-        {120.38,-1297.669,28.705},
-        {79.293,3704.578,40.945},
-        {2937.738,5325.846,100.176},
-        {727.153,4189.818,40.476},
-        {-103.14,369.008,112.267},
-        {99.959,6619.539,32.314},
-        {-282.6689,6226.274,31.3554},
-        {1707.556,4921.021,41.865},
-        {-1581.8604,5204.295,3.9093},
-        {10.8264,-1101.1573,29.613},
-        {1690.0428,3589.0144,35.5883},
-        {1159.1442,-316.5876,69.5134},
-        {2341.8074,2571.737,47.6079},
-        {-3048.193,585.2986,7.7708},
-        {-3149.7073,1115.8302,20.7216},
-        {-1840.641,-1235.3188,13.2937},
-        {810.6056,-2978.7407,5.8116},
-        {202.2747,-1645.2251,29.7679},
-        {253.2056,215.9778,106.2848},
-        {-1166.183,-233.9277,38.262},
-        {729.9886,2514.7131,73.1663},
-        {188.1851,3076.3318,43.0447},
-        {3687.9143,4569.0728,24.9397},
-        {1876.9755,6410.034,46.5982},
-        {2121.1458,4784.6865,40.8114},
-        {900.0845,3558.1562,33.6258},
-        {2695.2722,4324.496,45.6516},
-        {-1829.4277,798.4049,138.0583},
-        {-1203.7251,-1558.8663,4.1736},
-        {-73.2829,-2005.4764,18.2561},
-        {-1154.2014,-527.2959,31.7117},
-        {990.0786,-1800.3907,31.3781},
-        {827.5513,-2158.7441,29.417},
-        {-1512.0801,-103.625,54.2027},
-        {-970.7493,104.3396,55.0431},
-        {-428.6815,1213.9049,325.9329},
-        {-167.8387,-297.1122,39.0353},
-        {2747.3215,3465.1196,55.6336},
-        {-1103.659,2714.6895,19.4539},
-        {549.4841,-189.3053,54.4369},
-        {-1287.6895,-1118.8177,6.3057},
-        {1131.428,-982.0297,46.6521},
-        {-1028.0834,-2746.9358,13.3589},
-        {-538.5779,-1278.5424,26.3437},
-        {1326.4489,-1651.2626,52.0964},
-        {183.3252,-685.2661,42.607},
-        {1487.8461,1129.2,114.3005},
-        {-2305.538,3387.973,31.0201},
-        {-522.632,4193.4595,193.7517},
-        {-748.9897,5599.5337,41.5794},
-        {-288.0628,2545.2104,74.4223},
-        {2565.3264,296.8703,108.7367},
-        {-408.2484,585.783,124.378}
+        [1]   = {coords = v3(1992.183,3046.28,47.125)},
+        [2]   = {coords = v3(120.38,-1297.669,28.705)},
+        [3]   = {coords = v3(79.293,3704.578,40.945)},
+        [4]   = {coords = v3(2937.738,5325.846,100.176)},
+        [5]   = {coords = v3(727.153,4189.818,40.476)},
+        [6]   = {coords = v3(-103.14,369.008,112.267)},
+        [7]   = {coords = v3(99.959,6619.539,32.314)},
+        [8]   = {coords = v3(-282.6689,6226.274,31.3554)},
+        [9]   = {coords = v3(1707.556,4921.021,41.865)},
+        [10]  = {coords = v3(-1581.8604,5204.295,3.9093)},
+        [11]  = {coords = v3(10.8264,-1101.1573,29.613)},
+        [12]  = {coords = v3(1690.0428,3589.0144,35.5883)},
+        [13]  = {coords = v3(1159.1442,-316.5876,69.5134)},
+        [14]  = {coords = v3(2341.8074,2571.737,47.6079)},
+        [15]  = {coords = v3(-3048.193,585.2986,7.7708)},
+        [16]  = {coords = v3(-3149.7073,1115.8302,20.7216)},
+        [17]  = {coords = v3(-1840.641,-1235.3188,13.2937)},
+        [18]  = {coords = v3(810.6056,-2978.7407,5.8116)},
+        [19]  = {coords = v3(202.2747,-1645.2251,29.7679)},
+        [20]  = {coords = v3(253.2056,215.9778,106.2848)},
+        [21]  = {coords = v3(-1166.183,-233.9277,38.262)},
+        [22]  = {coords = v3(729.9886,2514.7131,73.1663)},
+        [23]  = {coords = v3(188.1851,3076.3318,43.0447)},
+        [24]  = {coords = v3(3687.9143,4569.0728,24.9397)},
+        [25]  = {coords = v3(1876.9755,6410.034,46.5982)},
+        [26]  = {coords = v3(2121.1458,4784.6865,40.8114)},
+        [27]  = {coords = v3(900.0845,3558.1562,33.6258)},
+        [28]  = {coords = v3(2695.2722,4324.496,45.6516)},
+        [29]  = {coords = v3(-1829.4277,798.4049,138.0583)},
+        [30]  = {coords = v3(-1203.7251,-1558.8663,4.1736)},
+        [31]  = {coords = v3(-73.2829,-2005.4764,18.2561)},
+        [32]  = {coords = v3(-1154.2014,-527.2959,31.7117)},
+        [33]  = {coords = v3(990.0786,-1800.3907,31.3781)},
+        [34]  = {coords = v3(827.5513,-2158.7441,29.417)},
+        [35]  = {coords = v3(-1512.0801,-103.625,54.2027)},
+        [36]  = {coords = v3(-970.7493,104.3396,55.0431)},
+        [37]  = {coords = v3(-428.6815,1213.9049,325.9329)},
+        [38]  = {coords = v3(-167.8387,-297.1122,39.0353)},
+        [39]  = {coords = v3(2747.3215,3465.1196,55.6336)},
+        [40]  = {coords = v3(-1103.659,2714.6895,19.4539)},
+        [41]  = {coords = v3(549.4841,-189.3053,54.4369)},
+        [42]  = {coords = v3(-1287.6895,-1118.8177,6.3057)},
+        [43]  = {coords = v3(1131.428,-982.0297,46.6521)},
+        [44]  = {coords = v3(-1028.0834,-2746.9358,13.3589)},
+        [45]  = {coords = v3(-538.5779,-1278.5424,26.3437)},
+        [46]  = {coords = v3(1326.4489,-1651.2626,52.0964)},
+        [47]  = {coords = v3(183.3252,-685.2661,42.607)},
+        [48]  = {coords = v3(1487.8461,1129.2,114.3005)},
+        [49]  = {coords = v3(-2305.538,3387.973,31.0201)},
+        [50]  = {coords = v3(-522.632,4193.4595,193.7517)},
+        [51]  = {coords = v3(-748.9897,5599.5337,41.5794)},
+        [52]  = {coords = v3(-288.0628,2545.2104,74.4223)},
+        [53]  = {coords = v3(2565.3264,296.8703,108.7367)},
+        [54]  = {coords = v3(-408.2484,585.783,124.378)}
     },
     signalJammers = {
         {1006.372,-2881.68,30.422},
@@ -750,26 +768,26 @@ local collectibles = {
             }
         },
         { group = "Arcade", locations = {
-            { coords = v3(-247.6898,6212.915,30.944), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(1695.1714,4785.1177,40.9847), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-116.3816,-1772.1368,28.8592), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-599.5152,279.6308,81.074), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-1273.2231,-304.1054,37.2289), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(758.3455,-815.9312,25.2905), bools = { 31723, 31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." }
+            { coords = v3(-247.6898,6212.915,30.944),    bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(1695.1714,4785.1177,40.9847),  bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-116.3816,-1772.1368,28.8592), bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-599.5152,279.6308,81.074),    bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-1273.2231,-304.1054,37.2289), bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(758.3455,-815.9312,25.2905),   bools = { 31723,31709 }, artist = "CircoLoco Records", title = "Green EP", hint = "Note:\nIt only spawns in one of them." }
             }
         },
         { group = "Agency", locations = {
-            { coords = v3(388.3036,-74.6683,67.1805), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
-            { coords = v3(-1016.535,-413.186,38.6161), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
+            { coords = v3(388.3036,-74.6683,67.1805),   bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
+            { coords = v3(-1016.535,-413.186,38.6161),  bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
             { coords = v3(-589.4908,-707.4646,35.2844), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." },
             { coords = v3(-1039.083,-756.4792,18.8395), bools = { 32316,32294,32287 }, artist = "Dr. Dre", hint = "Note:\nRequires completion of the Dr. Dre contract before it will be available.\nIt only spawns in one of them." }
             }
         },
         { group = "Permanent Locations (Chop Shop DLC)", locations = {
             { coords = v3(-55.69081,-1089.542,25.913), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(77.626,-1946.111,21.038), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-435.913,1058.663,327.705), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
-            { coords = v3(-67.077,-806.703,321.239), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(77.626,-1946.111,21.038),    bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-435.913,1058.663,327.705),  bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
+            { coords = v3(-67.077,-806.703,321.239),   bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." },
             { coords = v3(-1636.231,-1091.961,13.238), bools = { 42149 }, artist = "DâM-FunK", title = "Even the Score", hint = "Note:\nIt only spawns in one of them." }
             }
         }
@@ -1671,15 +1689,15 @@ local others = {
     },
     -- Eclipse Blvd Garage Week: February 16, 2023
     streetDealers = {
-        [1] = {coords = v3(550.8953,-1774.5175,28.3121)},
-        [2] = {coords = v3(-154.924,6434.428,30.916)},
-        [3] = {coords = v3(400.9768,2635.3691,43.5045)},
-        [4] = {coords = v3(1533.846,3796.837,33.456)},
-        [5] = {coords = v3(-1666.642,-1080.0201,12.1537)},
-        [6] = {coords = v3(-1560.6105,-413.3221,37.1001)},
-        [7] = {coords = v3(819.2939,-2988.8562,5.0209)},
-        [8] = {coords = v3(1001.701,-2162.448,29.567)},
-        [9] = {coords = v3(1388.9678,-1506.0815,57.0407)},
+        [1]  = {coords = v3(550.8953,-1774.5175,28.3121)},
+        [2]  = {coords = v3(-154.924,6434.428,30.916)},
+        [3]  = {coords = v3(400.9768,2635.3691,43.5045)},
+        [4]  = {coords = v3(1533.846,3796.837,33.456)},
+        [5]  = {coords = v3(-1666.642,-1080.0201,12.1537)},
+        [6]  = {coords = v3(-1560.6105,-413.3221,37.1001)},
+        [7]  = {coords = v3(819.2939,-2988.8562,5.0209)},
+        [8]  = {coords = v3(1001.701,-2162.448,29.567)},
+        [9]  = {coords = v3(1388.9678,-1506.0815,57.0407)},
         [10] = {coords = v3(-3054.574,556.711,0.661)},
         [11] = {coords = v3(-72.8903,80.717,70.6161)},
         [12] = {coords = v3(198.6676,-167.0663,55.3187)},
@@ -1761,6 +1779,7 @@ end
 local function has_weapon_component(weaponComponentId)
     return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
 end
+
 local function has_buried_stash(buriedStashId)
     return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
 end
@@ -1805,18 +1824,34 @@ local function has_trick_or_treat(trickOrTreatId)
     return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
 end
 
--- (this function is not from R* source code)
-local function GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
-    local count = 0
-    for i = 0, 2 do
-        if has_epsilon_robe(i) then
-            count = count + 1
+local function countCollectedBoolStatItems(hasCollectibleFunc, endIndex, hasCollectibleFunc__params)
+    endIndex = endIndex - 1
+
+    local startIndex = 0
+    local collectedCount = 0
+
+    for i = startIndex, endIndex do
+        if hasCollectibleFunc(i, hasCollectibleFunc__params) then
+            collectedCount = collectedCount + 1
         end
     end
-    return count
+    return collectedCount
 end
 
--- (this function is not from R* source code)
+local function checkServiceCarbineUnlock(has_weapon_component)
+    if weapon.has_ped_got_weapon(player.player_ped(), gameplay.get_hash_key("weapon_tacticalrifle")) then
+        return true
+    end
+
+    for i = 1, 5 do
+        if not has_weapon_component(i - 1) then
+            return false
+        end
+    end
+
+    return true
+end
+
 local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     --[[
     R* ISSUE: Collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
@@ -1841,35 +1876,13 @@ local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     return count
 end
 
--- This is the same code as the leaked source code, couldn't find a stat for it.
-local function GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
-    local count = 0
-    for i = 0, 4 do
-        if has_weapon_component(i) then
-            count = count + 1
-        end
-    end
-    return count
-end
-
--- (this function is not from R* source code)
-local function GET_LOCAL_PLAYER_NUM_JUNK_ENERGY_SKYDIVES_COLLECTED()
-    local count = 0
-    for i = 0, 9 do
-        if has_junk_energy_skydive(i) then
-            count = count + 1
-        end
-    end
-    return count
-end
-
 -- This is the same code as the leaked source code.
 local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
     local invalidstuntJumpId = -1
 
     if stuntJumpId ~= invalidstuntJumpId then
-        local stat = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
-        local stuntJumpsFoundMask = stats.stat_get_u64(stat)
+        local statHash = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
+        local stuntJumpsFoundMask = stats.stat_get_u64(statHash)
         return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
     end
 
@@ -1884,14 +1897,14 @@ local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collecti
     }
 
     -- Iterate through all pickups
-    for i, pickup in ipairs(pickup_Table) do
+    for i, pickupGroup in ipairs(pickup_Table) do
         if not feat.on then
             break
         end
 
         -- Skips teleports related to random events.
         if collectibleTypeName == "Movie Props" then
-            if i > 7 then
+            if i >= 8 then
                 return
             end
         end
@@ -1899,24 +1912,24 @@ local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collecti
         -- Checks if we didn't already collected that one, if so skip.
         if not collectibleHandlers_Table[collectibleTypeName](i-1) then
             local initialWait_Time = 4
-            if pickup["extraWait_Time"] then
-                initialWait_Time = pickup["extraWait_Time"]
+            if pickupGroup["extraWait_Time"] then
+                initialWait_Time = pickupGroup["extraWait_Time"]
             end
 
-            if pickup["notification"] then
-                menu.notify(pickup["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
+            if pickupGroup["notification"] then
+                menu.notify(pickupGroup["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
             end
 
             menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #pickup_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
 
-            teleport_myself(pickup[1], pickup[2], pickup[3])
+            teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
 
             -- If this flag is set, it means we must wait a lil longer after a teleport, ex: loading the Casino building.
-            if pickup["extraWait_Time"] then
+            if pickupGroup["extraWait_Time"] then
                 local start_Time = os.clock()
                 while (os.clock() - start_Time) < initialWait_Time do
                     system.yield()
-                    teleport_myself(pickup[1], pickup[2], pickup[3])
+                    teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
                     system.yield(100)
                 end
             end
@@ -2299,17 +2312,6 @@ local seasonalCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonals]", "par
 
 local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]", "parent", collectiblesOnlineMenu_Feat.id)
 
-
-local dailyCollectiblesOnlineMenu_Feat = menu.add_feature("Daily Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
-
-local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Daily Collectibles]", "parent", dailyCollectiblesOnlineMenu_Feat.id)
-
-local weeklyCollectiblesOnlineMenu_Feat = menu.add_feature("Weekly Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
-
-local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectiblesOnlineParentMenu_Feat.id)
-
-local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent", collectiblesOnlineParentMenu_Feat.id)
-
 ------------------------ Action Figures (100)       ------------------------
     local actionFiguresMenu_Feat = menu.add_feature("Action Figures (-1/100)", "parent", collectiblesOnlineMenu_Feat.id, function()
         menu.notify("99 and 100 will only appear after you've collected all the others.", SCRIPT_TITLE, 8, COLOR.BLUE.int)
@@ -2333,12 +2335,12 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     end)
     autoActionFigures_Feat.hint = "This will automatically collect the 100 Action Figures for you, allowing you to go AFK.\n\nFor performance reasons, it is highly recommended to do this in an invite-only session."
 
-    for i, actionFigure in ipairs(collectibles.actionFigures) do
-        actionFigure.feat = menu.add_feature("Action Figure " .. i .. " (" .. actionFigure.name .. ")", "action", actionFiguresMenu_Feat.id, function()
-            teleport_myself(actionFigure[1], actionFigure[2], actionFigure[3])
+    for i, actionFigureGroup in ipairs(collectibles.actionFigures) do
+        actionFigureGroup.feat = menu.add_feature("Action Figure " .. i .. " (" .. actionFigureGroup.name .. ")", "action", actionFiguresMenu_Feat.id, function()
+            teleport_myself(actionFigureGroup.coords.x, actionFigureGroup.coords.y, actionFigureGroup.coords.z)
         end)
-        if actionFigure.hint then
-            actionFigure.feat.hint = actionFigure.hint
+        if actionFigureGroup.hint then
+            actionFigureGroup.feat.hint = actionFigureGroup.hint
         end
     end
 --
@@ -2421,19 +2423,19 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     end)
     autoMovieProps_Feat.hint = "This will automatically collect the first 7 Movie Props for you, allowing you to go AFK.\n\nFor performance reasons, it is highly recommended to do this in an invite-only session."
 
-    for i, movieProp in ipairs(collectibles.movieProps) do
+    for i, moviePropGroup in ipairs(collectibles.movieProps) do
         if i <= 7 then
-            movieProp.feat = menu.add_feature("Movie Prop " .. i, "action", moviePropsMenu_Feat.id, function()
-                teleport_myself(movieProp[1], movieProp[2], movieProp[3])
+            moviePropGroup.feat = menu.add_feature("Movie Prop " .. i, "action", moviePropsMenu_Feat.id, function()
+                teleport_myself(moviePropGroup.coords.x, moviePropGroup.coords.y, moviePropGroup.coords.z)
             end)
         else
-            movieProp.feat = menu.add_feature("Movie Prop " .. i .. " (" .. movieProp.name .. ")", "action_value_i", moviePropsMenu_Feat.id, function(feat)
-                local index = (feat.value == 1 and 1) or (feat.value == 2 and 4) or 7
-                teleport_myself(movieProp[index], movieProp[index + 1], movieProp[index + 2])
+            moviePropGroup.feat = menu.add_feature("Movie Prop " .. i .. " (" .. moviePropGroup.name .. ")", "action_value_i", moviePropsMenu_Feat.id, function(feat)
+                local selectedCoords = moviePropGroup.eventCoords[feat.value]
+                teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
             end)
-            movieProp.feat.min = 1
-            movieProp.feat.max = 3
-            movieProp.feat.hint = movieProp.hint
+            moviePropGroup.feat.min = 1
+            moviePropGroup.feat.max = 3
+            moviePropGroup.feat.hint = moviePropGroup.hint
         end
     end
 --
@@ -2452,9 +2454,9 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     autoPlayingCards_Feat.hint = "This will automatically collect the 54 Playing Cards for you, allowing you to go AFK.\n\nFor performance reasons, it is highly recommended to do this in an invite-only session."
 
 
-    for i, playingCard in ipairs(collectibles.playingCards) do
-        playingCard.feat = menu.add_feature("Playing Card " .. i, "action", playingCardsMenu_Feat.id, function()
-            teleport_myself(playingCard[1], playingCard[2], playingCard[3])
+    for i, playingCardGroup in ipairs(collectibles.playingCards) do
+        playingCardGroup.feat = menu.add_feature("Playing Card " .. i, "action", playingCardsMenu_Feat.id, function()
+            teleport_myself(playingCardGroup.coords.x, playingCardGroup.coords.y, playingCardGroup.coords.z)
         end)
     end
 --
@@ -2502,6 +2504,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Stunt Jumps (50)           ------------------------
     local stuntJumpsMenu_Feat = menu.add_feature("Stunt Jumps (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
+
     for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
         stuntJumpGroup.feat = menu.add_feature("Stunt Jump " .. i, "action_value_i", stuntJumpsMenu_Feat.id, function(feat)
             local selectedCoords = nil
@@ -2603,8 +2606,13 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     sprayCans_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
 --
 
+local dailyCollectiblesOnlineMenu_Feat = menu.add_feature("Daily Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
+
+local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Daily Collectibles]", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+
 ------------------------ Buried Stashes (2)         ------------------------
     local buriedStashesMenu_Feat = menu.add_feature("Buried Stashes (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    buriedStashesMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
         buriedStashGroup.feat = menu.add_feature("Buried Stash " .. i, "action", buriedStashesMenu_Feat.id, function()
@@ -2614,6 +2622,20 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Hidden Caches (10)         ------------------------
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    hiddenCachesMenu_Feat.hint = "Synced with other players: Yes"
+
+    -- TODO: So that it works out, I need to implement that we can loop trough the Main Loop content but I was lazy at the time I'm writting this.
+    --local autohiddenCaches_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", hiddenCachesMenu_Feat.id, function(feat)
+    --    if feat.on then
+    --        local hiddenCacheHash_Table = {
+    --            gameplay.get_hash_key("h4_prop_h4_box_ammo_02a"),
+    --        }
+    --        auto_mode_pickup(feat, dailyCollectibles.hiddenCaches, hiddenCacheHash_Table, "Hidden Caches")
+    --        feat.on = false
+    --    end
+    --end)
+    --autohiddenCaches_Feat.hint = "This will automatically collect the 10 Hidden Caches for you, allowing you to go AFK.\n\nFor performance reasons, it is highly recommended to do this in an invite-only session."
+
 
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
         hiddenCacheGroup.feat = menu.add_feature("Hidden Cache " .. i, "action", hiddenCachesMenu_Feat.id, function()
@@ -2623,6 +2645,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Junk Energy Skydives (10)  ------------------------
     local junkEnergySkydivesMenu_Feat = menu.add_feature("Junk Energy Skydives (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    junkEnergySkydivesMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, junkEnergySkydiveGroup in ipairs(dailyCollectibles.junkEnergySkydives) do
         junkEnergySkydiveGroup.feat = menu.add_feature("Junk Energy Skydive " .. i .. " (" .. junkEnergySkydiveGroup.location .. ")", "action", junkEnergySkydivesMenu_Feat.id, function()
@@ -2632,6 +2655,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Shipwreck (1)              ------------------------
     local shipwreckMenu_Feat = menu.add_feature("Shipwreck (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    shipwreckMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
         shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function()
@@ -2641,6 +2665,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Treasure Chests (2)        ------------------------
     local treasureChestsMenu_Feat = menu.add_feature("Treasure Chests (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    treasureChestsMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, treasureChestGroup in ipairs(dailyCollectibles.treasureChests) do
         treasureChestGroup.feat = menu.add_feature("Treasure Chest (" .. treasureChestGroup.name .. ")", "action_value_i", treasureChestsMenu_Feat.id, function(feat)
@@ -2661,6 +2686,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Trick Or Treat (10)        ------------------------
     local trickOrTreatMenu_Feat = menu.add_feature("Trick Or Treat (-1/10)", "parent", seasonalDailyCollectiblesOnlineMenu_Feat.id)
+    trickOrTreatMenu_Feat.hint = "Synced with other players: Unknown" -- I haven't been able to test that yet
 
     --local autoTrickOrTreat_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", trickOrTreatMenu_Feat.id, function(feat)
     --    if feat.on then
@@ -2683,6 +2709,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ LS Tags (5)                ------------------------
     local lsTagsMenu_Feat = menu.add_feature("LS Tags (-1/5)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    lsTagsMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, lsTagGroup in ipairs(dailyCollectibles.lsTags) do
         lsTagGroup.feat = menu.add_feature("LS Tag " .. i, "action", lsTagsMenu_Feat.id, function()
@@ -2693,6 +2720,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Lucky Wheel (1)            ------------------------
     local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel" .. COLOR.RED.hex .. "[BROKEN] (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    luckyWheelMenu_Feat.hint = "Synced with other players: Yes"
 
     dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action", luckyWheelMenu_Feat.id, function()
         teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
@@ -2701,6 +2729,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    gCachesMenu_Feat.hint = "Synced with other players: No"
 
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
         gCacheGroup.feat = menu.add_feature("G's Cache" .. " (" .. "Search Area " .. i .. ")", "action_value_i", gCachesMenu_Feat.id, function(feat)
@@ -2714,6 +2743,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Stash House (1)            ------------------------
     local stashHousesMenu_Feat = menu.add_feature("Stash House (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    stashHousesMenu_Feat.hint = "Synced with other players: No"
 
     local stashHouse_Feat = menu.add_feature("Stash House", "action_value_i", stashHousesMenu_Feat.id, function(feat)
         local index = feat.value
@@ -2725,6 +2755,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ RC Bandito Time Trial (1)  ------------------------
     local RCBanditoTimeTrialMenu_Feat = menu.add_feature("RC Bandito Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    RCBanditoTimeTrialMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, RCBanditoTimeTrialGroup in ipairs(dailyCollectibles.RCBanditoTimeTrials) do
         RCBanditoTimeTrialGroup.feat = menu.add_feature("RC Bandito Time Trial " .. i .. " (" .. RCBanditoTimeTrialGroup.name .. ")", "action", RCBanditoTimeTrialMenu_Feat.id, function()
@@ -2734,6 +2765,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Junk Energy Time Trial (1) ------------------------
     local junkEnergyTimeTrialMenu_Feat = menu.add_feature("Junk Energy Time Trial (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    junkEnergyTimeTrialMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, junkEnergyTimeTrialGroup in ipairs(dailyCollectibles.junkEnergyTimeTrials) do
         junkEnergyTimeTrialGroup.feat = menu.add_feature("Junk Energy Time Trial " .. i .. " (" .. junkEnergyTimeTrialGroup.name .. ")", "action", junkEnergyTimeTrialMenu_Feat.id, function()
@@ -2743,6 +2775,7 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
 --
 ------------------------ Madrazo Hit (1)            ------------------------
     local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hit (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    madrazoHitsMenu_Feat.hint = "Synced with other players: No" --  Location #2 [In Private Solo sessions]
 
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
         madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitsMenu_Feat.id, function(feat)
@@ -2762,8 +2795,11 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     end
 --
 
+local weeklyCollectiblesOnlineMenu_Feat = menu.add_feature("Weekly Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
+
 ------------------------ Time Trial (1)             ------------------------
     local timeTrialMenu_Feat = menu.add_feature("Time Trial (-1/1)", "parent", weeklyCollectiblesOnlineMenu_Feat.id)
+    timeTrialMenu_Feat.hint = "Synced with other players: Yes"
 
     for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
         timeTrialGroup.feat = menu.add_feature("Time Trial " .. i .. " (" .. timeTrialGroup.name .. ")", "action_value_i", timeTrialMenu_Feat.id, function(feat)
@@ -2779,8 +2815,11 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     end
 --
 
+local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectiblesOnlineParentMenu_Feat.id)
+
 ------------------------ Gun Van (1)                ------------------------
     local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
+    gunVansMenu_Feat.hint = "Synced with other players: Yes"
 
     local gunVan_Feat = menu.add_feature("Gun Van", "action_value_i", gunVansMenu_Feat.id, function(feat)
         local index = feat.value
@@ -2790,8 +2829,12 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     gunVan_Feat.min = 1
     gunVan_Feat.max = #others.gunVans
 --
+
+local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent", collectiblesOnlineParentMenu_Feat.id)
+
 ------------------------ Street Dealers (3)         ------------------------
     local streetDealersMenu_Feat = menu.add_feature("Street Dealers (-1/3)", "parent", streetDealersOnlineMenu_Feat.id)
+    streetDealersMenu_Feat.hint = "Synced with other players: Yes"
 
     local streetDealers_Feat = menu.add_feature("Street Dealer", "action_value_i", streetDealersMenu_Feat.id, function(feat)
         local index = feat.value
@@ -2801,6 +2844,78 @@ local streetDealersOnlineMenu_Feat = menu.add_feature("Street Dealers", "parent"
     streetDealers_Feat.min = 1
     streetDealers_Feat.max = #others.streetDealers
 --
+
+menu.add_feature("        <- - - - - - - - - - - - - - - - - - - - - - - ->", "action", collectiblesOnlineParentMenu_Feat.id)
+
+local statsViewerMenu_Feat = menu.add_feature("Stats Viewer", "parent", collectiblesOnlineParentMenu_Feat.id)
+
+local statsViewerMP0Menu_Feat = menu.add_feature("MultiPlayer 1", "parent", statsViewerMenu_Feat.id)
+
+local statsViewerMP1Menu_Feat = menu.add_feature("MultiPlayer 2", "parent", statsViewerMenu_Feat.id)
+
+local statsViewerMPPLYMenu_Feat = menu.add_feature("MultiPlayer Player", "parent", statsViewerMenu_Feat.id)
+
+-- Function to create feats for a given MP stat prefix
+local function createStatViewerFeats(characterMenuID, MPStatPrefix)
+    local hints = {
+        -- TODO: Add the in game max value resolved (probably globals)
+        ["SNOWMEN_COLLECTED"]        = "/25)",
+        ["USB_RADIO_COLLECTED"]      = "/10",
+        ["ACTION_FIG_COLLECTED"]     = "/100)",
+        ["LDORGANICS_COLLECTED"]     = "/100)",
+        ["MOVIE_PROPS_COLLECTED"]    = "/10)",
+        ["PLAYING_CARD_COLLECTED"]   = "/54)",
+        ["SIGNAL_JAMMERS_COLLECTED"] = "/50)",
+        ["USJS_COMPLETED"]           = "/50)",
+        ["RCTTCOMPLETEDWEEK"]        = "/1",
+        ["BTTCOMPLETED"]             = "/1",
+        ["TIMETRIAL_COMPLETED_WEEK"] = "/1",
+        ["LUCKY_WHEEL_NUM_SPIN"]     = "/1",
+        ["BURIED_STASH_COLLECTED"]   = "/2)",
+        ["UNDERWATRPACK_COLLECTED"]  = "/10)",
+        ["SKYDIVES_COLLECTED"]       = "/10",
+        ["SHIPWRECKED_COLLECTED"]    = "/1",
+        ["TREASURECHEST_COLLECTED"]  = "/2)",
+        ["TRICKORTREAT_COLLECTED"]   = "/10)",
+        ["TAGGING_COLLECTED"]        = "/5)",
+        ["DAILYDEADDROP_COLLECTED"]  = "/1)"
+    }
+
+    -- Iterate over the list of stat names
+    for _, statName in ipairs(STAT_VIEWER_NAMES__LIST) do
+        -- Flag to indicate if we should create a feature for this stat
+        local shouldCreateFeature = false
+        local strippedStatName = nil
+
+        -- Check the MPStatPrefix and determine if the statName matches the prefix
+        if MPStatPrefix == "MP0" or MPStatPrefix == "MP1" then
+            if statName:match("^MPx_") then
+                shouldCreateFeature = true
+                strippedStatName = statName:gsub("^MPx_", "")
+            end
+        elseif MPStatPrefix == "MPPLY" then
+            if statName:match("^MPPLY_") then
+                shouldCreateFeature = true
+                strippedStatName = statName:gsub("^MPPLY_", "")
+            end
+        end
+
+        -- If a feature should be created, add it to the global table
+        if shouldCreateFeature then
+            local varName = "statsViewer__" .. MPStatPrefix .. "_" .. strippedStatName .. "__Feat"
+            _G[varName] = menu.add_feature(MPStatPrefix .. "_" .. strippedStatName, "action_value_i", characterMenuID)
+            _G[varName].hint = hints[strippedStatName] or ""
+            _G[varName].min = -1
+            _G[varName].max = 100000000000000000 -- will have to see what to do with this one lol
+        end
+    end
+end
+
+-- Create features for MP0, MP1 and MMPLY
+createStatViewerFeats(statsViewerMP0Menu_Feat.id,   "MP0")
+createStatViewerFeats(statsViewerMP1Menu_Feat.id,   "MP1")
+createStatViewerFeats(statsViewerMPPLYMenu_Feat.id, "MPPLY")
+
 
 -- Function to remove any color codes from a feat name
 local function removeFeatNameColorCodes(featName)
@@ -2845,7 +2960,7 @@ local function update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpCh
     for i, epsilonRobeGroup in ipairs(collectibles.epsilonRobes) do
         local updatedName = removeFeatNameColorCodes(epsilonRobeGroup.feat.name)
 
-        if has_epsilon_robe(i-1, lastMpChar) then
+        if has_epsilon_robe(i - 1) then
             updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
         end
 
@@ -2908,6 +3023,14 @@ local function update_feat_name__media_sticks__state(resolvedLocationsIds)
     end
 end
 
+local function update_feat_name__weapon_components__state(has_weapon_component, hasPlayerUnlockedServiceCarbine)
+    weaponComponents_Feat.name = removeFeatNameColorCodes(weaponComponents_Feat.name)
+
+    if hasPlayerUnlockedServiceCarbine then
+        weaponComponents_Feat.name = COLOR.COLLECTED.hex .. weaponComponents_Feat.name .. "#DEFAULT#"
+    end
+end
+
 local function update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     metalDetectors_Feat.name = removeFeatNameColorCodes(metalDetectors_Feat.name)
 
@@ -2915,8 +3038,6 @@ local function update_feat_name__metal_detector__state(hasPlayerCollectedMetalDe
         metalDetectors_Feat.name = COLOR.COLLECTED.hex .. metalDetectors_Feat.name .. "#DEFAULT#"
     end
 end
-
--- weaponComponents goes here
 
 local function update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
     sprayCans_Feat.name = removeFeatNameColorCodes(sprayCans_Feat.name)
@@ -3139,7 +3260,7 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerCollectedLuckyWheel)
+local function update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerSpinnedLuckyWheel)
     local feat = dailyCollectibles.luckyWheel.feat
 
     feat.name = removeFeatNameColorCodes(feat.name)
@@ -3148,7 +3269,7 @@ local function update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPla
     if
         is_session_started()
     then
-        if hasPlayerCollectedLuckyWheel then
+        if hasPlayerSpinnedLuckyWheel then
             feat.name = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
         else
             feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
@@ -3314,29 +3435,65 @@ local function update_feat_name__street_dealers__state(resolvedLocationsIds, are
     end
 end
 
+local function get_local_incremented_value(scriptName, _Local)
+    local value = script.get_local_i(gameplay.get_hash_key(scriptName), _Local)
+    if value ~= nil then
+        return value + 1
+    end
+    return nil
+end
+
+-- Define tables to hold references to the properties
+local statsViewer_Table = {
+    MP0 = {
+        SNOWMEN_COLLECTED        = statsViewer__MP0_SNOWMEN_COLLECTED__Feat,
+        USB_RADIO_COLLECTED      = statsViewer__MP0_USB_RADIO_COLLECTED__Feat,
+        ACTION_FIG_COLLECTED     = statsViewer__MP0_ACTION_FIG_COLLECTED__Feat,
+        LDORGANICS_COLLECTED     = statsViewer__MP0_LDORGANICS_COLLECTED__Feat,
+        MOVIE_PROPS_COLLECTED    = statsViewer__MP0_MOVIE_PROPS_COLLECTED__Feat,
+        PLAYING_CARD_COLLECTED   = statsViewer__MP0_PLAYING_CARD_COLLECTED__Feat,
+        SIGNAL_JAMMERS_COLLECTED = statsViewer__MP0_SIGNAL_JAMMERS_COLLECTED__Feat,
+        USJS_COMPLETED           = statsViewer__MP0_USJS_COMPLETED__Feat,
+        LUCKY_WHEEL_NUM_SPIN     = statsViewer__MP0_LUCKY_WHEEL_NUM_SPIN__Feat,
+        BURIED_STASH_COLLECTED   = statsViewer__MP0_BURIED_STASH_COLLECTED__Feat,
+        UNDERWATRPACK_COLLECTED  = statsViewer__MP0_UNDERWATRPACK_COLLECTED__Feat,
+        SKYDIVES_COLLECTED       = statsViewer__MP0_SKYDIVES_COLLECTED__Feat,
+        SHIPWRECKED_COLLECTED    = statsViewer__MP0_SHIPWRECKED_COLLECTED__Feat,
+        TREASURECHEST_COLLECTED  = statsViewer__MP0_TREASURECHEST_COLLECTED__Feat,
+        TRICKORTREAT_COLLECTED   = statsViewer__MP0_TRICKORTREAT_COLLECTED__Feat,
+        TAGGING_COLLECTED        = statsViewer__MP0_TAGGING_COLLECTED__Feat,
+        DAILYDEADDROP_COLLECTED  = statsViewer__MP0_DAILYDEADDROP_COLLECTED__Feat
+    },
+    MP1 = {
+        SNOWMEN_COLLECTED        = statsViewer__MP1_SNOWMEN_COLLECTED__Feat,
+        USB_RADIO_COLLECTED      = statsViewer__MP1_USB_RADIO_COLLECTED__Feat,
+        ACTION_FIG_COLLECTED     = statsViewer__MP1_ACTION_FIG_COLLECTED__Feat,
+        LDORGANICS_COLLECTED     = statsViewer__MP1_LDORGANICS_COLLECTED__Feat,
+        MOVIE_PROPS_COLLECTED    = statsViewer__MP1_MOVIE_PROPS_COLLECTED__Feat,
+        PLAYING_CARD_COLLECTED   = statsViewer__MP1_PLAYING_CARD_COLLECTED__Feat,
+        SIGNAL_JAMMERS_COLLECTED = statsViewer__MP1_SIGNAL_JAMMERS_COLLECTED__Feat,
+        USJS_COMPLETED           = statsViewer__MP1_USJS_COMPLETED__Feat,
+        LUCKY_WHEEL_NUM_SPIN     = statsViewer__MP1_LUCKY_WHEEL_NUM_SPIN__Feat,
+        BURIED_STASH_COLLECTED   = statsViewer__MP1_BURIED_STASH_COLLECTED__Feat,
+        UNDERWATRPACK_COLLECTED  = statsViewer__MP1_UNDERWATRPACK_COLLECTED__Feat,
+        SKYDIVES_COLLECTED       = statsViewer__MP1_SKYDIVES_COLLECTED__Feat,
+        SHIPWRECKED_COLLECTED    = statsViewer__MP1_SHIPWRECKED_COLLECTED__Feat,
+        TREASURECHEST_COLLECTED  = statsViewer__MP1_TREASURECHEST_COLLECTED__Feat,
+        TRICKORTREAT_COLLECTED   = statsViewer__MP1_TRICKORTREAT_COLLECTED__Feat,
+        TAGGING_COLLECTED        = statsViewer__MP1_TAGGING_COLLECTED__Feat,
+        DAILYDEADDROP_COLLECTED  = statsViewer__MP1_DAILYDEADDROP_COLLECTED__Feat
+    },
+    MPPLY = {
+        RCTTCOMPLETEDWEEK        = statsViewer__MPPLY_RCTTCOMPLETEDWEEK__Feat,
+        BTTCOMPLETED             = statsViewer__MPPLY_BTTCOMPLETED__Feat,
+        TIMETRIAL_COMPLETED_WEEK = statsViewer__MPPLY_TIMETRIAL_COMPLETED_WEEK__Feat
+    }
+}
+
 
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
     local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
-
-    local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
-    local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
-
-    local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/
-    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1     -- TODO: Add user personal best -- BUG: \/
-    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1   -- TODO: Add user personal best -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for)
-    local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
-    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
-    local hasPlayerCollectedLuckyWheel = stats.stat_get_int(gameplay.get_hash_key("MP0_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 or stats.stat_get_int(gameplay.get_hash_key("MP1_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 -- BUG: Only updates on enter in the casino (It's likely just not the stat I'm looking for)
-    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
-    local hasPlayerCollectedShipwreck = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734, -1)
-    local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
-
-    local localPlayerNumEpsilonRobesCollected = GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED()
-    local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
-    local localPlayerNumTacticalRifleComponentsCollected = GET_LOCAL_PLAYER_NUM_TACTICAL_RIFLE_COMPONENTS_COLLECTED()
-    local localPlayerNumJunkEnergySkydives = GET_LOCAL_PLAYER_NUM_JUNK_ENERGY_SKYDIVES_COLLECTED()
 
     local resolvedLocationsIds = {
         mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
@@ -3401,16 +3558,16 @@ mainLoop_Thread = create_tick_handler(function()
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
         },
         stashHouse = {
-            marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1
+            marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1 -- BUG: location 12 didn't need +1 (it was actually 11) or maybe is an issue with my teleports? maybe a teleport moved or got deleted
         },
         RCBanditoTimeTrial = {
-            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeRCBanditoTimeTrial) + 1
+            spawn = get_local_incremented_value("freemode", Local.activeRCBanditoTimeTrial)
         },
         junkEnergyTimeTrial = {
-            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeJunkEnergyTimeTrial) + 1
+            spawn = get_local_incremented_value("freemode", Local.activeJunkEnergyTimeTrial)
         },
         timeTrial = {
-            spawn = script.get_local_i(gameplay.get_hash_key("freemode"), Local.activeTimeTrial) + 1
+            spawn = get_local_incremented_value("freemode", Local.activeTimeTrial)
         },
         gunVan = {
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1
@@ -3422,39 +3579,91 @@ mainLoop_Thread = create_tick_handler(function()
         }
     }
 
+    local hasPlayerUnlockedServiceCarbine = checkServiceCarbineUnlock(has_weapon_component)
+    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
+    local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
+
+    local hasPlayerSpinnedLuckyWheel = stats.stat_get_int(gameplay.get_hash_key("MP0_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 or stats.stat_get_int(gameplay.get_hash_key("MP1_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 -- BUG: Only updates on enter in the casino (It's likely just not the stat I'm looking for)
+    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
+    local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
+    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_RCTTBESTTIME)
+    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1     -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_BTTBESTTIME)
+    local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
+
+    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1   -- TODO: Add user personal best -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for) (maybe: MPPLY_TIMETRIALBESTTIME)
+
+    local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
+
+    local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
+
+    local localPlayerNumActionFiguresCollected = countCollectedBoolStatItems(has_action_figure, 100)
+    local localPlayerNumGhostsExposedCollected = script.get_global_i(Global.numberOfGhostsExposedCollected)
+    local localPlayerNumLDOrganicsProductsCollected = countCollectedBoolStatItems(has_action_figure, 100)
+    local localPlayerNumMoviePropsCollected = countCollectedBoolStatItems(has_movie_prop, 10)
+    local localPlayerNumPlayingCardsCollected = countCollectedBoolStatItems(has_playing_card, 54)
+    local localPlayerNumSignalJammersCollected = countCollectedBoolStatItems(has_signal_jammer, 50)
+    local localPlayerNumSnowmenCollected = countCollectedBoolStatItems(has_snowman, 25)
+    local localPlayerNumStuntJumpsCollected = countCollectedBoolStatItems(is_stunt_jump_completed, 50, lastMpChar) -- Is it gonna work xD ?
+    local localPlayerNumEpsilonRobesCollected = countCollectedBoolStatItems(has_epsilon_robe, 3)
+    local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    local localPlayerNumTacticalRifleComponentsCollected = countCollectedBoolStatItems(has_weapon_component, 5)
+    local localPlayerNumMetalDetectorsCollected = tonumber(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)
+    local localPlayerNumSprayCansCollected = tonumber(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)
+
+    local localPlayerNumBuriedStashesCollected = countCollectedBoolStatItems(has_buried_stash, 2)
+    local localPlayerNumHiddenCachesCollected = countCollectedBoolStatItems(has_hidden_cache, 10)
+    local localPlayerNumJunkEnergySkydivesCollected = countCollectedBoolStatItems(has_junk_energy_skydive, 10)
+    local localPlayerNumShipwreckCollected = countCollectedBoolStatItems(has_shipwreck, 1)
+    local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
+    local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
+    local localPlayerNumLSTagsCollected = countCollectedBoolStatItems(has_ls_tag, 5)
+    local localPlayerNumLuckyWheelCollected = tonumber(hasPlayerSpinnedLuckyWheel and 1 or 0)
+    local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
+    local localPlayerNumStashHouseCollected = tonumber(hasPlayerCollectedStashHouse and 1 or 0)
+    local localPlayerNumRCBanditoTimeTrialCollected = tonumber(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)
+    local localPlayerNumJunkEnergyTimeTrialCollected = tonumber(hasPlayerCollectedJunkEnergyTimeTrial and 1 or 0)
+    local localPlayerNumMadrazoHitCollected = tonumber(hasPlayerKilledMadrazoHit and 1 or 0)
+
+    local localPlayerNumTimeTrialCompleted = tonumber(hasPlayerCollectedTimeTrial and 1 or 0)
+
+    local localPlayerNumGunVanAvailable = tonumber(isGunVanAvailable and 1 or 0)
+
+    local localPlayerNumStreetDealersAvailable = tonumber(areStreetDealersAvailable and 3 or 0) -- TODO: ew shit is hardcodded.
+
     -- Known bug: in SP globals dont reset to 0 so... will have to fix that
-    actionFiguresMenu_Feat.name         = "Action Figures ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_ACTION_FIG_COLLECTED"),      -1)  .. "/100)"
-    ghostsExposedMenu_Feat.name         = "Ghosts Exposed ("         .. script.get_global_i(Global.numberOfGhostsExposedCollected)                                         .. "/10)"
-    ldOrganicsProductMenu_Feat.name     = "LD Organics Product ("    .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_LDORGANICS_COLLECTED"),      -1)  .. "/100)"
-    moviePropsMenu_Feat.name            = "Movie Props ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_MOVIE_PROPS_COLLECTED"),     -1)  .. "/10)"
-    playingCardsMenu_Feat.name          = "Playing Cards ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_PLAYING_CARD_COLLECTED"),    -1)  .. "/54)"
-    signalJammersMenu_Feat.name         = "Signal Jammers ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SIGNAL_JAMMERS_COLLECTED"),  -1)  .. "/50)"
-    snowmenMenu_Feat.name               = "Snowmen ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SNOWMEN_COLLECTED"),         -1)  .. "/25)"
-    stuntJumpsMenu_Feat.name            = "Stunt Jumps ("            .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED"),            -1)  .. "/50)" -- CREDIT: Thanks @doctorflexochan for the stat name.
-    epsilonRobesMenu_Feat.name          = "Epsilon Robes ("          .. localPlayerNumEpsilonRobesCollected                                                                .. "/3)"
-    mediaSticksMenu_Feat.name           = "Media Sticks ("           .. localPlayerNumUsbRadioCollected                                                                    .. "/9)"
-    weaponComponentsMenu_Feat.name      = "Weapon Components ("      .. localPlayerNumTacticalRifleComponentsCollected                                                     .. "/5)"
-    metalDetectorsMenu_Feat.name        = "Metal Detectors ("        .. tostring(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)                               .. "/1)"
-    sprayCansMenu_Feat.name             = "Spray Cans ("             .. tostring(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)                                    .. "/1)"
+    actionFiguresMenu_Feat.name         = "Action Figures ("                              .. localPlayerNumActionFiguresCollected           .. "/100)"
+    ghostsExposedMenu_Feat.name         = "Ghosts Exposed ("                              .. localPlayerNumGhostsExposedCollected           .. "/10)"
+    ldOrganicsProductMenu_Feat.name     = "LD Organics Product ("                         .. localPlayerNumLDOrganicsProductsCollected      .. "/100)"
+    moviePropsMenu_Feat.name            = "Movie Props ("                                 .. localPlayerNumMoviePropsCollected              .. "/10)"
+    playingCardsMenu_Feat.name          = "Playing Cards ("                               .. localPlayerNumPlayingCardsCollected            .. "/54)"
+    signalJammersMenu_Feat.name         = "Signal Jammers ("                              .. localPlayerNumSignalJammersCollected           .. "/50)"
+    snowmenMenu_Feat.name               = "Snowmen ("                                     .. localPlayerNumSnowmenCollected                 .. "/25)"
+    stuntJumpsMenu_Feat.name            = "Stunt Jumps ("                                 .. localPlayerNumStuntJumpsCollected              .. "/50)"
+    epsilonRobesMenu_Feat.name          = "Epsilon Robes ("                               .. localPlayerNumEpsilonRobesCollected            .. "/3)"
+    mediaSticksMenu_Feat.name           = "Media Sticks ("                                .. localPlayerNumUsbRadioCollected                .. "/9)"
+    weaponComponentsMenu_Feat.name      = "Weapon Components ("                           .. localPlayerNumTacticalRifleComponentsCollected .. "/5)"
+    metalDetectorsMenu_Feat.name        = "Metal Detectors ("                             .. localPlayerNumMetalDetectorsCollected          .. "/1)"
+    sprayCansMenu_Feat.name             = "Spray Cans ("                                  .. localPlayerNumSprayCansCollected               .. "/1)"
 
-    buriedStashesMenu_Feat.name         = "Buried Stashes ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_BURIED_STASH_COLLECTED"),    -1)  .. "/2)"  -- TODO: 2/1, 3/1 !? i MUST stop using this method then.
-    hiddenCachesMenu_Feat.name          = "Hidden Caches ("          .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_UNDERWATRPACK_COLLECTED"),   -1)  .. "/10)"
-    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("   .. localPlayerNumJunkEnergySkydives                                                                   .. "/10)" -- R* ISSUE (The stat updates only on session switch): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SKYDIVES_COLLECTED"), -1)
-    shipwreckMenu_Feat.name             = "Shipwreck ("              .. tostring(hasPlayerCollectedShipwreck and 1 or 0)                                                   .. "/1)"  -- R* ISSUE (total count from the begining I think?): stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_SHIPWRECKED_COLLECTED"), -1)
-    treasureChestsMenu_Feat.name        = "Treasure Chests ("        .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TREASURECHEST_COLLECTED"),   -1)  .. "/2)"
-    trickOrTreatMenu_Feat.name          = "Trick Or Treat ("         .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TRICKORTREAT_COLLECTED"),    -1)  .. "/10)"
-    lsTagsMenu_Feat.name                = "LS Tags ("                .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_TAGGING_COLLECTED"),         -1)  .. "/5)"
-    luckyWheelMenu_Feat.name            = "Lucky Wheel" .. COLOR.RED.hex .. " [BROKEN] (" .. tostring(hasPlayerCollectedLuckyWheel and 1 or 0)                                                  .. "/1)"
-    gCachesMenu_Feat.name               = "G's Cache ("              .. stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYDEADDROP_COLLECTED"),   -1)  .. "/1)"
-    stashHousesMenu_Feat.name           = "Stash House ("            .. tostring(hasPlayerCollectedStashHouse and 1 or 0)                                                  .. "/1)"
-    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("  .. tostring(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)                                          .. "/1)"
-    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial (" .. tostring(hasPlayerCollectedJunkEnergyTimeTrial and 1 or 0)                                         .. "/1)"
-    madrazoHitsMenu_Feat.name           = "Madrazo Hit ("            .. tostring(hasPlayerKilledMadrazoHit and 1 or 0)                                                     .. "/1)"
+    buriedStashesMenu_Feat.name         = "Buried Stashes ("                              .. localPlayerNumBuriedStashesCollected           .. "/2)"
+    hiddenCachesMenu_Feat.name          = "Hidden Caches ("                               .. localPlayerNumHiddenCachesCollected            .. "/10)"
+    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("                        .. localPlayerNumJunkEnergySkydivesCollected      .. "/10)"
+    shipwreckMenu_Feat.name             = "Shipwreck ("                                   .. localPlayerNumShipwreckCollected               .. "/1)"
+    treasureChestsMenu_Feat.name        = "Treasure Chests ("                             .. localPlayerNumTreasureChestsCollected          .. "/2)"
+    trickOrTreatMenu_Feat.name          = "Trick Or Treat ("                              .. localPlayerNumTrickOrTreatCollected            .. "/10)"
+    lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsCollected                  .. "/5)"
+    luckyWheelMenu_Feat.name            = "Lucky Wheel" .. COLOR.RED.hex .. " [BROKEN] (" .. localPlayerNumLuckyWheelCollected              .. "/1)"
+    gCachesMenu_Feat.name               = "G's Cache ("                                   .. localPlayerNumGCacheCollected                  .. "/1)"
+    stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseCollected              .. "/1)"
+    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCollected      .. "/1)"
+    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial ("                      .. localPlayerNumJunkEnergyTimeTrialCollected     .. "/1)"
+    madrazoHitsMenu_Feat.name           = "Madrazo Hit ("                                 .. localPlayerNumMadrazoHitCollected              .. "/1)"
 
-    timeTrialMenu_Feat.name             = "Time Trial ("             .. tostring(hasPlayerCollectedTimeTrial and 1 or 0)                                                   .. "/1)"
+    timeTrialMenu_Feat.name             = "Time Trial ("                                  .. localPlayerNumTimeTrialCompleted               .. "/1)"
 
-    gunVansMenu_Feat.name               = "Gun Vans ("               .. tostring(isGunVanAvailable and 1 or 0)                                                             .. "/1)"
-    streetDealersMenu_Feat.name         = "Street Dealers ("         .. tostring(areStreetDealersAvailable and 3 or 0)                                                     .. "/3)"
+    gunVansMenu_Feat.name               = "Gun Vans ("                                    .. localPlayerNumGunVanAvailable                  .. "/1)"
+
+    streetDealersMenu_Feat.name         = "Street Dealers ("                              .. localPlayerNumStreetDealersAvailable           .. "/3)"
 
     update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
     update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
@@ -3464,9 +3673,9 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
     update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
     update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
-    update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpChar)
+    update_feat_name__epsilon_robes__state(has_epsilon_robe)
     update_feat_name__media_sticks__state(resolvedLocationsIds)
-    -- TODO: Misses weaponComponents here
+    update_feat_name__weapon_components__state(has_weapon_component, hasPlayerUnlockedServiceCarbine)
     update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
     update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
 
@@ -3477,7 +3686,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerCollectedLuckyWheel)
+    update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerSpinnedLuckyWheel)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
@@ -3487,7 +3696,22 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
+
     update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
+
+    -- Loop through each character and stat type to set values
+    for _, statName in ipairs(STAT_VIEWER_NAMES__LIST) do
+        if statName:match("^MPx_") then
+            local strippedStatName = statName:gsub("^MPx_", "")
+            statsViewer_Table["MP0"][strippedStatName].value = stats.stat_get_int(gameplay.get_hash_key("MP0_" .. strippedStatName), -1)
+            statsViewer_Table["MP1"][strippedStatName].value = stats.stat_get_int(gameplay.get_hash_key("MP1_" .. strippedStatName), -1)
+        elseif statName:match("^MPPLY_") then
+            local strippedStatName = statName:gsub("^MPPLY_", "")
+            statsViewer_Table["MPPLY"][strippedStatName].value = stats.stat_get_int(gameplay.get_hash_key("MPPLY_" .. strippedStatName), -1)
+        end
+
+        system.yield()
+    end
 end, 1000)
 
 
@@ -3505,9 +3729,6 @@ end, 1000)
     https://gta.fandom.com/wiki/Los_Santos_Slasher
     https://gta.fandom.com/wiki/Stone_Hatchet
     https://gta.fandom.com/wiki/Double-Action_Revolver
-
-    Daily Collectibles:
-    Casino Lucky Wheel
 
     Add Green color to all collected MenuFeat's
     make snowmens, jack o lanters etc .. blue when they are available otherwite remove color
