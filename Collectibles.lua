@@ -54,6 +54,8 @@ COLOR.COLLECTED = COLOR.GREEN_FROM_WALLET_MONEY
 COLOR.FOUND = COLOR.BLUE
 local Global <const> = {
     --[[
+    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
+
     This is up-to-date for b3274
                        --> "How to update after new build update"
     ]]
@@ -65,10 +67,13 @@ local Global <const> = {
     activeMadrazoHits = 2738934 + 6838,
     activeStreetDealer1 = 2738934 + 6813 + (0 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
     activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
-    activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1  --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    maxNumLuckyWheelSpinsPerDay = 262145 + 26746  --> Tunable: VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY
 }
 local Local <const> = {
     --[[
+    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
+
     This is up-to-date for b3274
                        --> "How to update after new build update"
     ]]
@@ -255,7 +260,7 @@ local function is_myself_in_interior(interiorId)
         and NATIVES.INTERIOR.GET_INTERIOR_FROM_PRIMARY_VIEW() == interiorId
         and not (
             is_any_game_overlay_open()
-            or is_transition_active()
+            or is_session_transition_active()
             or NATIVES.HUD.IS_WARNING_MESSAGE_ACTIVE()
             or NATIVES.HUD.IS_WARNING_MESSAGE_READY_FOR_CONTROL()
             or is_any_cutscene_playing(playerId)
@@ -1806,7 +1811,7 @@ local function has_junk_energy_skydive(junkEnergySkydiveId)
         or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
 end
 local function has_shipwreck(shipwreckId)
-    return is_in_range(shipwreckId, 0, 0) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
+    return is_in_range(shipwreckId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
 end
 local function has_treasure_chest(treasureChestId)
     return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
@@ -1928,7 +1933,6 @@ local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collecti
             if pickupGroup["extraWait_Time"] then
                 local start_Time = os.clock()
                 while (os.clock() - start_Time) < initialWait_Time do
-                    system.yield()
                     teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
                     system.yield(100)
                 end
@@ -2719,13 +2723,38 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     end
 --
 ------------------------ Lucky Wheel (1)            ------------------------
-    local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel" .. COLOR.RED.hex .. "[BROKEN] (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    local maxNumLuckyWheelSpinsPerDay = script.get_global_i(Global.maxNumLuckyWheelSpinsPerDay)
+
+    local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel (-1/)" .. maxNumLuckyWheelSpinsPerDay, "parent", dailyCollectiblesOnlineMenu_Feat.id)
     luckyWheelMenu_Feat.hint = "Synced with other players: Yes"
 
     dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action", luckyWheelMenu_Feat.id, function()
+        --local playerNextToLuckyWheelCoords = v3(1110.53, 225.31, -49.84)
+        --local initialWait_Time = 30
+        --local minInteriorTime = 3  -- Minimum time in seconds the player has to be in the interior
+        --local start_Time = os.clock()
+        --local interiorStartTime = nil
+        --
+        --while (os.clock() - start_Time) < initialWait_Time do
+        --    teleport_myself(playerNextToLuckyWheelCoords.x, playerNextToLuckyWheelCoords.y, playerNextToLuckyWheelCoords.z)
+        --
+        --    if is_myself_in_interior(275201) then
+        --        if not interiorStartTime then
+        --            interiorStartTime = os.clock()
+        --        elseif (os.clock() - interiorStartTime) >= minInteriorTime then
+        --            break
+        --        end
+        --    else
+        --        interiorStartTime = nil
+        --    end
+        --
+        --    system.yield(100)
+        --end
+        --
+        -- Player sometimes doesn't teleport in the casino but stay in the void, + sometimes player is stuck so I commented it all ...
         teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
     end)
-    dailyCollectibles.luckyWheel.feat.hint = "Note:\nYou must first complete the cutscene before entering the casino for the first time."
+    dailyCollectibles.luckyWheel.feat.hint = "Note:\nTo unlock the weapon wheel, you must first complete the cutscene before entering the casino for the first time.\nAdditionally, you need to obtain a Casino membership."
 --
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
@@ -3260,19 +3289,18 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerSpinnedLuckyWheel)
+local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned)
     local feat = dailyCollectibles.luckyWheel.feat
 
     feat.name = removeFeatNameColorCodes(feat.name)
-    feat.hint = ""
 
-    if
-        is_session_started()
-    then
-        if hasPlayerSpinnedLuckyWheel then
+    if is_session_started() then
+        if localPlayerNumLuckyWheelSpinned == maxNumLuckyWheelSpinsPerDay then
             feat.name = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
         else
-            feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
+            if hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoStandardMembership then
+                feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
+            end
         end
     end
 end
@@ -3504,7 +3532,7 @@ mainLoop_Thread = create_tick_handler(function()
         },
         shipwreck = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1
-            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- R* ISSUE: I think they originally planned 2, but for now it's 1 max.
+            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- Note: I think R* originally planned 2, but for now it's 1 max.
         },
         hiddenCaches = {
             [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH0"), -1) + 1,
@@ -3583,7 +3611,8 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
 
-    local hasPlayerSpinnedLuckyWheel = stats.stat_get_int(gameplay.get_hash_key("MP0_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 or stats.stat_get_int(gameplay.get_hash_key("MP1_LUCKY_WHEEL_NUM_SPIN"), -1) == 1 -- BUG: Only updates on enter in the casino (It's likely just not the stat I'm looking for)
+    local hasPlayerCompletedCasinoTutorial = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(27089, -1)
+    local hasPlayerAcquiredCasinoMembership = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26966, -1)
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
     local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_RCTTBESTTIME)
@@ -3603,7 +3632,7 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumPlayingCardsCollected = countCollectedBoolStatItems(has_playing_card, 54)
     local localPlayerNumSignalJammersCollected = countCollectedBoolStatItems(has_signal_jammer, 50)
     local localPlayerNumSnowmenCollected = countCollectedBoolStatItems(has_snowman, 25)
-    local localPlayerNumStuntJumpsCollected = countCollectedBoolStatItems(is_stunt_jump_completed, 50, lastMpChar) -- Is it gonna work xD ?
+    local localPlayerNumStuntJumpsCollected = countCollectedBoolStatItems(is_stunt_jump_completed, 50, lastMpChar)
     local localPlayerNumEpsilonRobesCollected = countCollectedBoolStatItems(has_epsilon_robe, 3)
     local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     local localPlayerNumTacticalRifleComponentsCollected = countCollectedBoolStatItems(has_weapon_component, 5)
@@ -3617,7 +3646,7 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
     local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
     local localPlayerNumLSTagsCollected = countCollectedBoolStatItems(has_ls_tag, 5)
-    local localPlayerNumLuckyWheelCollected = tonumber(hasPlayerSpinnedLuckyWheel and 1 or 0)
+    local localPlayerNumLuckyWheelSpinned = stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 10412, lastMpChar), -1)
     local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
     local localPlayerNumStashHouseCollected = tonumber(hasPlayerCollectedStashHouse and 1 or 0)
     local localPlayerNumRCBanditoTimeTrialCollected = tonumber(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)
@@ -3652,7 +3681,7 @@ mainLoop_Thread = create_tick_handler(function()
     treasureChestsMenu_Feat.name        = "Treasure Chests ("                             .. localPlayerNumTreasureChestsCollected          .. "/2)"
     trickOrTreatMenu_Feat.name          = "Trick Or Treat ("                              .. localPlayerNumTrickOrTreatCollected            .. "/10)"
     lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsCollected                  .. "/5)"
-    luckyWheelMenu_Feat.name            = "Lucky Wheel" .. COLOR.RED.hex .. " [BROKEN] (" .. localPlayerNumLuckyWheelCollected              .. "/1)"
+    luckyWheelMenu_Feat.name            = "Lucky Wheel ("                                 .. localPlayerNumLuckyWheelSpinned                .. "/" .. maxNumLuckyWheelSpinsPerDay .. ")"
     gCachesMenu_Feat.name               = "G's Cache ("                                   .. localPlayerNumGCacheCollected                  .. "/1)"
     stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseCollected              .. "/1)"
     RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCollected      .. "/1)"
@@ -3686,7 +3715,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__lucky_wheel__state(resolvedLocationsIds, hasPlayerSpinnedLuckyWheel)
+    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
