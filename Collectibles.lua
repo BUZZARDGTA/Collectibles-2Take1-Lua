@@ -2999,6 +2999,7 @@ local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar)
     local iNumSpin = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
 
     if iCurrentPosixTime > iCharacterUsedTime and iCurrentPosixTime > iPlayerUsedTime then
+        -- SET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, 0)
         return false
     elseif VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE > 0 then
         if iNumSpin < VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY then
@@ -3380,22 +3381,32 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
+local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
     local feat = dailyCollectibles.luckyWheel.feat
 
-    feat.name = removeFeatNameColorCodes(feat.name)
+    local updatedName = removeFeatNameColorCodes(feat.name)
+    local updatedHint = feat.hint
+    local updateSpinStatusMessage = false
 
     if is_session_started() then
         if localPlayerNumLuckyWheelSpinned == maxNumLuckyWheelSpinsPerDay then
-            feat.name = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
-            feat.hint = dailyCollectibles.luckyWheel.hint .. "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
+            updatedName = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
+            updateSpinStatusMessage = true
         else
-            if hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoStandardMembership then
-                feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
-                feat.hint = dailyCollectibles.luckyWheel.hint .. "\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
+            if hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoMembership then
+                updatedName = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
+                updateSpinStatusMessage = true
             end
         end
     end
+
+    if updateSpinStatusMessage then
+        -- There is a bug where when you just spin then the text is at -01:59:59
+        updatedHint = dailyCollectibles.luckyWheel.hint .. "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
+    end
+
+    feat.name = updatedName
+    feat.hint = updatedHint
 end
 
 local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
@@ -3753,7 +3764,7 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
     local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
     local localPlayerNumLSTagsTagged = countCollectedBoolStatItems(has_ls_tag, 5)
-    local localPlayerNumLuckyWheelSpinned = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
+    local localPlayerNumLuckyWheelSpinned = HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar) and GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar) or 0
     local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
     local localPlayerNumStashHouseRaided = tonumber(hasPlayerRaidedStashHouse and 1 or 0)
     local localPlayerNumRCBanditoTimeTrialCompleted = tonumber(hasPlayerCompletedRCBanditoTimeTrial and 1 or 0)
@@ -3822,7 +3833,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
+    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerRaidedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime, RCTimeTrialParTimeOverride)
