@@ -61,14 +61,18 @@ local Global <const> = {
     ]]
     numberOfGhostsExposedCollected = 2708057 + 534,
     numberOfNightclubToiletAttendantTipped = 1579649,
-    isGunVanAvailable = 262145 + 33232, --> Tunable: XM22_GUN_VAN_AVAILABLE
-    areStreetDealersAvailable = 262145 + 33479, --> Tunable: ENABLE_STREETDEALERS_DLC22022
     activeMediaStick_DamFunk_EvenTheScore = 2708657,
     activeMadrazoHits = 2738934 + 6838,
     activeStreetDealer1 = 2738934 + 6813 + (0 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
     activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
     activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
-    maxNumLuckyWheelSpinsPerDay = 262145 + 26746  --> Tunable: VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY
+
+    Tunable = {
+        XM22_GUN_VAN_AVAILABLE = 262145 + 33232,
+        ENABLE_STREETDEALERS_DLC22022 = 262145 + 33479,
+        VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = 262145 + 26746,
+        VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = 262145 + 26747
+    }
 }
 local Local <const> = {
     --[[
@@ -80,6 +84,10 @@ local Local <const> = {
     activeTimeTrial = 14386 + 11, --> freemode.c
     activeRCBanditoTimeTrial = 14436, --> freemode.c
     activeJunkEnergyTimeTrial = 15239 + 3 --> freemode.c
+}
+local MP_STAT <const> = {
+    LUCKY_WHEEL_USAGE = 8352,
+    LUCKY_WHEEL_NUM_SPIN = 10412
 }
 local STAT_VIEWER_NAMES__LIST <const> = {
     "MPx_SNOWMEN_COLLECTED",
@@ -134,6 +142,10 @@ local function create_tick_handler(handler, ms)
             system.yield(ms)
         end
     end)
+end
+
+local function CONVERT_POSIX_TIME(posixTime)
+    return os.date("*t", posixTime)
 end
 
 local function teleport_myself(x, y, z, keepVehicle)
@@ -1344,7 +1356,7 @@ local dailyCollectibles = {
     },
     -- The Diamond Casino & Resort update: July 23, 2019
     luckyWheel = {
-        coords = v3(925.04,46.48,80.096)
+        coords = v3(925.04,46.48,80.096), hint = "Note:\nTo unlock the weapon wheel, you must first complete the cutscene before entering the casino for the first time.\nAdditionally, you need to obtain a Casino membership."
     },
     -- Eclipse Blvd Garage Week: February 16, 2023
     gCaches = {
@@ -1747,152 +1759,6 @@ local others = {
     }
 }
 
-
-local function has_all_bools(packedStatBoolCodesTable)
-    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
-        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
-            return false
-        end
-    end
-    return true
-end
-
-local function has_action_figure(actionFigureId)
-    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
-end
-local function has_ghost_exposed(ghostExposedId)
-    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
-end
-local function has_ld_organic_product(ldOrganicProductId)
-    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(34262 + ldOrganicProductId, -1) or false
-end
-local function has_movie_prop(moviePropId)
-    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
-end
-local function has_playing_card(playingCardId)
-    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26911 + playingCardId, -1) or false
-end
-local function has_signal_jammer(signalJammerId)
-    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(28099 + signalJammerId, -1) or false
-end
-local function has_snowman(snowmanId)
-    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36630 + snowmanId, -1) or false
-end
-local function has_epsilon_robe(epsilonRobeId)
-    return is_in_range(epsilonRobeId, 0, 2) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25003 + epsilonRobeId, -1) or false
-end
-local function has_weapon_component(weaponComponentId)
-    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
-end
-
-local function has_buried_stash(buriedStashId)
-    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
-end
-local function has_hidden_cache(hiddenCacheId)
-    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
-end
-local function has_junk_energy_skydive(junkEnergySkydiveId)
-    --[[
-    ChatGPT + decompiled script enginered, I have done nothing but copy paste decompiled and asked GPT to make the working algorythm.
-    Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
-    ]]
-    if not is_in_range(junkEnergySkydiveId, 0, 9) then
-        return false
-    end
-
-    -- Calculate the base stat IDs for the specific skydive ID
-    local statId1 = 34837 + junkEnergySkydiveId * 4
-    local statId2 = 34839 + junkEnergySkydiveId * 4
-    local statId3 = 34838 + junkEnergySkydiveId * 4
-
-    -- Check if any of the stats indicate the skydive has been collected
-    return NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
-        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
-        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
-end
-local function has_shipwreck(shipwreckId)
-    return is_in_range(shipwreckId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
-end
-local function has_treasure_chest(treasureChestId)
-    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
-end
-local function has_ls_tag(lsTagId)
-    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
-end
-local function has_trick_or_treat(trickOrTreatId)
-    local packedStatId = false
-    if is_in_range(trickOrTreatId, 0, 9) then
-        packedStatId = 34252 + trickOrTreatId
-    elseif is_in_range(trickOrTreatId, 10, 199) then
-        packedStatId = 34512 + (trickOrTreatId - 10)
-    end
-    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
-end
-
-local function countCollectedBoolStatItems(hasCollectibleFunc, endIndex, hasCollectibleFunc__params)
-    endIndex = endIndex - 1
-
-    local startIndex = 0
-    local collectedCount = 0
-
-    for i = startIndex, endIndex do
-        if hasCollectibleFunc(i, hasCollectibleFunc__params) then
-            collectedCount = collectedCount + 1
-        end
-    end
-    return collectedCount
-end
-
-local function checkServiceCarbineUnlock(has_weapon_component)
-    if weapon.has_ped_got_weapon(player.player_ped(), gameplay.get_hash_key("weapon_tacticalrifle")) then
-        return true
-    end
-
-    for i = 1, 5 do
-        if not has_weapon_component(i - 1) then
-            return false
-        end
-    end
-
-    return true
-end
-
-local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
-    --[[
-    R* ISSUE: Collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
-    After going to Singleplayer and going back online, it does not count that one as collected anymore.
-    That's the reason I've made this function here.
-    The following line is what I'd use if R* didn't fucked up:
-    local count = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"), -1) -- Global_2708057.f_425 - v1.69 (b3258)
-    ]]
-    --
-    local count = 0
-    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
-        for i2, location in ipairs(mediaStickGroup.locations) do
-            if has_all_bools(location.bools) then
-                count = count + 1
-            end
-
-            if mediaStickGroup.group == "Nightclub" or mediaStickGroup.group == "Arcade" or mediaStickGroup.group == "Agency" or mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" then
-                break
-            end
-        end
-    end
-    return count
-end
-
--- This is the same code as the leaked source code.
-local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
-    local invalidstuntJumpId = -1
-
-    if stuntJumpId ~= invalidstuntJumpId then
-        local statHash = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
-        local stuntJumpsFoundMask = stats.stat_get_u64(statHash)
-        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
-    end
-
-    return false
-end
 
 local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collectibleTypeName)
     local collectibleHandlers_Table = {
@@ -2723,9 +2589,7 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     end
 --
 ------------------------ Lucky Wheel (1)            ------------------------
-    local maxNumLuckyWheelSpinsPerDay = script.get_global_i(Global.maxNumLuckyWheelSpinsPerDay)
-
-    local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel (-1/)" .. maxNumLuckyWheelSpinsPerDay, "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     luckyWheelMenu_Feat.hint = "Synced with other players: Yes"
 
     dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action", luckyWheelMenu_Feat.id, function()
@@ -2754,7 +2618,7 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
         -- Player sometimes doesn't teleport in the casino but stay in the void, + sometimes player is stuck so I commented it all ...
         teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
     end)
-    dailyCollectibles.luckyWheel.feat.hint = "Note:\nTo unlock the weapon wheel, you must first complete the cutscene before entering the casino for the first time.\nAdditionally, you need to obtain a Casino membership."
+    dailyCollectibles.luckyWheel.feat.hint = dailyCollectibles.luckyWheel.hint
 --
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
@@ -2945,6 +2809,206 @@ createStatViewerFeats(statsViewerMP0Menu_Feat.id,   "MP0")
 createStatViewerFeats(statsViewerMP1Menu_Feat.id,   "MP1")
 createStatViewerFeats(statsViewerMPPLYMenu_Feat.id, "MPPLY")
 
+
+local function has_all_bools(packedStatBoolCodesTable)
+    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
+        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
+            return false
+        end
+    end
+    return true
+end
+
+local function has_action_figure(actionFigureId)
+    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
+end
+local function has_ghost_exposed(ghostExposedId)
+    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
+end
+local function has_ld_organic_product(ldOrganicProductId)
+    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(34262 + ldOrganicProductId, -1) or false
+end
+local function has_movie_prop(moviePropId)
+    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
+end
+local function has_playing_card(playingCardId)
+    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26911 + playingCardId, -1) or false
+end
+local function has_signal_jammer(signalJammerId)
+    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(28099 + signalJammerId, -1) or false
+end
+local function has_snowman(snowmanId)
+    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36630 + snowmanId, -1) or false
+end
+local function has_epsilon_robe(epsilonRobeId)
+    return is_in_range(epsilonRobeId, 0, 2) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25003 + epsilonRobeId, -1) or false
+end
+local function has_weapon_component(weaponComponentId)
+    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
+end
+
+local function has_buried_stash(buriedStashId)
+    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
+end
+local function has_hidden_cache(hiddenCacheId)
+    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
+end
+local function has_junk_energy_skydive(junkEnergySkydiveId)
+    --[[
+    ChatGPT + decompiled script enginered, I have done nothing but copy paste decompiled and asked GPT to make the working algorythm.
+    Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
+    ]]
+    if not is_in_range(junkEnergySkydiveId, 0, 9) then
+        return false
+    end
+
+    -- Calculate the base stat IDs for the specific skydive ID
+    local statId1 = 34837 + junkEnergySkydiveId * 4
+    local statId2 = 34839 + junkEnergySkydiveId * 4
+    local statId3 = 34838 + junkEnergySkydiveId * 4
+
+    -- Check if any of the stats indicate the skydive has been collected
+    return NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
+end
+local function has_shipwreck(shipwreckId)
+    return is_in_range(shipwreckId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
+end
+local function has_treasure_chest(treasureChestId)
+    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
+end
+local function has_ls_tag(lsTagId)
+    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
+end
+local function has_trick_or_treat(trickOrTreatId)
+    local packedStatId = false
+    if is_in_range(trickOrTreatId, 0, 9) then
+        packedStatId = 34252 + trickOrTreatId
+    elseif is_in_range(trickOrTreatId, 10, 199) then
+        packedStatId = 34512 + (trickOrTreatId - 10)
+    end
+    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
+end
+
+-- This is the same code as the leaked source code.
+local function GET_MP_INT_CHARACTER_STAT(intStat, charSlot)
+    return stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, intStat, charSlot), -1) or 0
+end
+
+local function countCollectedBoolStatItems(hasCollectibleFunc, endIndex, hasCollectibleFunc__params)
+    endIndex = endIndex - 1
+
+    local startIndex = 0
+    local collectedCount = 0
+
+    for i = startIndex, endIndex do
+        if hasCollectibleFunc(i, hasCollectibleFunc__params) then
+            collectedCount = collectedCount + 1
+        end
+    end
+    return collectedCount
+end
+
+local function checkServiceCarbineUnlock(has_weapon_component)
+    if weapon.has_ped_got_weapon(player.player_ped(), gameplay.get_hash_key("weapon_tacticalrifle")) then
+        return true
+    end
+
+    for i = 1, 5 do
+        if not has_weapon_component(i - 1) then
+            return false
+        end
+    end
+
+    return true
+end
+
+local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    --[[
+    R* ISSUE: Collecting: group = "Permanent Locations (Chop Shop DLC)" artist = "DâM-FunK", title = "Even the Score
+    After going to Singleplayer and going back online, it does not count that one as collected anymore.
+    That's the reason I've made this function here.
+    The following line is what I'd use if R* didn't fucked up:
+    local count = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_USB_RADIO_COLLECTED"), -1) -- Global_2708057.f_425 - v1.69 (b3258)
+    ]]
+    --
+    local count = 0
+    for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
+        for i2, location in ipairs(mediaStickGroup.locations) do
+            if has_all_bools(location.bools) then
+                count = count + 1
+            end
+
+            if mediaStickGroup.group == "Nightclub" or mediaStickGroup.group == "Arcade" or mediaStickGroup.group == "Agency" or mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)" then
+                break
+            end
+        end
+    end
+    return count
+end
+
+-- This is the same code as the leaked source code.
+local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
+    local invalidstuntJumpId = -1
+
+    if stuntJumpId ~= invalidstuntJumpId then
+        local statHash = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
+        local stuntJumpsFoundMask = stats.stat_get_u64(statHash)
+        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
+    end
+
+    return false
+end
+
+-- This is the same code as the leaked source code.
+local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar)
+    local VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE)
+    local VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
+
+    local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar) -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today. just the hour/second is good
+    local iPlayerUsedTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LUCKY_WHEEL_USAGE"), -1) -- player stat posix time for Lucky Wheel usage -- it seems lucky wheel can only be played once for both characters but the game source code allows both. but currently its global only.
+    local iCurrentPosixTime = NATIVES.NETWORK.GET_CLOUD_TIME_AS_INT()
+    local iNumSpin = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
+
+    if iCurrentPosixTime > iCharacterUsedTime and iCurrentPosixTime > iPlayerUsedTime then
+        return false
+    elseif VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE > 0 then
+        if iNumSpin < VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY then
+            return false
+        end
+    end
+
+    return true
+end
+
+-- This is the same code as the leaked source code.
+local function get_lucky_wheel_spin_status_message(lastMpChar)
+    if HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar) then
+        local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar)
+        local iCurrentPosixTime = NATIVES.NETWORK.GET_CLOUD_TIME_AS_INT()
+        local iTimeDiff = iCharacterUsedTime - iCurrentPosixTime
+
+        if iTimeDiff > 0 then
+            local sDate = CONVERT_POSIX_TIME(iTimeDiff)
+
+            sDate.hour = sDate.hour - 1 -- idk I added this because it seems to be that but it's weird, probably a reason why I should better use NATIVES.NETWORK.CONVERT_POSIX_TIME
+
+            local iTimeMS = (sDate.hour * 3600000)
+            iTimeMS = iTimeMS + (sDate.min * 60000)
+            iTimeMs = iTimeMS + (sDate.sec * 1000)
+            return "You can only spin the Lucky Wheel once per day.\nTime remaining before you can spin the Lucky Wheel: " .. sDate.hour .. ":" .. sDate.min .. ":" .. sDate.sec
+
+            -- I couldn't figures out how to output the generated table from 2T1 API, so I dropped this code commented.
+            --local sDate = native.ByteBuffer16() -- 32, 64, 128, 256
+            --NATIVES.NETWORK.CONVERT_POSIX_TIME(iTimeDiff, sDate)
+            --print(sDate)
+            --print(sDate:__tointeger())
+        else
+            return "Your spin of the Lucky Wheel is now available."
+        end
+    end
+end
 
 -- Function to remove any color codes from a feat name
 local function removeFeatNameColorCodes(featName)
@@ -3289,7 +3353,7 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     end
 end
 
-local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned)
+local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
     local feat = dailyCollectibles.luckyWheel.feat
 
     feat.name = removeFeatNameColorCodes(feat.name)
@@ -3297,9 +3361,11 @@ local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay,
     if is_session_started() then
         if localPlayerNumLuckyWheelSpinned == maxNumLuckyWheelSpinsPerDay then
             feat.name = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
+            feat.hint = dailyCollectibles.luckyWheel.hint .. "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
         else
             if hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoStandardMembership then
                 feat.name = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
+                feat.hint = dailyCollectibles.luckyWheel.hint .. "\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
             end
         end
     end
@@ -3613,6 +3679,7 @@ mainLoop_Thread = create_tick_handler(function()
 
     local hasPlayerCompletedCasinoTutorial = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(27089, -1)
     local hasPlayerAcquiredCasinoMembership = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26966, -1)
+    local maxNumLuckyWheelSpinsPerDay = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
     local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
     local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_RCTTBESTTIME)
@@ -3621,9 +3688,9 @@ mainLoop_Thread = create_tick_handler(function()
 
     local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1   -- TODO: Add user personal best -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for) (maybe: MPPLY_TIMETRIALBESTTIME)
 
-    local isGunVanAvailable = script.get_global_i(Global.isGunVanAvailable) == 1
+    local isGunVanAvailable = script.get_global_i(Global.Tunable.XM22_GUN_VAN_AVAILABLE) == 1
 
-    local areStreetDealersAvailable = script.get_global_i(Global.areStreetDealersAvailable) == 1
+    local areStreetDealersAvailable = script.get_global_i(Global.Tunable.ENABLE_STREETDEALERS_DLC22022) == 1
 
     local localPlayerNumActionFiguresCollected = countCollectedBoolStatItems(has_action_figure, 100)
     local localPlayerNumGhostsExposedCollected = script.get_global_i(Global.numberOfGhostsExposedCollected)
@@ -3646,7 +3713,7 @@ mainLoop_Thread = create_tick_handler(function()
     local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
     local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
     local localPlayerNumLSTagsCollected = countCollectedBoolStatItems(has_ls_tag, 5)
-    local localPlayerNumLuckyWheelSpinned = stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, 10412, lastMpChar), -1)
+    local localPlayerNumLuckyWheelSpinned = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
     local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
     local localPlayerNumStashHouseCollected = tonumber(hasPlayerCollectedStashHouse and 1 or 0)
     local localPlayerNumRCBanditoTimeTrialCollected = tonumber(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)
@@ -3681,7 +3748,7 @@ mainLoop_Thread = create_tick_handler(function()
     treasureChestsMenu_Feat.name        = "Treasure Chests ("                             .. localPlayerNumTreasureChestsCollected          .. "/2)"
     trickOrTreatMenu_Feat.name          = "Trick Or Treat ("                              .. localPlayerNumTrickOrTreatCollected            .. "/10)"
     lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsCollected                  .. "/5)"
-    luckyWheelMenu_Feat.name            = "Lucky Wheel ("                                 .. localPlayerNumLuckyWheelSpinned                .. "/" .. maxNumLuckyWheelSpinsPerDay .. ")"
+    luckyWheelMenu_Feat.name            = "Lucky Wheel ("                                 .. localPlayerNumLuckyWheelSpinned                .. "/"     .. maxNumLuckyWheelSpinsPerDay .. ")"
     gCachesMenu_Feat.name               = "G's Cache ("                                   .. localPlayerNumGCacheCollected                  .. "/1)"
     stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseCollected              .. "/1)"
     RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCollected      .. "/1)"
@@ -3715,7 +3782,7 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__treasure_chests__state(resolvedLocationsIds)
     update_feat_name__ls_tags__state(resolvedLocationsIds)
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned)
+    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
     update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
     update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
@@ -3741,7 +3808,7 @@ mainLoop_Thread = create_tick_handler(function()
 
         system.yield()
     end
-end, 1000)
+end, 0)
 
 
 --[[ TODO:
