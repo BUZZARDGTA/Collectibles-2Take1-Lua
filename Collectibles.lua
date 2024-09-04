@@ -3031,10 +3031,10 @@ local function get_lucky_wheel_spin_status_message(lastMpChar)
             --NATIVES.NETWORK.CONVERT_POSIX_TIME(iTimeDiff, sDate)
             --print(sDate)
             --print(sDate:__tointeger())
-        else
-            return "Your spin of the Lucky Wheel is now available."
         end
     end
+
+    return "Your spin of the Lucky Wheel is now available."
 end
 
 -- Function to remove any color codes from a feat name
