@@ -135,6 +135,18 @@ local function is_in_range(value, min, max)
     return value >= min and value <= max
 end
 
+-- Function generated from ChatGPT
+local function convertTime(ms)
+    local totalSeconds = math.floor(ms / 1000)
+
+    return {
+        hours = math.floor(totalSeconds / 3600),
+        minutes = math.floor((totalSeconds % 3600) / 60),
+        seconds = totalSeconds % 60,
+        milliseconds = math.floor(ms % 1000 / 10)
+    }
+end
+
 local function create_tick_handler(handler, ms)
     return menu.create_thread(function()
         while true do
@@ -1318,45 +1330,9 @@ local dailyCollectibles = {
         [29] = {coords = v3(1.7607,6410.2383,33.779)},
         [30] = {coords = v3(1411.0867,3608.7688,37.0159)}
     },
-    -- Freemode Events Update: September 15, 2015
-    -- CREDIT: https://gtalens.com/map/time-trials-regular
-    timeTrials = {
-        [1]   = {name = "Del Perro Pier",        startCoords = v3(-1811.675,-1199.542,12.0174), endCoords = v3(1665.568,-13.891,172.7744),   parTime = "1:43.200", hint = "From its pristine beaches to its evaporating lakes, San Andreas takes water quality (if not quantity) seriously. See an epidemic waiting to happen on this time trial from the pier to the reservoir."},
-        [2]   = {name = "Observatory",           startCoords = v3(-377.166,1250.818,326.4899),  endCoords = v3(2168.589,4777.306,40.2251),   parTime = "2:04.400", hint = "Complex time trial that takes you from the glamorous peaks of the Vinewood Hills to the grimey troughs of the Grapeseed shoreline. Sober up fast - there's no easy route."},
-        [3]   = {name = "Great Ocean Highway",   startCoords = v3(-1253.24,-380.457,58.2873),   endCoords = v3(-2223.156,4254.68,45.4055),   parTime = "2:04.900", hint = "For once, let a low-T CEO on his daily commute scream at you instead of his executive assistant. Time trial our of LS along the one-percent-crammed Great Ocean Highway."},
-        [4]   = {name = "Mount Gordo",           startCoords = v3(2702.037,5145.717,42.8568),   endCoords = v3(2848.184,5945.502,355.2424),  parTime = "0:46.300", hint = "Short, technical time trial up to the most picturesque suicide spot in the county. Be a statistic that matters."},
-        [5]   = {name = "End to End",            startCoords = v3(1261.353,-3278.38,4.8335),    endCoords = v3(95.0126,6793.054,19.1916),    parTime = "4:09.500", hint = "Mix a large cocktail of Junk Energy Drink and amphetamines because this is going to be a long drive: epic time trial along the length of the Golden State."},
-        [6]   = {name = "Fort Zancudo",          startCoords = v3(-1554.312,2755.009,16.8004),  endCoords = v3(807.0756,1277.671,359.4458),  parTime = "1:44.000", hint = "Follow in the panicked footsteps of deserters, waterboarded detainees, and peace protesters who didn't think the wars would go on this long. Pacey time trial away from Fort Zancudo towards the city lights."},
-        [7]   = {name = "Storm Drain",           startCoords = v3(637.1439,-1845.855,8.2676),   endCoords = v3(1049.15,-264.0645,50.4311),   parTime = "0:38.500", hint = "On a rainy day a human body can float the length of the LS Storm Drain in just 12 minutes. Get up close to the Los Santos circle of life with this not-so-simple time trial: precision is your only chance."},
-        [8]   = {name = "Up Chiliad",            startCoords = v3(-552.626,5042.703,127.9448),  endCoords = v3(500.2789,5597.249,794.726),   parTime = "1:10.100", hint = "This time trial on one of Mount Chiliad's most perilous faces is a golden opportunity for show-offs and reconstructive surgeons alike. Remember to book a bed at Mount Zonah Medical Center before you set off."},
-        [9]   = {name = "Sawmill",               startCoords = v3(-579.1157,5324.664,69.2662),  endCoords = v3(2763.49,2756.706,42.2599),    parTime = "2:15.000", hint = "The death of American industry hasn't just provided rusty subject matter for your Snapmatic albums, it's created lots of edgy, supercar-friendly racetracks. Time trial from the sawmill to Davis Quartz."},
-        [10]  = {name = "Cypress Flats",         startCoords = v3(1067.343,-2448.237,28.0683),  endCoords = v3(2072.565,2342.533,93.5678),   parTime = "2:07.200", hint = "From the old economy to the new - escape the industrial wastes of south LS with this time trial out to turbine-covered hills, where global warming's being delayed one sliced up bird at a time."},
-        [11]  = {name = "Up-n-Atom",             startCoords = v3(1577.189,6439.966,23.6996),   endCoords = v3(-2422.939,4229.418,8.1163),   parTime = "1:41.300", hint = "Get a beach body the American way. Eat a four pound, microwave-fresh burger then hit a time trial from Up-n-Atom to North Chumash. Just hope catastrophic heart failure doesn't hit you 'til next year."},
-        [12]  = {name = "Maze Bank Arena",       startCoords = v3(-199.7486,-1973.311,26.6204), endCoords = v3(228.1437,1196.745,224.4599),  parTime = "1:17.800", hint = "Like every great American city, driving across Los Santos is a matter of one long, straight road, fender-deep in mangled pedestrians. Breakneck time trial from the Maze Bank Arena to the Sisyphus Theatre."},
-        [13]  = {name = "Tongva Valley",         startCoords = v3(-1504.541,1482.49,116.053),   endCoords = v3(-631.941,-371.4568,33.8127),  parTime = "0:58.800", hint = "Canoeists, hikers and eco-fascists have had dibs on the only breathable parts of San Andreas for too long. Strike back for fossil fuel enthusiasts with this short time trial through Tongva Valley."},
-        [14]  = {name = "Coast to Coast",        startCoords = v3(-1502.047,4940.611,63.8034),  endCoords = v3(3782.324,4464.408,5.0935),    parTime = "2:29.400", hint = "Use highways or head for the hills. Update Lifeinvader or watch the road. Shout at your kids in the back or crack one off to the fragance billboards. Welcome to a cross-state time trial in the land of the free."},
-        [15]  = {name = "Casino",                startCoords = v3(947.562,142.6773,79.8307),    endCoords = v3(-102.2509,854.2916,234.7128), parTime = "1:00.000", hint = "Start your day like a pro: play 8 hours of Casino blackjack with your remortgager and divorce attorney, then wash it all down with a time trial through North LS to a Vinewood Hills mansion you'll never own."},
-        [16]  = {name = "Route 68",              startCoords = v3(1246.225,2685.11,36.5944),    endCoords = v3(-2566.326,2330.098,32.06),    parTime = "1:19.000", hint = "Time trial along the classic route that has inspired generations of poets, pilgrims, rednecks and sex offenders with its connection remoteness and absence of meaningful law enforcement."},
-        [17]  = {name = "LSIA",                  startCoords = v3(-1021.146,-2580.291,33.6353), endCoords = v3(-1505.461,1485.94,115.6857),  parTime = "1:43.400", hint = "Like a driver for a ride share company whose lawyers insist they are definitely not employees, get across the whole city from LSIA like your star rating, future income, and whole self-worth depended on it."},
-        [18]  = {name = "Calafia Way",           startCoords = v3(231.9767,3301.489,39.5627),   endCoords = v3(995.3146,4459.696,49.8577),   parTime = "1:24.200", hint = "Like every post-hipster tourist with a camera phone, take a tour of crushed dreams in the Alamo Sea and think about what filter best captures the sadness. Time trial for the Snapmatic generation."},
-        [19]  = {name = "Vinewood Bowl",         startCoords = v3(860.353,536.8055,124.7803),   endCoords = v3(-1578.38,5170.146,18.5865),   parTime = "2:58.800", hint = "Nothing violates the tranquility of green hills or lonely desert roads as efficiently as competitive motorsport. Kill two birds with one time trial all the way from the Vinewood Bowl to Paleto Cove."},
-        [20]  = {name = "Power Station",         startCoords = v3(2820.651,1642.276,23.668),    endCoords = v3(1365.989,-578.5997,73.3803),  parTime = "1:26.600", hint = "From the Palmer-Taylor Power Station to the suburbs of LS, this is a time trial for anyone who's taken a big lungful of Los Santos smog and thought \"couldn't this air be just a little bit more polluted\"."},
-        [21]  = {name = "Raton Canyon",          startCoords = v3(-2257.799,4315.927,44.5551),  endCoords = v3(-243.3874,4084.597,36.0077),  parTime = "1:16.600", hint = "Like a wild-eyed junior exec trying to impress on an extreme-sports team builder, risk soiling yourself all the way along the Raton Canyon rapids. Time trial from the Pacific shoreline to the Alamo Sea."},
-        [22]  = {name = "Down Chiliad",          startCoords = v3(526.397,5624.461,779.3564),   endCoords = v3(2278.745,5788.454,154.0056),  parTime = "0:54.200", hint = "Brutal time trial down the slopes of Mt. Chiliad: if you're going slower than a freefall, you're probably a coward."},
-        [23]  = {name = "Elysian Island",        startCoords = v3(175.2847,-3042.075,4.7734),   endCoords = v3(2782.971,-711.3731,4.0575),   parTime = "1:40.000", hint = "There will come a day when you need to get the hell out of town and lose yourself in the Palomino Highlands for a while. And on that day every practice run is going to count."},
-        [24]  = {name = "Galileo Park",          startCoords = v3(813.3556,1274.954,359.511),   endCoords = v3(-2306.769,439.64,173.4667),   parTime = "2:05.000", hint = "Social mobility, Los Santos style: how fast can you get an SUV across the Vinewood Hills to the new installation at the Kortz Center?"},
-        [25]  = {name = "Stab City",             startCoords = v3(77.5248,3629.915,38.6907),    endCoords = v3(-537.2578,281.2907,82.0704),  parTime = "2:00.000", hint = "Stick a turbo charger under the hood of the American dream, and see how long it takes you to make it from Stab City to the Vinewood Hills."},
-        [26]  = {name = "Vinewood Hills",        startCoords = v3(1004.657,898.837,209.0257),   endCoords = v3(-3140.729,1180.876,19.309),   parTime = "2:35.000", hint = "It's a young professional rite of passage: leave work, and get from the Vinewood Hills to the beach at Chumash fast enough to catch the sunset and bask in the illusion of a meaningful existence."},
-        [27]  = {name = "Grove Street",          startCoords = v3(104.8058,-1938.982,19.8037),  endCoords = v3(-931.7014,174.1591,65.2086),  parTime = "1:20.000", hint = "You can go a long way real fast coming out of this neighborhood..."},
-        [28]  = {name = "LSIA II",               startCoords = v3(-985.2776,-2698.696,12.8307), endCoords = v3(-408.1892,1184.952,324.5297), parTime = "2:24.000", hint = "Los Santos loves a social climber: in this case, off the tarmac at LSIA to the highest point in Galileo Park in less time than it takes to buy your degree online."},
-        [29]  = {name = "Pillbox Hill",          startCoords = v3(230.6618,-1399.026,29.4856),  endCoords = v3(-319.9582,2729.578,67.8719),  parTime = "2:16.000", hint = "The fastest route from the ICU to the Hill Valley Cemetery has been a point of long-standing debate among the emergency services of Los Santos. Time to settle it once and for all."},
-        [30]  = {name = "Elysian Island II",     startCoords = v3(-546.6672,-2857.928,5.0004),  endCoords = v3(-1605.27,-953.8167,12.0174),  parTime = "1:50.000", hint = "A breakneck tour of the most polluted docks, marinas, canals and rivers in the state, finishing with some almost certainly toxic candy floss at the pier."},
-        [31]  = {name = "Lake Vinewood Estates", startCoords = v3(-172.8944,1034.826,231.2332), endCoords = v3(-1580.673,3060.978,31.1954),  parTime = "1:26.000", hint = "If you want to stay under the radar coming into Fort Zancudo this hot, you better be prepared to take it off road."},
-        [32]  = {name = "El Burro Heights",      startCoords = v3(1691.47,-1458.635,111.7033),  endCoords = v3(-408.4781,1184.1,324.5365),   parTime = "2:10.000", hint = "We're all in the gutter, but some of us are getting a PB en route to the stars..."}
-    },
     -- The Diamond Casino & Resort update: July 23, 2019
     luckyWheel = {
-        coords = v3(925.04,46.48,80.096), hint = "Note:\nTo unlock the weapon wheel, you must first complete the cutscene before entering the casino for the first time.\nAdditionally, you need to obtain a Casino membership."
+        coords = v3(925.04,46.48,80.096), hint = "Note:\nTo unlock the casino lucky wheel, you must first complete the cutscene before entering the casino for the first time.\nAdditionally, you need to obtain a casino membership."
     },
     -- Eclipse Blvd Garage Week: February 16, 2023
     gCaches = {
@@ -1668,6 +1644,44 @@ local dailyCollectibles = {
                 v3(-510.926,301.11,82.315)
             }
         }
+    }
+}
+local weeklyCollectibles = {
+    -- Freemode Events Update: September 15, 2015
+    -- CREDIT: https://gtalens.com/map/time-trials-regular
+    timeTrials = {
+        [1]   = {name = "Del Perro Pier",        startCoords = v3(-1811.675,-1199.542,12.0174), endCoords = v3(1665.568,-13.891,172.7744),   parTime = "01:43.20", hint = "From its pristine beaches to its evaporating lakes, San Andreas takes water quality (if not quantity) seriously. See an epidemic waiting to happen on this time trial from the pier to the reservoir."},
+        [2]   = {name = "Observatory",           startCoords = v3(-377.166,1250.818,326.4899),  endCoords = v3(2168.589,4777.306,40.2251),   parTime = "02:04.40", hint = "Complex time trial that takes you from the glamorous peaks of the Vinewood Hills to the grimey troughs of the Grapeseed shoreline. Sober up fast - there's no easy route."},
+        [3]   = {name = "Great Ocean Highway",   startCoords = v3(-1253.24,-380.457,58.2873),   endCoords = v3(-2223.156,4254.68,45.4055),   parTime = "02:04.90", hint = "For once, let a low-T CEO on his daily commute scream at you instead of his executive assistant. Time trial our of LS along the one-percent-crammed Great Ocean Highway."},
+        [4]   = {name = "Mount Gordo",           startCoords = v3(2702.037,5145.717,42.8568),   endCoords = v3(2848.184,5945.502,355.2424),  parTime = "00:46.30", hint = "Short, technical time trial up to the most picturesque suicide spot in the county. Be a statistic that matters."},
+        [5]   = {name = "End to End",            startCoords = v3(1261.353,-3278.38,4.8335),    endCoords = v3(95.0126,6793.054,19.1916),    parTime = "04:09.50", hint = "Mix a large cocktail of Junk Energy Drink and amphetamines because this is going to be a long drive: epic time trial along the length of the Golden State."},
+        [6]   = {name = "Fort Zancudo",          startCoords = v3(-1554.312,2755.009,16.8004),  endCoords = v3(807.0756,1277.671,359.4458),  parTime = "01:44.00", hint = "Follow in the panicked footsteps of deserters, waterboarded detainees, and peace protesters who didn't think the wars would go on this long. Pacey time trial away from Fort Zancudo towards the city lights."},
+        [7]   = {name = "Storm Drain",           startCoords = v3(637.1439,-1845.855,8.2676),   endCoords = v3(1049.15,-264.0645,50.4311),   parTime = "00:38.50", hint = "On a rainy day a human body can float the length of the LS Storm Drain in just 12 minutes. Get up close to the Los Santos circle of life with this not-so-simple time trial: precision is your only chance."},
+        [8]   = {name = "Up Chiliad",            startCoords = v3(-552.626,5042.703,127.9448),  endCoords = v3(500.2789,5597.249,794.726),   parTime = "01:10.10", hint = "This time trial on one of Mount Chiliad's most perilous faces is a golden opportunity for show-offs and reconstructive surgeons alike. Remember to book a bed at Mount Zonah Medical Center before you set off."},
+        [9]   = {name = "Sawmill",               startCoords = v3(-579.1157,5324.664,69.2662),  endCoords = v3(2763.49,2756.706,42.2599),    parTime = "02:15.00", hint = "The death of American industry hasn't just provided rusty subject matter for your Snapmatic albums, it's created lots of edgy, supercar-friendly racetracks. Time trial from the sawmill to Davis Quartz."},
+        [10]  = {name = "Cypress Flats",         startCoords = v3(1067.343,-2448.237,28.0683),  endCoords = v3(2072.565,2342.533,93.5678),   parTime = "02:07.20", hint = "From the old economy to the new - escape the industrial wastes of south LS with this time trial out to turbine-covered hills, where global warming's being delayed one sliced up bird at a time."},
+        [11]  = {name = "Up-n-Atom",             startCoords = v3(1577.189,6439.966,23.6996),   endCoords = v3(-2422.939,4229.418,8.1163),   parTime = "01:41.30", hint = "Get a beach body the American way. Eat a four pound, microwave-fresh burger then hit a time trial from Up-n-Atom to North Chumash. Just hope catastrophic heart failure doesn't hit you 'til next year."},
+        [12]  = {name = "Maze Bank Arena",       startCoords = v3(-199.7486,-1973.311,26.6204), endCoords = v3(228.1437,1196.745,224.4599),  parTime = "01:17.80", hint = "Like every great American city, driving across Los Santos is a matter of one long, straight road, fender-deep in mangled pedestrians. Breakneck time trial from the Maze Bank Arena to the Sisyphus Theatre."},
+        [13]  = {name = "Tongva Valley",         startCoords = v3(-1504.541,1482.49,116.053),   endCoords = v3(-631.941,-371.4568,33.8127),  parTime = "00:58.80", hint = "Canoeists, hikers and eco-fascists have had dibs on the only breathable parts of San Andreas for too long. Strike back for fossil fuel enthusiasts with this short time trial through Tongva Valley."},
+        [14]  = {name = "Coast to Coast",        startCoords = v3(-1502.047,4940.611,63.8034),  endCoords = v3(3782.324,4464.408,5.0935),    parTime = "02:29.40", hint = "Use highways or head for the hills. Update Lifeinvader or watch the road. Shout at your kids in the back or crack one off to the fragance billboards. Welcome to a cross-state time trial in the land of the free."},
+        [15]  = {name = "Casino",                startCoords = v3(947.562,142.6773,79.8307),    endCoords = v3(-102.2509,854.2916,234.7128), parTime = "01:00.00", hint = "Start your day like a pro: play 8 hours of Casino blackjack with your remortgager and divorce attorney, then wash it all down with a time trial through North LS to a Vinewood Hills mansion you'll never own."},
+        [16]  = {name = "Route 68",              startCoords = v3(1246.225,2685.11,36.5944),    endCoords = v3(-2566.326,2330.098,32.06),    parTime = "01:19.00", hint = "Time trial along the classic route that has inspired generations of poets, pilgrims, rednecks and sex offenders with its connection remoteness and absence of meaningful law enforcement."},
+        [17]  = {name = "LSIA",                  startCoords = v3(-1021.146,-2580.291,33.6353), endCoords = v3(-1505.461,1485.94,115.6857),  parTime = "01:43.40", hint = "Like a driver for a ride share company whose lawyers insist they are definitely not employees, get across the whole city from LSIA like your star rating, future income, and whole self-worth depended on it."},
+        [18]  = {name = "Calafia Way",           startCoords = v3(231.9767,3301.489,39.5627),   endCoords = v3(995.3146,4459.696,49.8577),   parTime = "01:24.20", hint = "Like every post-hipster tourist with a camera phone, take a tour of crushed dreams in the Alamo Sea and think about what filter best captures the sadness. Time trial for the Snapmatic generation."},
+        [19]  = {name = "Vinewood Bowl",         startCoords = v3(860.353,536.8055,124.7803),   endCoords = v3(-1578.38,5170.146,18.5865),   parTime = "02:58.80", hint = "Nothing violates the tranquility of green hills or lonely desert roads as efficiently as competitive motorsport. Kill two birds with one time trial all the way from the Vinewood Bowl to Paleto Cove."},
+        [20]  = {name = "Power Station",         startCoords = v3(2820.651,1642.276,23.668),    endCoords = v3(1365.989,-578.5997,73.3803),  parTime = "01:26.60", hint = "From the Palmer-Taylor Power Station to the suburbs of LS, this is a time trial for anyone who's taken a big lungful of Los Santos smog and thought \"couldn't this air be just a little bit more polluted\"."},
+        [21]  = {name = "Raton Canyon",          startCoords = v3(-2257.799,4315.927,44.5551),  endCoords = v3(-243.3874,4084.597,36.0077),  parTime = "01:16.60", hint = "Like a wild-eyed junior exec trying to impress on an extreme-sports team builder, risk soiling yourself all the way along the Raton Canyon rapids. Time trial from the Pacific shoreline to the Alamo Sea."},
+        [22]  = {name = "Down Chiliad",          startCoords = v3(526.397,5624.461,779.3564),   endCoords = v3(2278.745,5788.454,154.0056),  parTime = "00:54.20", hint = "Brutal time trial down the slopes of Mt. Chiliad: if you're going slower than a freefall, you're probably a coward."},
+        [23]  = {name = "Elysian Island",        startCoords = v3(175.2847,-3042.075,4.7734),   endCoords = v3(2782.971,-711.3731,4.0575),   parTime = "01:40.00", hint = "There will come a day when you need to get the hell out of town and lose yourself in the Palomino Highlands for a while. And on that day every practice run is going to count."},
+        [24]  = {name = "Galileo Park",          startCoords = v3(813.3556,1274.954,359.511),   endCoords = v3(-2306.769,439.64,173.4667),   parTime = "02:05.00", hint = "Social mobility, Los Santos style: how fast can you get an SUV across the Vinewood Hills to the new installation at the Kortz Center?"},
+        [25]  = {name = "Stab City",             startCoords = v3(77.5248,3629.915,38.6907),    endCoords = v3(-537.2578,281.2907,82.0704),  parTime = "02:00.00", hint = "Stick a turbo charger under the hood of the American dream, and see how long it takes you to make it from Stab City to the Vinewood Hills."},
+        [26]  = {name = "Vinewood Hills",        startCoords = v3(1004.657,898.837,209.0257),   endCoords = v3(-3140.729,1180.876,19.309),   parTime = "02:35.00", hint = "It's a young professional rite of passage: leave work, and get from the Vinewood Hills to the beach at Chumash fast enough to catch the sunset and bask in the illusion of a meaningful existence."},
+        [27]  = {name = "Grove Street",          startCoords = v3(104.8058,-1938.982,19.8037),  endCoords = v3(-931.7014,174.1591,65.2086),  parTime = "01:20.00", hint = "You can go a long way real fast coming out of this neighborhood..."},
+        [28]  = {name = "LSIA II",               startCoords = v3(-985.2776,-2698.696,12.8307), endCoords = v3(-408.1892,1184.952,324.5297), parTime = "02:24.00", hint = "Los Santos loves a social climber: in this case, off the tarmac at LSIA to the highest point in Galileo Park in less time than it takes to buy your degree online."},
+        [29]  = {name = "Pillbox Hill",          startCoords = v3(230.6618,-1399.026,29.4856),  endCoords = v3(-319.9582,2729.578,67.8719),  parTime = "02:16.00", hint = "The fastest route from the ICU to the Hill Valley Cemetery has been a point of long-standing debate among the emergency services of Los Santos. Time to settle it once and for all."},
+        [30]  = {name = "Elysian Island II",     startCoords = v3(-546.6672,-2857.928,5.0004),  endCoords = v3(-1605.27,-953.8167,12.0174),  parTime = "01:50.00", hint = "A breakneck tour of the most polluted docks, marinas, canals and rivers in the state, finishing with some almost certainly toxic candy floss at the pier."},
+        [31]  = {name = "Lake Vinewood Estates", startCoords = v3(-172.8944,1034.826,231.2332), endCoords = v3(-1580.673,3060.978,31.1954),  parTime = "01:26.00", hint = "If you want to stay under the radar coming into Fort Zancudo this hot, you better be prepared to take it off road."},
+        [32]  = {name = "El Burro Heights",      startCoords = v3(1691.47,-1458.635,111.7033),  endCoords = v3(-408.4781,1184.1,324.5365),   parTime = "02:10.00", hint = "We're all in the gutter, but some of us are getting a PB en route to the stars..."}
     }
 }
 local others = {
@@ -2694,7 +2708,7 @@ local weeklyCollectiblesOnlineMenu_Feat = menu.add_feature("Weekly Collectibles"
     local timeTrialMenu_Feat = menu.add_feature("Time Trial (-1/1)", "parent", weeklyCollectiblesOnlineMenu_Feat.id)
     timeTrialMenu_Feat.hint = "Synced with other players: Yes"
 
-    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+    for i, timeTrialGroup in ipairs(weeklyCollectibles.timeTrials) do
         timeTrialGroup.feat = menu.add_feature("Time Trial " .. i .. " (" .. timeTrialGroup.name .. ")", "action_value_i", timeTrialMenu_Feat.id, function(feat)
             if feat.value == 1 then
                 teleport_myself(timeTrialGroup.startCoords.x, timeTrialGroup.startCoords.y, timeTrialGroup.startCoords.z)
@@ -2966,8 +2980,8 @@ local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar)
     local VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE)
     local VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
 
-    local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar) -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today. just the hour/second is good
-    local iPlayerUsedTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LUCKY_WHEEL_USAGE"), -1) -- player stat posix time for Lucky Wheel usage -- it seems lucky wheel can only be played once for both characters but the game source code allows both. but currently its global only.
+    local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar) -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today.
+    local iPlayerUsedTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LUCKY_WHEEL_USAGE"), -1) -- player stat posix time for Lucky Wheel usage -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today. -- it seems lucky wheel can only be played once for both characters but the game source code allows both. but currently its global only.
     local iCurrentPosixTime = NATIVES.NETWORK.GET_CLOUD_TIME_AS_INT()
     local iNumSpin = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
 
@@ -2991,12 +3005,12 @@ local function get_lucky_wheel_spin_status_message(lastMpChar)
 
         if iTimeDiff > 0 then
             local sDate = CONVERT_POSIX_TIME(iTimeDiff)
-
             sDate.hour = sDate.hour - 1 -- idk I added this because it seems to be that but it's weird, probably a reason why I should better use NATIVES.NETWORK.CONVERT_POSIX_TIME
 
             local iTimeMS = (sDate.hour * 3600000)
             iTimeMS = iTimeMS + (sDate.min * 60000)
             iTimeMs = iTimeMS + (sDate.sec * 1000)
+
             return "You can only spin the Lucky Wheel once per day.\nTime remaining before you can spin the Lucky Wheel: " .. sDate.hour .. ":" .. sDate.min .. ":" .. sDate.sec
 
             -- I couldn't figures out how to output the generated table from 2T1 API, so I dropped this code commented.
@@ -3396,7 +3410,7 @@ local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayer
     end
 end
 
-local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
+local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerRaidedStashHouse)
     stashHouse_Feat.name = removeFeatNameColorCodes(stashHouse_Feat.name)
     stashHouse_Feat.hint = ""
 
@@ -3405,7 +3419,7 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
         and resolvedLocationsIds.stashHouse.marker >= 1
         and resolvedLocationsIds.stashHouse.marker <= #dailyCollectibles.stashHouses
     then
-        if hasPlayerCollectedStashHouse then
+        if hasPlayerRaidedStashHouse then
             stashHouse_Feat.name = COLOR.COLLECTED.hex .. stashHouse_Feat.name .. "#DEFAULT#"
             stashHouse_Feat.hint = "Collected at:\n< " .. resolvedLocationsIds.stashHouse.marker .. " >"
         else
@@ -3415,41 +3429,47 @@ local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPla
     end
 end
 
-local function update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
+local function update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime)
     for i, RCBanditoTimeTrialGroup in ipairs(dailyCollectibles.RCBanditoTimeTrials) do
         local updatedName = removeFeatNameColorCodes(RCBanditoTimeTrialGroup.feat.name)
+        local updatedHint = ""
 
         if
             is_session_started()
             and i == resolvedLocationsIds.RCBanditoTimeTrial.spawn
         then
-            if hasPlayerCollectedRCBanditoTimeTrial then
+            if hasPlayerCompletedRCBanditoTimeTrial then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
                 updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
             end
+            updatedHint = formattedRCBanditoTimeTrialBestTime
         end
 
         RCBanditoTimeTrialGroup.feat.name = updatedName
+        RCBanditoTimeTrialGroup.feat.hint = updatedHint
     end
 end
 
-local function update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCollectedJunkEnergyTimeTrial)
+local function update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
     for i, junkEnergyTimeTrialGroup in ipairs(dailyCollectibles.junkEnergyTimeTrials) do
         local updatedName = removeFeatNameColorCodes(junkEnergyTimeTrialGroup.feat.name)
+        local updatedHint = ""
 
         if
             is_session_started()
             and i == resolvedLocationsIds.junkEnergyTimeTrial.spawn
         then
-            if hasPlayerCollectedJunkEnergyTimeTrial then
+            if hasPlayerCompletedJunkEnergyTimeTrial then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
                 updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
             end
+            updatedHint = formattedJunkEnergyTimeTrialBestTime
         end
 
         junkEnergyTimeTrialGroup.feat.name = updatedName
+        junkEnergyTimeTrialGroup.feat.hint = updatedHint
     end
 end
 
@@ -3472,22 +3492,25 @@ local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPl
     end
 end
 
-local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
-    for i, timeTrialGroup in ipairs(dailyCollectibles.timeTrials) do
+local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime)
+    for i, timeTrialGroup in ipairs(weeklyCollectibles.timeTrials) do
         local updatedName = removeFeatNameColorCodes(timeTrialGroup.feat.name)
+        local updatedHint = ""
 
         if
             is_session_started()
             and i == resolvedLocationsIds.timeTrial.spawn
         then
-            if hasPlayerCollectedTimeTrial then
+            if hasPlayerCompletedTimeTrial then
                 updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
             else
                 updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
             end
+            updatedHint = formattedTimeTrialBestTime
         end
 
         timeTrialGroup.feat.name = updatedName
+        timeTrialGroup.feat.hint = timeTrialGroup.hint .. "\n\nPar Time: " .. timeTrialGroup.parTime .. "\n" .. updatedHint
     end
 end
 
@@ -3529,12 +3552,23 @@ local function update_feat_name__street_dealers__state(resolvedLocationsIds, are
     end
 end
 
-local function get_local_incremented_value(scriptName, _Local)
+local function get_local_i_incremented_value(scriptName, _Local)
     local value = script.get_local_i(gameplay.get_hash_key(scriptName), _Local)
     if value ~= nil then
         return value + 1
     end
     return nil
+end
+
+local function get_time_trials_formatted_personal_best_time(statName)
+    local ms = stats.stat_get_int(gameplay.get_hash_key(statName), -1)
+
+    if ms >= 0 then
+        local timeComponents = convertTime(ms)
+        return string.format("PERSONAL BEST: %02d:%02d:%02d", timeComponents.minutes, timeComponents.seconds, timeComponents.milliseconds)
+    end
+
+    return "00:00:00:00"
 end
 
 -- Define tables to hold references to the properties
@@ -3655,13 +3689,13 @@ mainLoop_Thread = create_tick_handler(function()
             marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1 -- BUG: location 12 didn't need +1 (it was actually 11) or maybe is an issue with my teleports? maybe a teleport moved or got deleted
         },
         RCBanditoTimeTrial = {
-            spawn = get_local_incremented_value("freemode", Local.activeRCBanditoTimeTrial)
+            spawn = get_local_i_incremented_value("freemode", Local.activeRCBanditoTimeTrial)
         },
         junkEnergyTimeTrial = {
-            spawn = get_local_incremented_value("freemode", Local.activeJunkEnergyTimeTrial)
+            spawn = get_local_i_incremented_value("freemode", Local.activeJunkEnergyTimeTrial)
         },
         timeTrial = {
-            spawn = get_local_incremented_value("freemode", Local.activeTimeTrial)
+            spawn = get_local_i_incremented_value("freemode", Local.activeTimeTrial)
         },
         gunVan = {
             spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1
@@ -3681,12 +3715,15 @@ mainLoop_Thread = create_tick_handler(function()
     local hasPlayerAcquiredCasinoMembership = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26966, -1)
     local maxNumLuckyWheelSpinsPerDay = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
     local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
-    local hasPlayerCollectedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCollectedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1 -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_RCTTBESTTIME)
-    local hasPlayerCollectedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1     -- TODO: Add user personal best -- BUG: \/                                                                     (maybe: MPPLY_BTTBESTTIME)
+    local hasPlayerRaidedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
+    local hasPlayerCompletedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1
+    local formattedRCBanditoTimeTrialBestTime = get_time_trials_formatted_personal_best_time("MPPLY_RCTTBESTTIME")
+    local hasPlayerCompletedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1
+    local formattedJunkEnergyTimeTrialBestTime = get_time_trials_formatted_personal_best_time("MPPLY_BTTBESTTIME")
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
 
-    local hasPlayerCollectedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1   -- TODO: Add user personal best -- BUG: Personal best 00:00:00 (it's likely just not the stat I'm looking for) (maybe: MPPLY_TIMETRIALBESTTIME)
+    local hasPlayerCompletedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1
+    local formattedTimeTrialBestTime = get_time_trials_formatted_personal_best_time("MPPLY_TIMETRIALBESTTIME")
 
     local isGunVanAvailable = script.get_global_i(Global.Tunable.XM22_GUN_VAN_AVAILABLE) == 1
 
@@ -3708,19 +3745,19 @@ mainLoop_Thread = create_tick_handler(function()
 
     local localPlayerNumBuriedStashesCollected = countCollectedBoolStatItems(has_buried_stash, 2)
     local localPlayerNumHiddenCachesCollected = countCollectedBoolStatItems(has_hidden_cache, 10)
-    local localPlayerNumJunkEnergySkydivesCollected = countCollectedBoolStatItems(has_junk_energy_skydive, 10)
+    local localPlayerNumJunkEnergySkydivesCompleted = countCollectedBoolStatItems(has_junk_energy_skydive, 10)
     local localPlayerNumShipwreckCollected = countCollectedBoolStatItems(has_shipwreck, 1)
     local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
     local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
-    local localPlayerNumLSTagsCollected = countCollectedBoolStatItems(has_ls_tag, 5)
+    local localPlayerNumLSTagsTagged = countCollectedBoolStatItems(has_ls_tag, 5)
     local localPlayerNumLuckyWheelSpinned = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
     local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
-    local localPlayerNumStashHouseCollected = tonumber(hasPlayerCollectedStashHouse and 1 or 0)
-    local localPlayerNumRCBanditoTimeTrialCollected = tonumber(hasPlayerCollectedRCBanditoTimeTrial and 1 or 0)
-    local localPlayerNumJunkEnergyTimeTrialCollected = tonumber(hasPlayerCollectedJunkEnergyTimeTrial and 1 or 0)
+    local localPlayerNumStashHouseRaided = tonumber(hasPlayerRaidedStashHouse and 1 or 0)
+    local localPlayerNumRCBanditoTimeTrialCompleted = tonumber(hasPlayerCompletedRCBanditoTimeTrial and 1 or 0)
+    local localPlayerNumJunkEnergyTimeTrialCompleted = tonumber(hasPlayerCompletedJunkEnergyTimeTrial and 1 or 0)
     local localPlayerNumMadrazoHitCollected = tonumber(hasPlayerKilledMadrazoHit and 1 or 0)
 
-    local localPlayerNumTimeTrialCompleted = tonumber(hasPlayerCollectedTimeTrial and 1 or 0)
+    local localPlayerNumTimeTrialCompleted = tonumber(hasPlayerCompletedTimeTrial and 1 or 0)
 
     local localPlayerNumGunVanAvailable = tonumber(isGunVanAvailable and 1 or 0)
 
@@ -3743,16 +3780,16 @@ mainLoop_Thread = create_tick_handler(function()
 
     buriedStashesMenu_Feat.name         = "Buried Stashes ("                              .. localPlayerNumBuriedStashesCollected           .. "/2)"
     hiddenCachesMenu_Feat.name          = "Hidden Caches ("                               .. localPlayerNumHiddenCachesCollected            .. "/10)"
-    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("                        .. localPlayerNumJunkEnergySkydivesCollected      .. "/10)"
+    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("                        .. localPlayerNumJunkEnergySkydivesCompleted      .. "/10)"
     shipwreckMenu_Feat.name             = "Shipwreck ("                                   .. localPlayerNumShipwreckCollected               .. "/1)"
     treasureChestsMenu_Feat.name        = "Treasure Chests ("                             .. localPlayerNumTreasureChestsCollected          .. "/2)"
     trickOrTreatMenu_Feat.name          = "Trick Or Treat ("                              .. localPlayerNumTrickOrTreatCollected            .. "/10)"
-    lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsCollected                  .. "/5)"
+    lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsTagged                     .. "/5)"
     luckyWheelMenu_Feat.name            = "Lucky Wheel ("                                 .. localPlayerNumLuckyWheelSpinned                .. "/"     .. maxNumLuckyWheelSpinsPerDay .. ")"
     gCachesMenu_Feat.name               = "G's Cache ("                                   .. localPlayerNumGCacheCollected                  .. "/1)"
-    stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseCollected              .. "/1)"
-    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCollected      .. "/1)"
-    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial ("                      .. localPlayerNumJunkEnergyTimeTrialCollected     .. "/1)"
+    stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseRaided                 .. "/1)"
+    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCompleted      .. "/1)"
+    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial ("                      .. localPlayerNumJunkEnergyTimeTrialCompleted     .. "/1)"
     madrazoHitsMenu_Feat.name           = "Madrazo Hit ("                                 .. localPlayerNumMadrazoHitCollected              .. "/1)"
 
     timeTrialMenu_Feat.name             = "Time Trial ("                                  .. localPlayerNumTimeTrialCompleted               .. "/1)"
@@ -3784,12 +3821,12 @@ mainLoop_Thread = create_tick_handler(function()
     update_feat_name__trick_or_treats__state(resolvedLocationsIds)
     update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoStandardMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
     update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
-    update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerCollectedStashHouse)
-    update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCollectedRCBanditoTimeTrial)
-    update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCollectedJunkEnergyTimeTrial)
+    update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerRaidedStashHouse)
+    update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime)
+    update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
     update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
 
-    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCollectedTimeTrial)
+    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime)
 
     update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
 
