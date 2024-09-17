@@ -6,7 +6,22 @@
 
 -- Globals START
 ---- Global variables START
-local autoCollect_Thread
+--local createdBlips = { -- maybe better uses `auto_create_table()` ?
+--    treasureHunts = {
+--        FirstClue = {},
+--        RemainingClues = {},
+--        FinalLocation = {}
+--    },
+--    stuntJumps = {},
+--    buriedStashes = {},
+--    hiddenCaches = {},
+--    shipwreck = {},
+--    treasureChests = {},
+--    lsTags = {},
+--    trickOrTreat = {},
+--    gCaches = {}
+--}
+local teleportWithVehicleSetting_Feat
 ---- Global variables END
 
 ---- Global constants 1/2 START
@@ -43,81 +58,290 @@ end
 ---- Global functions 1/2 END
 
 ---- Global constants 2/2 START
-local COLOR <const> = {
+local COLORS <const> = {
     RED = create_color_entry(255, 0, 0, 255),
     ORANGE = create_color_entry(255, 165, 0, 255),
     BLUE = create_color_entry(0, 0, 255, 255),
+    BLUE_FROM_BLIP_COLOR_38 = create_color_entry(45, 110, 185, 255),
     GREEN = create_color_entry(0, 255, 0, 255),
     GREEN_FROM_WALLET_MONEY = create_color_entry(114, 204, 114, 255),
 }
-COLOR.COLLECTED = COLOR.GREEN_FROM_WALLET_MONEY
-COLOR.FOUND = COLOR.BLUE
-local Global <const> = {
-    --[[
-    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
-
-    This is up-to-date for b3274
-                       --> "How to update after new build update"
-    ]]
-    numberOfGhostsExposedCollected = 2708057 + 534,
-    numberOfNightclubToiletAttendantTipped = 1579649,
-    activeMediaStick_DamFunk_EvenTheScore = 2708657,
-    activeMadrazoHits = 2738934 + 6838,
-    activeStreetDealer1 = 2738934 + 6813 + (0 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
-    activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
-    activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
-
-    Tunable = {
-        XM22_GUN_VAN_AVAILABLE = 262145 + 33232,
-        ENABLE_STREETDEALERS_DLC22022 = 262145 + 33479,
-        VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = 262145 + 26746,
-        VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = 262145 + 26747,
-        TIME_TRIAL_OVERRIDE_TIME = 262145 + 11129,
-        RC_TIME_TRIAL_OVERRIDE_TIME = 262145 + 26346
-    }
+COLORS.COLLECTED = COLORS.GREEN_FROM_WALLET_MONEY
+COLORS.FOUND = COLORS.BLUE_FROM_BLIP_COLOR_38
+local BLIP_COLORS <const> = {
+    INACTIVE = 0,
+    COLLECTED = 2,
+    FOUND = 38,
 }
-local Local <const> = {
-    --[[
-    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
-
-    This is up-to-date for b3274
-                       --> "How to update after new build update"
+local BLIPS <const> = {
+    --[[ NOTE:
+    I don't like working with Blips as R* decided to DELETE blips when they should technically only be HIDDEN.
+    They don't even have such method. So dealing with those have to be done only in "last method".
     ]]
-    activeTimeTrial = 14386 + 11, --> freemode.c
-    activeRCBanditoTimeTrial = 14436, --> freemode.c
-    activeJunkEnergyTimeTrial = 15239 + 3 --> freemode.c
+    --RADAR_SNITCH = 47,
+    --RADAR_TEMP_2 = 430,
+    RADAR_NHP_CHEST = 587,
+    RADAR_BAT_CLUB_PROPERTY = 614,
+    --RADAR_RC_TIME_TRIALS = 673,
+    --RADAR_CASINO = 679,
+    --RADAR_CASINO_WHEEL = 681,
+    --RADAR_JUNK_SKYDIVE = 829,
+    --RADAR_DEAD_DROP_PACKAGE = 842,
+    --RADAR_GUN_VAN = 844,
+    --RADAR_STASH_HOUSE = 845,
+    --RADAR_BICYCLE_TRIAL = 860,
+    --RADAR_CASINO_PREP = 878,
+    --RADAR_DAILY_BOUNTY = 886,
+    --RADAR_BAIL_BONDS_OFFICE = 893
 }
-local MP_STAT <const> = {
+local MP_STATS <const> = {
     LUCKY_WHEEL_USAGE = 8352,
     LUCKY_WHEEL_NUM_SPIN = 10412
 }
-local STAT_VIEWER_NAMES__LIST <const> = {
-    "MPx_SNOWMEN_COLLECTED",
-    "MPx_USB_RADIO_COLLECTED",
-    "MPx_ACTION_FIG_COLLECTED",
-    "MPx_LDORGANICS_COLLECTED",
-    "MPx_MOVIE_PROPS_COLLECTED",
-    "MPx_PLAYING_CARD_COLLECTED",
-    "MPx_SIGNAL_JAMMERS_COLLECTED",
-    "MPx_USJS_COMPLETED",
-    "MPPLY_RCTTCOMPLETEDWEEK",
-    "MPPLY_BTTCOMPLETED",
-    "MPPLY_TIMETRIAL_COMPLETED_WEEK",
-    "MPx_LUCKY_WHEEL_NUM_SPIN",
-    "MPx_BURIED_STASH_COLLECTED",
-    "MPx_UNDERWATRPACK_COLLECTED",
-    "MPx_SKYDIVES_COLLECTED", -- R* ISSUE (The stat updates only on session switch)
-    "MPx_SHIPWRECKED_COLLECTED", -- R* ISSUE (total count from the begining I think?)
-    "MPx_TREASURECHEST_COLLECTED",
-    "MPx_TRICKORTREAT_COLLECTED",
-    "MPx_TAGGING_COLLECTED",
-    "MPx_DAILYDEADDROP_COLLECTED"
+--COLLECTED_SNOWMEN_OUTFIT = 36656,
+--SERIAL_KILLER_NAVY_REVOLVER_FOUND = 18989,
+local PACKED_MP_BOOL <const> = {
+    SERIAL_KILLER_CLUE_1 = 18981,
+    SEEKING_TRUTH_TOILET_TIP = 25003,
+    STARTED_METAL_DETECTOR_COLLECTABLE = 25520,
+    COLLECTED_METAL_DETECTOR = 25521,
+    BURIED_STASH_0 = 25522,
+    ACTION_FIGURE_0 = 26811,
+    PLAYING_CARD_0 = 26911,
+    CASINO_MEMBERSHIP_PURCHASED = 26966,
+    CASINO_SEEN_CASINO_MOCAP = 27089,
+    SIGNAL_JAMMER_0 = 28099,
+    HIDDEN_CACHE_0 = 30297,
+    TREASURE_CHESTS_0 = 30307,
+    SHIPWRECKED_0 = 31734,
+    COLLECTED_TACTICAL_RIFLE_BARREL = 32319,
+    TRICK_OR_TREAT_0 = 34252,
+    LD_ORGANICS_0 = 34262,
+    TRICK_OR_TREAT_10 = 34512,
+    DAILYCOLLECT_DEAD_DROP_0 = 36628,
+    DEAD_DROP_COLLECTED_FIRST = 36629,
+    DAILYCOLLECT_SNOW_MEN_0 = 36630
+}
+local PACKED_MP_INT <const> = {
+    DAILY_STASH_HOUSE = 36623,
+    DAILYCOLLECT_DEAD_DROP_LOCATION_0 = 41213,
+    DAILYCOLLECT_DEAD_DROP_AREA_0 = 41214
+}
+
+local LOCALS_INDEXES <const> = {
+    --[[
+    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
+
+    This is up-to-date for b3274
+                       --> "How to update after new build update"
+    ]]
+    activeTimeTrial = {script = "freemode", index = 14386 + 11},
+    activeRCBanditoTimeTrial = {script = "freemode", index = 14436},
+    activeJunkEnergyTimeTrial = {script = "freemode", index = 15239 + 3},
+    treasureHuntBitset = {script = "freemode", index = 18136 + 26}, --> &Local_18136 and uParam0->f_26 from int func_19581(var uParam0)//Position - 0x5E3C1B
+    activeTreasureHuntFirstClueLocation = {script = "freemode", index = 18136 + 34}, --> &Local_18136 and uParam0->f_37 = OBJECT::CREATE_OBJECT(joaat("xm_prop_x17_note_paper_01a"), func_19627(uParam0->f_34), bVar0, false, false);
+    activetreasureHuntFinalLocation = {script = "freemode", index = 18136 + 35}, --> &Local_18136 and uParam0->f_36 = OBJECT::CREATE_OBJECT(joaat("xm_prop_x17_chest_closed"), func_19577(uParam0->f_35), true, false, false);
+    spinCasinoLuckyWheelMask = {script = "casino_lucky_wheel", index = 280 + 0}
+}
+local GLOBALS_INDEXES <const> = {
+    --[[
+    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
+
+    This is up-to-date for b3274
+                       --> "How to update after new build update"
+    ]]
+    -- treasureChestBlip = 2708057 + 483 * [iVar7] -- TODO: iVar7 can either be 0 or 1, I didn't want to bother codding it but later i should investigate further for cleaner code.
+    numberOfGhostsExposedCollected = 2708057 + 534,
+    numberOfNightclubToiletAttendantTipped = 1579649,
+    activeMediaStick_DamFunk_EvenTheScore = 2708657,
+    activeStreetDealer1 = 2738934 + 6813 + (0 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeStreetDealer2 = 2738934 + 6813 + (1 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeStreetDealer3 = 2738934 + 6813 + (2 * 7) + 1, --> Global_2738934.f_6813[iParam0 /*7*/]
+    activeMadrazoHit = 2738934 + 6838
+}
+local TUNABLES_INDEXES <const> = {
+    --[[
+    Scrapped from: https://github.com/root-cause/v-decompiled-scripts
+
+    This is up-to-date for b3274
+                       --> "How to update after new build update"
+    ]]
+    --> tuneables_processing.c
+    DISABLE_EVENT_ATOBTIMETRIAL = { index = 262145 + 10675, type = "bool" },
+    TIME_TRIAL_OVERRIDE_TIME = { index = 262145 + 11129, type = "int" },
+    ENABLE_DOUBLE_ACTION_REVOLVER = { index = 262145 + 22641, type = "bool" },
+    ENABLE_TREASURE_HUNT = { index = 262145 + 23088, type = "bool" },
+    DISABLE_EVENT_RCTIMETRIAL = { index = 262145 + 26345, type = "int" },
+    RC_TIME_TRIAL_OVERRIDE_TIME = { index = 262145 + 26346, type = "int" },
+    VC_CASINO_DISABLE_WHEEL = { index = 262145 + 26498, type = "bool" },
+    VC_FIGURES_ENABLE = { index = 262145 + 26671, type = "bool" },
+    VC_CARDS_ENABLE = { index = 262145 + 26677, type = "bool" },
+    VC_PEYOTE_ENABLE = { index = 262145 + 26683, type = "bool" },
+    VC_PEYOTE_DISABLE_1 = { index = 262145 + 26684, type = "bool" },
+    VC_PEYOTE_DISABLE_2 = { index = 262145 + 26685, type = "bool" },
+    VC_PEYOTE_DISABLE_3 = { index = 262145 + 26686, type = "bool" },
+    VC_PEYOTE_DISABLE_4 = { index = 262145 + 26687, type = "bool" },
+    VC_PEYOTE_DISABLE_5 = { index = 262145 + 26688, type = "bool" },
+    VC_PEYOTE_DISABLE_6 = { index = 262145 + 26689, type = "bool" },
+    VC_PEYOTE_DISABLE_7 = { index = 262145 + 26690, type = "bool" },
+    VC_PEYOTE_DISABLE_8 = { index = 262145 + 26691, type = "bool" },
+    VC_PEYOTE_DISABLE_9 = { index = 262145 + 26692, type = "bool" },
+    VC_PEYOTE_DISABLE_10 = { index = 262145 + 26693, type = "bool" },
+    VC_PEYOTE_DISABLE_11 = { index = 262145 + 26694, type = "bool" },
+    VC_PEYOTE_DISABLE_12 = { index = 262145 + 26695, type = "bool" },
+    VC_PEYOTE_DISABLE_13 = { index = 262145 + 26696, type = "bool" },
+    VC_PEYOTE_DISABLE_14 = { index = 262145 + 26697, type = "bool" },
+    VC_PEYOTE_DISABLE_15 = { index = 262145 + 26698, type = "bool" },
+    VC_PEYOTE_DISABLE_SASQUATCH_LOC = { index = 262145 + 26699, type = "bool" },
+    VC_PEYOTE_DISABLE_CHOP_LOC = { index = 262145 + 26700, type = "bool" },
+    VC_PEYOTE_DISABLE_ROTTWEILER = { index = 262145 + 26701, type = "bool" },
+    VC_PEYOTE_DISABLE_MTLION = { index = 262145 + 26702, type = "bool" },
+    VC_PEYOTE_DISABLE_WESTY = { index = 262145 + 26703, type = "bool" },
+    VC_PEYOTE_DISABLE_PUG = { index = 262145 + 26704, type = "bool" },
+    VC_PEYOTE_DISABLE_CROW = { index = 262145 + 26705, type = "bool" },
+    VC_PEYOTE_DISABLE_HUSKY = { index = 262145 + 26706, type = "bool" },
+    VC_PEYOTE_DISABLE_SHEPHERD = { index = 262145 + 26707, type = "bool" },
+    VC_PEYOTE_DISABLE_PIGEON = { index = 262145 + 26708, type = "bool" },
+    VC_PEYOTE_DISABLE_FISH = { index = 262145 + 26709, type = "bool" },
+    VC_PEYOTE_DISABLE_COW = { index = 262145 + 26710, type = "bool" },
+    VC_PEYOTE_DISABLE_POODLE = { index = 262145 + 26711, type = "bool" },
+    VC_PEYOTE_DISABLE_SHARKHAMMER = { index = 262145 + 26712, type = "bool" },
+    VC_PEYOTE_DISABLE_PIG = { index = 262145 + 26713, type = "bool" },
+    VC_PEYOTE_DISABLE_COYOTE = { index = 262145 + 26714, type = "bool" },
+    VC_PEYOTE_DISABLE_STINGRAY = { index = 262145 + 26715, type = "bool" },
+    VC_PEYOTE_DISABLE_DEER = { index = 262145 + 26716, type = "bool" },
+    VC_PEYOTE_DISABLE_SEAGULL = { index = 262145 + 26717, type = "bool" },
+    VC_PEYOTE_DISABLE_KILLERWHALE = { index = 262145 + 26718, type = "bool" },
+    VC_PEYOTE_DISABLE_BOAR = { index = 262145 + 26719, type = "bool" },
+    VC_PEYOTE_DISABLE_RABBIT = { index = 262145 + 26720, type = "bool" },
+    VC_PEYOTE_DISABLE_DOLPHIN = { index = 262145 + 26721, type = "bool" },
+    VC_PEYOTE_DISABLE_HEN = { index = 262145 + 26722, type = "bool" },
+    VC_PEYOTE_DISABLE_RETRIEVER = { index = 262145 + 26723, type = "bool" },
+    VC_PEYOTE_DISABLE_CHICKENHAWK = { index = 262145 + 26724, type = "bool" },
+    VC_PEYOTE_DISABLE_CAT = { index = 262145 + 26725, type = "bool" },
+    VC_PEYOTE_DISABLE_SHARKTIGER = { index = 262145 + 26726, type = "bool" },
+    VC_PEYOTE_DISABLE_CORMORANT = { index = 262145 + 26727, type = "bool" },
+    VC_PEYOTE_DISABLE_SASQUATCH = { index = 262145 + 26728, type = "bool" },
+    VC_PEYOTE_DISABLE_CHOP = { index = 262145 + 26729, type = "bool" },
+    VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = { index = 262145 + 26746, type = "int" },
+    VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = { index = 262145 + 26747, type = "bool" },
+    COLLECTABLES_SIGNAL_JAMMERS = { index = 262145 + 27934, type = "bool" },
+    COLLECTABLES_MOVIE_PROPS = { index = 262145 + 29152, type = "bool" },
+    COLLECTABLES_UNDERWATER_PACKAGES = { index = 262145 + 29218, type = "bool" },
+    COLLECTABLES_TREASURE_CHESTS = { index = 262145 + 29219, type = "bool" },
+    COLLECTABLES_RADIO_STATIONS = { index = 262145 + 29220, type = "bool" },
+    NUMBER_OF_ACTIVE_HIDDEN_CACHES = { index = 262145 + 29730, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_INDEX = { index = 262145 + 30234, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_TREASURE_CHEST0 = { index = 262145 + 30235, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_TREASURE_CHEST1 = { index = 262145 + 30236, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE0 = { index = 262145 + 30237, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE1 = { index = 262145 + 30238, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE2 = { index = 262145 + 30239, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE3 = { index = 262145 + 30240, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE4 = { index = 262145 + 30241, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE5 = { index = 262145 + 30242, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE6 = { index = 262145 + 30243, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE7 = { index = 262145 + 30244, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE8 = { index = 262145 + 30245, type = "int" },
+    DAILY_COLLECTABLES_OVERRIDE_HIDDEN_CACHE9 = { index = 262145 + 30246, type = "int" },
+    DISABLE_DAILY_COLLECTABLE_TREASURE_HUNT_GRASS_CULL_LOCATION_BITSET = { index = 262145 + 30247, type = "int" },
+    COLLECTABLES_USB_PIRATE_RADIO = { index = 262145 + 30258, type = "bool" },
+    NUMBER_OF_USB_PIRATE_RADIO_MIXES_AT_LOCATIONS = { index = 262145 + 30259, type = "int" },
+    NUMBER_OF_ACTIVE_SHIPWRECKED = { index = 262145 + 30260, type = "int" },
+    COLLECTABLES_SHIPWRECKED = { index = 262145 + 30261, type = "bool" },
+    NUMBER_OF_ACTIVE_BURIED_STASH = { index = 262145 + 30263, type = "int" },
+    COLLECTABLES_BURIED_STASH = { index = 262145 + 30264, type = "bool" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_0  = { index = 262145 + 30387 + 1, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_1  = { index = 262145 + 30387 + 2, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_2  = { index = 262145 + 30387 + 3, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_3  = { index = 262145 + 30387 + 4, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_4  = { index = 262145 + 30387 + 5, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_5  = { index = 262145 + 30387 + 6, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_6  = { index = 262145 + 30387 + 7, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_7  = { index = 262145 + 30387 + 8, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_8  = { index = 262145 + 30387 + 9, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_9  = { index = 262145 + 30387 + 10, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_10 = { index = 262145 + 30387 + 11, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_11 = { index = 262145 + 30387 + 12, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_12 = { index = 262145 + 30387 + 13, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_13 = { index = 262145 + 30387 + 14, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_14 = { index = 262145 + 30387 + 15, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_15 = { index = 262145 + 30387 + 16, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_16 = { index = 262145 + 30387 + 17, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_17 = { index = 262145 + 30387 + 18, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_18 = { index = 262145 + 30387 + 19, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_19 = { index = 262145 + 30387 + 20, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_20 = { index = 262145 + 30387 + 21, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_21 = { index = 262145 + 30387 + 22, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_22 = { index = 262145 + 30387 + 23, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_23 = { index = 262145 + 30387 + 24, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_LOCATION_BITSET_24 = { index = 262145 + 30387 + 25, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_FINALE_LOCATION_BITSET = { index = 262145 + 30413, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_MOODY_LOCATION_BITSET = { index = 262145 + 30414, type = "int" },
+    ACTIVE_DAILY_COLLECTABLE_USB_FIXER_DRE = { index = 262145 + 31196, type = "bool" },
+    NUMBER_OF_ACTIVE_TRICK_OR_TREAT = { index = 262145 + 32083, type = "int" },
+    COLLECTABLES_TRICK_OR_TREAT = { index = 262145 + 32084, type = "bool" },
+    NUMBER_OF_ACTIVE_LD_ORGANICS = { index = 262145 + 32098, type = "int" },
+    COLLECTABLES_LD_ORGANICS = { index = 262145 + 32099, type = "bool" },
+    NUMBER_OF_ACTIVE_SKYDIVES = { index = 262145 + 32103, type = "int" },
+    COLLECTABLES_SKYDIVES = { index = 262145 + 32104, type = "bool" },
+    NUMBER_OF_ACTIVE_DEAD_DROP = { index = 262145 + 33222, type = "int" },
+    COLLECTABLES_DEAD_DROP = { index = 262145 + 33223, type = "bool" },
+    NUMBER_OF_ACTIVE_SNOWMEN = { index = 262145 + 33227, type = "int" },
+    COLLECTABLES_SNOWMEN = { index = 262145 + 33228, type = "bool" },
+    XM22_GUN_VAN_AVAILABLE = { index = 262145 + 33232, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_0 = { index = 262145 + 33233 + 1, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_1 = { index = 262145 + 33233 + 2, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_2 = { index = 262145 + 33233 + 3, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_3 = { index = 262145 + 33233 + 4, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_4 = { index = 262145 + 33233 + 5, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_5 = { index = 262145 + 33233 + 6, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_6 = { index = 262145 + 33233 + 7, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_7 = { index = 262145 + 33233 + 8, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_8 = { index = 262145 + 33233 + 9, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_9 = { index = 262145 + 33233 + 10, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_10 = { index = 262145 + 33233 + 11, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_11 = { index = 262145 + 33233 + 12, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_12 = { index = 262145 + 33233 + 13, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_13 = { index = 262145 + 33233 + 14, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_14 = { index = 262145 + 33233 + 15, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_15 = { index = 262145 + 33233 + 16, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_16 = { index = 262145 + 33233 + 17, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_17 = { index = 262145 + 33233 + 18, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_18 = { index = 262145 + 33233 + 19, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_19 = { index = 262145 + 33233 + 20, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_20 = { index = 262145 + 33233 + 21, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_21 = { index = 262145 + 33233 + 22, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_22 = { index = 262145 + 33233 + 23, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_23 = { index = 262145 + 33233 + 24, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_24 = { index = 262145 + 33233 + 25, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_25 = { index = 262145 + 33233 + 26, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_26 = { index = 262145 + 33233 + 27, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_27 = { index = 262145 + 33233 + 28, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_28 = { index = 262145 + 33233 + 29, type = "bool" },
+    XM22_GUN_VAN_LOCATION_ENABLED_29 = { index = 262145 + 33233 + 30, type = "bool" },
+    ENABLE_DAILYSTASHHOUSE_DLC22022 = { index = 262145 + 33476, type = "bool" },
+    ENABLE_STREETDEALERS_DLC22022 = { index = 262145 + 33479, type = "bool" },
+    ENABLE_DAILY_BIKE_TIME_TRIAL = { index = 262145 + 34213, type = "bool" },
+    ENABLE_HALLOWEEN_GHOSTHUNT = { index = 262145 + 34221, type = "bool" },
+    TAGGING_POSTERS_NUMBER_OF_ACTIVE = { index = 262145 + 35524, type = "int" }
 }
 ---- Global constants 2/2 END
 
 ---- Global functions 2/2 START
 local function pluralize(word, count)
-    return word .. (count > 1 and "s" or "")
+    local irregularPlurals = {
+        ["Buried Stash"] = "Buried Stashes",
+        ["Treasure Hunt (First Clue)"] = "Treasure Hunt (First Clues)",
+        ["Treasure Hunt (Remaining Clue)"] = "Treasure Hunt (Remaining Clues)",
+        ["Treasure Hunt (Final Location)"] = "Treasure Hunt (Final Locations)"
+    }
+
+    if count > 1 then
+        return irregularPlurals[word] or (word .. "s")
+    end
+
+    return word
 end
 
 local function ensure_float(value)
@@ -138,16 +362,46 @@ local function is_in_range(value, min, max)
 end
 
 -- Function generated from ChatGPT
-local function ms_to_time_components(ms)
-    local totalSeconds = math.floor(ms / 1000)
+local function time_components_from_ms(baseMilliseconds)
+    local SECONDS_PER_DAY = 86400
+    local SECONDS_PER_HOUR = 3600
+    local SECONDS_PER_MINUTE = 60
+    local MILLISECONDS_PER_SECOND = 1000
+
+    local totalSeconds = math.floor(baseMilliseconds / MILLISECONDS_PER_SECOND)
+
+    local days = math.floor(totalSeconds / SECONDS_PER_DAY)
+    totalSeconds = totalSeconds % SECONDS_PER_DAY
+
+    local hours = math.floor(totalSeconds / SECONDS_PER_HOUR)
+    totalSeconds = totalSeconds % SECONDS_PER_HOUR
+
+    local minutes = math.floor(totalSeconds / SECONDS_PER_MINUTE)
+    local seconds = totalSeconds % SECONDS_PER_MINUTE
+    local milliseconds = baseMilliseconds % MILLISECONDS_PER_SECOND
 
     return {
-        hours = math.floor(totalSeconds / 3600),
-        minutes = math.floor((totalSeconds % 3600) / 60),
-        seconds = totalSeconds % 60,
-        milliseconds = math.floor(ms % 1000 / 10)
+        days = days,
+        hours = hours,
+        minutes = minutes,
+        seconds = seconds,
+        milliseconds = milliseconds
     }
 end
+
+-- Function generated from ChatGPT
+local function time_components_from_seconds(baseSeconds)
+    local MILLISECONDS_PER_SECOND = 1000
+    local timeComponents = time_components_from_ms(baseSeconds * MILLISECONDS_PER_SECOND)
+
+    timeComponents.milliseconds = nil -- Remove milliseconds field from the result since we are dealing with seconds
+
+    return timeComponents
+end
+
+--local function CONVERT_POSIX_TIME(posixTime)
+--    return os.date("*t", posixTime)
+--end
 
 local function create_tick_handler(handler, ms)
     return menu.create_thread(function()
@@ -158,20 +412,20 @@ local function create_tick_handler(handler, ms)
     end)
 end
 
-local function CONVERT_POSIX_TIME(posixTime)
-    return os.date("*t", posixTime)
-end
-
-local function format_on_races_display_time(ms)
+local function format_on_races_display_time_from_ms(ms)
     if ms >= 0 then
-        local timeComponents = ms_to_time_components(ms)
-        return string.format("%02d:%02d:%02d", timeComponents.minutes, timeComponents.seconds, timeComponents.milliseconds)
+        local timeComponents = time_components_from_ms(ms)
+        return string.format("%02d:%02d.%02d", timeComponents.minutes, timeComponents.seconds, timeComponents.milliseconds)
     end
 
-    return "00:00:00:00"
+    return "00:00.00"
 end
 
 local function teleport_myself(x, y, z, keepVehicle)
+    if teleportWithVehicleSetting_Feat.on then
+        keepVehicle = true
+    end
+
     x = ensure_float(x)
     y = ensure_float(y)
     z = ensure_float(z)
@@ -329,7 +583,7 @@ local function teleport_in_marker(markerPos, interiorId, notificationText)
         system.yield(2000)
 
         if (os.clock() - start_Time) >= 3 then
-            menu.notify(notificationText, SCRIPT_TITLE, 3, COLOR.BLUE.int)
+            menu.notify(notificationText, SCRIPT_TITLE, 3, COLORS.BLUE.int)
             start_Time = os.clock()
         end
     end
@@ -338,12 +592,576 @@ local function teleport_in_marker(markerPos, interiorId, notificationText)
         system.yield()
 
         if (os.clock() - start_Time) >= 1 then
-            menu.notify(notificationText, SCRIPT_TITLE, 1, COLOR.BLUE.int)
+            menu.notify(notificationText, SCRIPT_TITLE, 1, COLORS.BLUE.int)
             start_Time = os.clock()
         end
     end
 end
 
+local function remove_event_listener(eventType, listener)
+    if listener and event.remove_event_listener(eventType, listener) then
+        return
+    end
+
+    return listener
+end
+
+local function handle_script_exit(params)
+    local function remove_all_created_blips()
+        local function recursive_remove(blips)
+            for key, value in pairs(blips) do
+                if type(value) == "table" then
+                    recursive_remove(value)
+                else
+                    if NATIVES.HUD.DOES_BLIP_EXIST(value) then
+                        ui.remove_blip(value)
+                    end
+                end
+            end
+        end
+
+        recursive_remove(createdBlips)
+    end
+
+
+    params = params or {}
+    if params.clearAllNotifications == nil then
+        params.clearAllNotifications = false
+    end
+    if params.hasScriptCrashed == nil then
+        params.hasScriptCrashed = false
+    end
+
+    scriptExitEventListener = remove_event_listener("exit", scriptExitEventListener)
+
+    remove_all_created_blips()
+
+    -- This will delete notifications from other scripts too.
+    -- Suggestion is open: https://discord.com/channels/1088976448452304957/1092480948353904752/1253065431720394842
+    if params.clearAllNotifications then
+        menu.clear_all_notifications()
+    end
+
+    if params.hasScriptCrashed then
+        menu.notify("Oh no... Script crashed:(\nYou gotta restart it manually.", SCRIPT_NAME, 12, COLORS.RED.int)
+    end
+
+    menu.exit()
+end
+---- Global functions 2/2 END
+
+---- Global event listeners START
+scriptExitEventListener = event.add_event_listener("exit", function()
+    handle_script_exit()
+end)
+---- Global event listeners END
+-- Globals END
+
+
+-- Permissions Startup Checking START
+local unnecessaryPermissions = {}
+local missingPermissions = {}
+
+for _, flag in ipairs(TRUSTED_FLAGS) do
+    if menu.is_trusted_mode_enabled(flag.bitValue) then
+        if not flag.isRequiered then
+            table.insert(unnecessaryPermissions, flag.menuName)
+        end
+    else
+        if flag.isRequiered then
+            table.insert(missingPermissions, flag.menuName)
+        end
+    end
+end
+
+if #unnecessaryPermissions > 0 then
+    menu.notify("You do not require the following " .. pluralize("permission", #unnecessaryPermissions) .. ":\n" .. table.concat(unnecessaryPermissions, "\n"),
+        SCRIPT_NAME, 6, COLORS.ORANGE.int)
+end
+if #missingPermissions > 0 then
+    menu.notify(
+        "You need to enable the following " .. pluralize("permission", #missingPermissions) .. ":\n" .. table.concat(missingPermissions, "\n"),
+        SCRIPT_NAME, 6, COLORS.RED.int)
+    handle_script_exit()
+end
+-- Permissions Startup Checking END
+
+
+-- === Main Menu Features === --
+local function has_all_bools(packedStatBoolCodesTable)
+    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
+        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
+            return false
+        end
+    end
+    return true
+end
+
+-- TODO: Add Tunables as maxNum here
+--[[ TODO:
+PACKED_MP_MOVIE_PROPS_0,
+PACKED_MP_MOVIE_PROPS_1,
+PACKED_MP_MOVIE_PROPS_2,
+PACKED_MP_MOVIE_PROPS_3,
+PACKED_MP_MOVIE_PROPS_4,
+PACKED_MP_MOVIE_PROPS_5,
+PACKED_MP_MOVIE_PROPS_6,
+PACKED_MP_MOVIE_PROPS_7,						//10
+PACKED_MP_MOVIE_PROPS_8,
+PACKED_MP_MOVIE_PROPS_9,
+PACKED_MP_ALIEN_AWARD_OUTFIT,
+PACKED_MP_MOVIE_PROPS_0_DELIVERED,
+PACKED_MP_MOVIE_PROPS_1_DELIVERED,
+PACKED_MP_MOVIE_PROPS_2_DELIVERED,
+PACKED_MP_MOVIE_PROPS_3_DELIVERED,
+PACKED_MP_MOVIE_PROPS_4_DELIVERED,
+PACKED_MP_MOVIE_PROPS_5_DELIVERED,
+PACKED_MP_MOVIE_PROPS_6_DELIVERED,				//20
+PACKED_MP_MOVIE_PROPS_7_DELIVERED,
+PACKED_MP_MOVIE_PROPS_8_DELIVERED,
+PACKED_MP_MOVIE_PROPS_9_DELIVERED,
+PACKED_MP_MOVIE_PROPS_STARTED,
+
+PACKED_MP_ALIEN_AWARD_OUTFIT
+PACKED_MP_BOOL_YACHT_AWARD_OUTFIT
+PACKED_MP_BOOL_COLLECTED_IMPOTANT_RAGE_OUTFIT
+PACKED_MP_BOOL_COLLECTED_HIGHROLLER_OUTFIT
+PACKED_MP_BOOL_COLLECTED_FRONTIER_OUTFIT
+PACKED_MP_BOOL_COLLECTED_LD_ORGANICS_OUTFIT
+PACKED_MP_BOOL_COLLECTED_SNOWMEN_OUTFIT
+
+PACKED_MP_SKYDIVES_0,
+PACKED_MP_SKYDIVES_1,
+PACKED_MP_SKYDIVES_2,
+PACKED_MP_SKYDIVES_3,
+PACKED_MP_SKYDIVES_4,
+PACKED_MP_SKYDIVES_5,
+PACKED_MP_SKYDIVES_6,
+PACKED_MP_SKYDIVES_7,
+PACKED_MP_SKYDIVES_8,
+PACKED_MP_SKYDIVES_9,
+
+PACKED_MP_BURIED_STASH_0,
+PACKED_MP_BURIED_STASH_1,
+PACKED_MP_BURIED_STASH_2,
+PACKED_MP_BURIED_STASH_3,
+PACKED_MP_BURIED_STASH_4,
+PACKED_MP_BURIED_STASH_5,
+PACKED_MP_BURIED_STASH_6,
+PACKED_MP_BURIED_STASH_7,
+PACKED_MP_BURIED_STASH_8,
+PACKED_MP_BURIED_STASH_9,  //+12 (current 574)
+PACKED_MP_BURIED_STASH_COLLECTED_FIRST, 
+PACKED_MP_BURIED_STASH_HAS_BEEN_FOUND_0,
+PACKED_MP_BURIED_STASH_HAS_BEEN_FOUND_1,
+]]
+local function has_action_figure(actionFigureId)
+    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.ACTION_FIGURE_0 + actionFigureId, -1) or false
+end
+local function has_ghost_exposed(ghostExposedId)
+    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
+end
+local function has_ld_organic_product(ldOrganicProductId)
+    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.LD_ORGANICS_0 + ldOrganicProductId, -1) or false
+end
+local function has_movie_prop(moviePropId)
+    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
+end
+local function has_playing_card(playingCardId)
+    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.PLAYING_CARD_0 + playingCardId, -1) or false
+end
+local function has_signal_jammer(signalJammerId)
+    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.SIGNAL_JAMMER_0 + signalJammerId, -1) or false
+end
+local function has_snowman(snowmanId)
+    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.DAILYCOLLECT_SNOW_MEN_0 + snowmanId, -1) or false
+end
+local function has_epsilon_robe(epsilonRobeId)
+    return is_in_range(epsilonRobeId, 0, 2) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.SEEKING_TRUTH_TOILET_TIP + epsilonRobeId, -1) or false
+end
+local function has_weapon_component(weaponComponentId)
+    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.COLLECTED_TACTICAL_RIFLE_BARREL + weaponComponentId, -1) or false
+end
+
+local function has_buried_stash(buriedStashId)
+    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.BURIED_STASH_0 + buriedStashId, -1) or false
+end
+local function has_hidden_cache(hiddenCacheId)
+    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.HIDDEN_CACHE_0 + hiddenCacheId, -1) or false
+end
+local function has_junk_energy_skydive(junkEnergySkydiveId)
+    --[[
+    ChatGPT + decompiled script enginered, I have done nothing but copy paste decompiled and asked GPT to make the working algorythm.
+    Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
+    ]]
+    if not is_in_range(junkEnergySkydiveId, 0, 9) then
+        return false
+    end
+
+    -- Calculate the base stat IDs for the specific skydive ID
+    local statId1 = 34837 + junkEnergySkydiveId * 4
+    local statId2 = 34839 + junkEnergySkydiveId * 4
+    local statId3 = 34838 + junkEnergySkydiveId * 4
+
+    -- Check if any of the stats indicate the skydive has been collected
+    return NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
+        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
+end
+local function has_shipwreck(shipwreckId)
+    return is_in_range(shipwreckId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.SHIPWRECKED_0 + shipwreckId, -1) or false
+end
+local function has_treasure_chest(treasureChestId)
+    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.TREASURE_CHESTS_0 + treasureChestId, -1) or false
+end
+local function has_ls_tag(lsTagId)
+    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
+end
+local function has_trick_or_treat(trickOrTreatId)
+    local packedStatId = false
+    if is_in_range(trickOrTreatId, 0, 9) then
+        packedStatId = PACKED_MP_BOOL.TRICK_OR_TREAT_0 + trickOrTreatId
+    elseif is_in_range(trickOrTreatId, 10, 199) then
+        packedStatId = PACKED_MP_BOOL.TRICK_OR_TREAT_10 + (trickOrTreatId - 10)
+    end
+    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
+end
+
+local function count_collected_bool_stat_items(hasCollectibleFunc, endIndex, hasCollectibleFunc__params)
+    endIndex = endIndex - 1
+
+    local startIndex = 0
+    local collectedCount = 0
+
+    for i = startIndex, endIndex do
+        if hasCollectibleFunc(i, hasCollectibleFunc__params) then
+            collectedCount = collectedCount + 1
+        end
+    end
+    return collectedCount
+end
+
+local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collectibleTypeName, hasCollectibleFunc)
+    -- Iterate through all pickups
+    for i, pickupGroup in ipairs(pickup_Table) do
+        if not feat.on then
+            break
+        end
+
+        -- Skips teleports related to random events.
+        if collectibleTypeName == "Movie Props" then
+            if i >= 8 then
+                return
+            end
+        end
+
+        -- Checks if we didn't already collected that one, if so skip.
+        if not hasCollectibleFunc(i - 1) then
+            local initialWait_Time = 4
+            if pickupGroup["extraWait_Time"] then
+                initialWait_Time = pickupGroup["extraWait_Time"]
+            end
+
+            if pickupGroup["notification"] then
+                menu.notify(pickupGroup["notification"], SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+            end
+
+            menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #pickup_Table, SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+
+            teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
+
+            -- If this flag is set, it means we must wait a lil longer after a teleport, ex: loading the Casino building.
+            if pickupGroup["extraWait_Time"] then
+                local start_Time = os.clock()
+                while (os.clock() - start_Time) < initialWait_Time do
+                    teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
+                    system.yield(100)
+                end
+            end
+
+            local start_Time = os.clock()
+            local foundPickupNearby = false
+            local verifyPickup_Time = nil
+
+            -- Check for any matching collectibles for up to 4 seconds
+            while (os.clock() - start_Time) < 4 do -- Going under that makes it not collect 100% of them.
+                system.yield()
+
+                if foundPickupNearby and (os.clock() - verifyPickup_Time) > 3 then
+                    break -- Timeout of 3 seconds if a matched pickup was found, but still not collected
+                end
+
+                local nearbyPickups_Table = object.get_all_pickups() -- OBJECT::HAS_PICKUP_BEEN_COLLECTED, OBJECT::DOES_PICKUP_EXIST, OBJECT::DOES_PICKUP_OBJECT_EXIST
+                for _, nearbyPickup in pairs(nearbyPickups_Table) do
+                    local entityHash = entity.get_entity_model_hash(nearbyPickup)
+                    if table_contains(pickupHashes_Table, entityHash) then
+                        foundPickupNearby = true
+                        verifyPickup_Time = os.clock() -- Init verification time
+                        local pickupEntityPos = entity.get_entity_coords(nearbyPickup)
+                        teleport_myself(pickupEntityPos.x, pickupEntityPos.y, pickupEntityPos.z)
+                        system.yield(1000) -- Wait 1 second before rechecking, I do that in case the player as to "fall" on the ground, in order to collect the pickup.
+                        break -- Exit the inner loop to recheck the list of pickups
+                    end
+                end
+
+                -- Exit the loop if no pickup is found after checking
+                if verifyPickup_Time and not foundPickupNearby then
+                    break
+                end
+            end
+        end
+    end
+end
+
+local function auto_mode_e(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
+    local function start_auto_mode(noClip_Feat)
+        local initialWait_Time = 4
+
+        local function try_and_collect_it(collectible)
+            local function rotate_around_entity(targetEntity, radius, stepAngle)
+                local entityPos = entity.get_entity_coords(targetEntity)
+                local startAngle = 0
+                local endAngle = 360
+                local lookFront_Time = os.clock()
+                local lookBehind_Time = nil
+                local e_Time = os.clock()
+                local e_State = true
+
+                -- Perform the 360-degree rotation
+                for angle = startAngle, endAngle - stepAngle, stepAngle do
+                    if not feat.on then
+                        return
+                    end
+
+                    if e_State then
+                        if (os.clock() - e_Time) > 0.053 then
+                            controls.set_control_normal(0, 51, 0.0)
+                            e_State = false
+                            e_Time = os.clock()
+                        end
+                    else
+                        if (os.clock() - e_Time) > 0.053 then
+                            controls.set_control_normal(0, 51, 1.0)
+                            e_State = true
+                            e_Time = os.clock()
+                        end
+                    end
+
+                    if lookFront_Time then
+                        lookBehind_Time = nil
+                        if (os.clock() - lookFront_Time) > 0.15 then
+                            lookFront_Time = nil
+                            lookBehind_Time = os.clock()
+                        end
+                        controls.set_control_normal(0, 26, 0.0)
+                    elseif lookBehind_Time then
+                        lookFront_Time = nil
+                        if (os.clock() - lookBehind_Time) > 0.15 then
+                            lookBehind_Time = nil
+                            lookFront_Time = os.clock()
+                        end
+                        controls.set_control_normal(0, 26, 1.0)
+                    end
+
+                    system.yield()
+
+                    -- Convert angle to radians
+                    local radians = math.rad(angle)
+
+                    -- Calculate the new position based on the angle
+                    local xOffset = radius * math.cos(radians)
+                    local yOffset = radius * math.sin(radians)
+
+                    -- Calculate the new position
+                    local newPos = {
+                        x = entityPos.x + xOffset,
+                        y = entityPos.y + yOffset,
+                        z = entityPos.z
+                    }
+
+                    teleport_myself(newPos.x, newPos.y, newPos.z)
+                end
+            end
+
+            local start_Time = os.clock()
+            local verifyCollectible_Time = nil
+            local checkNearbyCollectibles_Time = nil
+            local collectibleEntity = 0
+
+            -- Check for any matching collectibles for up to {initialWait_Time} seconds
+            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
+                if not feat.on then
+                    return
+                end
+                system.yield()
+
+                -- Timeout of 6 seconds if a matched collectible was found, but still not collected
+                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 6 then
+                    return
+                end
+
+                local foundCollectibleThisFrame = false
+
+                -- Update player's nearby collectibles every 0.1 second to reduce CPU usage.
+                if not checkNearbyCollectibles_Time or (os.clock() - checkNearbyCollectibles_Time) > 0.1 then
+                    for _, collectibleHash in ipairs(collectibleHashes_Table) do
+                        collectibleEntity = NATIVES.OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(collectible[1], collectible[2], collectible[3], 0.01, collectibleHash, false, false, false)
+                        if collectibleEntity ~= 0 then
+                            break
+                        end
+                    end
+
+                    checkNearbyCollectibles_Time = os.clock()
+                end
+
+                if collectibleEntity ~= 0 then
+                    foundCollectibleThisFrame = true
+                    verifyCollectible_Time = os.clock() -- Init verification time
+
+                    local entityMaxSizeY = get_entity_max_size(collectibleEntity).y
+                    local radius = (entityMaxSizeY > 1.0 and entityMaxSizeY) or 1.0
+                    local stepAngle = 6 -- Define the angle increment for each step
+                    rotate_around_entity(collectibleEntity, radius, stepAngle)
+                end
+
+                -- Exit the loop if no collectibles are found after checking
+                if verifyCollectible_Time and not foundCollectibleThisFrame then
+                    return true
+                end
+            end
+
+            return false
+        end
+
+        local collectibleHandlers_Table = {
+            ["LD Organics Product"] = has_ld_organic_product,
+        }
+        local foundPreviousCollectible = false
+
+        -- Iterate through all collectibles
+        for i, collectible in ipairs(collectible_Table) do
+            if not feat.on then
+                return
+            end
+
+            -- Checks if we didn't already collected that one, if so skip.
+            if not collectibleHandlers_Table[collectibleTypeName](i - 1) then
+                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+
+                if collectible["notification"] then
+                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+                end
+
+
+                teleport_myself(collectible[1], collectible[2], collectible[3])
+                if foundPreviousCollectible then
+                    system.yield(3000) -- For 100% it's just requiered.
+                end
+                foundPreviousCollectible = try_and_collect_it(collectible, initialWait_Time)
+            end
+        end
+    end
+
+    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
+    local noClipState = noClip_Feat.on
+
+    start_auto_mode(noClip_Feat)
+
+    -- Restore player/ped settings
+    if not noClipState then
+        noClip_Feat.on = false
+    end
+    controls.set_control_normal(0, 26, 0.0)
+    controls.set_control_normal(0, 51, 0.0)
+    system.yield()
+end
+
+local function auto_mode_destroyable(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
+    local function start_auto_mode(noClip_Feat)
+        local function try_and_collect_it(collectible, initialWait_Time)
+            local start_Time = os.clock()
+            local verifyCollectible_Time = nil
+
+            -- Check for any matching collectibles for up to {initialWait_Time} seconds
+            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
+                if not feat.on then
+                    return
+                end
+                system.yield()
+
+                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 3 then
+                    return -- Timeout of 3 seconds if a matched collectible to shoot was found, but still not collected
+                end
+
+                local foundCollectibleNearby = false
+                local nearbyObjects_Table = object.get_all_objects()
+                for _, nearbyObject in pairs(nearbyObjects_Table) do
+                    local entityHash = entity.get_entity_model_hash(nearbyObject)
+                    if table_contains(collectibleHashes_Table, entityHash) then
+                        foundCollectibleNearby = true
+                        verifyCollectible_Time = os.clock() -- Init verification time
+                        local playerPed = player.player_ped()
+                        local playerPos = entity.get_entity_coords(playerPed)
+                        local collectibleEntity = nearbyObject
+                        local collectibleEntityPos = entity.get_entity_coords(collectibleEntity)
+                        if NATIVES.SYSTEM.VDIST(collectible[1], collectible[2], collectible[3], collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z) <= 0.01 then
+                            teleport_myself(collectibleEntityPos.x - 2, collectibleEntityPos.y - 2, collectibleEntityPos.z)
+                            NATIVES.FIRE.ADD_OWNED_EXPLOSION(playerPed, collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z, 36, 0.2, false, true, 0.0) -- 36 = railgun
+                            NATIVES.ENTITY.SET_ENTITY_HEALTH(collectibleEntity, 0, 0, 0) -- not needed but it doesn't hurt
+                            --gameplay.shoot_single_bullet_between_coords(playerPos, collectibleEntityPos, 0, gameplay.get_hash_key("weapon_pistol"), playerPed, false, true, 100000.0)
+                            break -- Exit the inner loop to recheck the list of collectibles
+                        end
+                    end
+                end
+
+                -- Exit the loop if no collectibles to shoot is found after checking
+                if verifyCollectible_Time and not foundCollectibleNearby then
+                    system.yield(1000) -- It just depends if you want it to be fast or not. I personally don't like it being too fast.
+                    return
+                end
+            end
+        end
+
+        local collectibleHandlers_Table = {
+            ["Signal Jammers"] = has_signal_jammer,
+            ["Snowmen"] = has_snowman,
+        }
+        local initialWait_Time = 8
+
+        -- Iterate through all collectibles to shoot
+        for i, collectible in ipairs(collectible_Table) do
+            if not feat.on then
+                return
+            end
+
+            -- Checks if we didn't already collected that one, if so skip.
+            if not collectibleHandlers_Table[collectibleTypeName](i - 1) then
+                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+
+                if collectible["notification"] then
+                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLORS.BLUE.int)
+                end
+
+                if not noClip_Feat.on then
+                    noClip_Feat.on = true
+                end
+
+                teleport_myself(collectible[1], collectible[2], collectible[3])
+                try_and_collect_it(collectible, initialWait_Time)
+            end
+        end
+    end
+
+    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
+    local noClipState = noClip_Feat.on
+
+    start_auto_mode(noClip_Feat)
+
+    -- Restore player/ped settings
+    if not noClipState then
+        noClip_Feat.on = false
+    end
+end
 
 local nightclubs = {
     [1]  = v3(756.989,-1332.463,26.2802),
@@ -774,6 +1592,64 @@ local collectibles = {
         [49] = {coords = {_start = v3(1480.1853, -2218.5376, 77.756454),  _end = v3(1429.0216,-2249.86,59.383785)}},
         [50] = {coords = {_start = v3(367.16415, -2522.2588, 6.246408),   _end = v3(401.67624,-2508.9697,10.139722)}}
     },
+    -- The Doomsday Heist: December 15th, 2017
+    treasureHunts = {
+        [1] = {
+            group = "First Clue", locations = {
+                [1]  = {coords = v3(3204.029,4732.324,193.519)},
+                [2]  = {coords = v3(-1577.4421,2100.604,69.268)},
+                [3]  = {coords = v3(-280.598,2846.174,54.105)},
+                [4]  = {coords = v3(-160.261,6583.436,5.213)},
+                [5]  = {coords = v3(3927.534,4401.725,16.681)},
+                [6]  = {coords = v3(500.93,5603.104,797.988)},
+                [7]  = {coords = v3(-424.332,1595.448,356.688)},
+                [8]  = {coords = v3(-598.221,2099.779,130.767)},
+                [9]  = {coords = v3(1012.713,2905.666,41.924)},
+                [10] = {coords = v3(2615.015,3665.585,102.223)},
+                [11] = {coords = v3(-1815.4386,1897.8048,138.1239)},
+                [12] = {coords = v3(-1766.872,-220.422,54.165)},
+                [13] = {coords = v3(2767.702,-1577.713,2.54)},
+                [14] = {coords = v3(-671.333,4404.611,18.628)},
+                [15] = {coords = v3(2918.5684,806.0303,3.0282)},
+                [16] = {coords = v3(1517.439,3916.156,31.555)},
+                [17] = {coords = v3(-751.984,4322.46,141.926)},
+                [18] = {coords = v3(-1642.1112,-1041.6047,5.436)},
+                [19] = {coords = v3(-1077.839,9.078,51.375)},
+                [20] = {coords = v3(1899.099,3479.637,45.849)}
+            }
+        },
+        [2] = {
+            group = "Remaining Clues", locations = {
+                [1]  = {coords = v3(-1914.0333,1388.7535,218.3793)},
+                [2]  = {coords = v3(1994.701,5079.219,41.663)},
+                [3]  = {coords = v3(1923.548,3985.898,31.257)}
+            }
+        },
+        [3] = {
+            group = "Final Location", locations = {
+                [1]  = {coords = v3(-1602.755,4498.812,18.201)},
+                [2]  = {coords = v3(2762.6592,4237.131,47.487)},
+                [3]  = {coords = v3(2994.539,6368.674,0.97)},
+                [4]  = {coords = v3(2690.052,5325.579,79.104)},
+                [5]  = {coords = v3(-1537.479,712.819,203.054)},
+                [6]  = {coords = v3(-123.319,3098.984,22.76)},
+                [7]  = {coords = v3(1760.0751,4831.1973,39.395)},
+                [8]  = {coords = v3(-919.149,6094.585,6.104)},
+                [9]  = {coords = v3(67.883,7085.546,0.925)},
+                [10] = {coords = v3(1407.51,3272.148,38.0382)},
+                [11] = {coords = v3(310.051,4370.523,51.035)},
+                [12] = {coords = v3(-972.75,872.791,171.396)},
+                [13] = {coords = v3(1436.604,-2743.677,1.848)},
+                [14] = {coords = v3(1533.905,2336.884,69.685)},
+                [15] = {coords = v3(-2187.804,143.174,168.261)},
+                [16] = {coords = v3(3049.21,-281.784,9.62)},
+                [17] = {coords = v3(3021.3538,3992.088,66.265)},
+                [18] = {coords = v3(2006.778,2021.514,62.948)},
+                [19] = {coords = v3(-1799.1526,2516.4028,1.1924)},
+                [20] = {coords = v3(1291.624,-1118.016,38.727)}
+            }
+        }
+    },
     -- Arena War: December 11th, 2018
     epsilonRobes = {
         [1] = {tips = 12,  name = "Seeking the Truth", hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes\n\nNote:\nDon't forget that the nightclub toilet attendant only accepts wallet money."},
@@ -1094,16 +1970,16 @@ local dailyCollectibles = {
             }
         }, {
             name = "underwater", spawns = {
-                [1]  = {id = 11, coords = v3(4942.0825,-5168.135,-3.575)},
-                [2]  = {id = 12, coords = v3(4560.804,-4356.775,-7.888)},
-                [3]  = {id = 13, coords = v3(5598.9644,-5604.2393,-6.0489)},
-                [4]  = {id = 14, coords = v3(5264.7236,-4920.671,-2.8715)},
-                [5]  = {id = 15, coords = v3(4944.2183,-4293.736,-6.6942)},
-                [6]  = {id = 16, coords = v3(4560.804,-4356.775,-7.888)}, -- Duplicate of [2] lol
-                [7]  = {id = 17, coords = v3(3983.0261,-4540.1865,-6.1264)},
-                [8]  = {id = 18, coords = v3(4414.676,-4651.4575,-5.083)},
-                [9]  = {id = 19, coords = v3(4540.07,-4774.899,-3.9321)},
-                [10] = {id = 20, coords = v3(4777.6006,-5394.6265,-5.0127)}
+                [1] = {id = 11, coords = v3(4942.0825,-5168.135,-3.575)},
+                [2] = {id = 12, coords = v3(4560.804,-4356.775,-7.888)},
+                [3] = {id = 13, coords = v3(5598.9644,-5604.2393,-6.0489)},
+                [4] = {id = 14, coords = v3(5264.7236,-4920.671,-2.8715)},
+                [5] = {id = 15, coords = v3(4944.2183,-4293.736,-6.6942)},
+                --[6]  = {id = 16, coords = v3(4560.804,-4356.775,-7.888)}, -- R* ISSUE: I've removed it because it's a duplicate of [2] lol
+                [6] = {id = 17, coords = v3(3983.0261,-4540.1865,-6.1264)},
+                [7] = {id = 18, coords = v3(4414.676,-4651.4575,-5.083)},
+                [8] = {id = 19, coords = v3(4540.07,-4774.899,-3.9321)},
+                [9] = {id = 20, coords = v3(4777.6006,-5394.6265,-5.0127)}
             }
         }
     },
@@ -1784,412 +2660,23 @@ local others = {
     }
 }
 
-
-local function auto_mode_pickup(feat, pickup_Table, pickupHashes_Table, collectibleTypeName)
-    local collectibleHandlers_Table = {
-        ["Action Figures"] = has_action_figure,
-        ["Movie Props"]    = has_movie_prop,
-        ["Playing Cards"]  = has_playing_card,
-    }
-
-    -- Iterate through all pickups
-    for i, pickupGroup in ipairs(pickup_Table) do
-        if not feat.on then
-            break
-        end
-
-        -- Skips teleports related to random events.
-        if collectibleTypeName == "Movie Props" then
-            if i >= 8 then
-                return
-            end
-        end
-
-        -- Checks if we didn't already collected that one, if so skip.
-        if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-            local initialWait_Time = 4
-            if pickupGroup["extraWait_Time"] then
-                initialWait_Time = pickupGroup["extraWait_Time"]
-            end
-
-            if pickupGroup["notification"] then
-                menu.notify(pickupGroup["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-            end
-
-            menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #pickup_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-            teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
-
-            -- If this flag is set, it means we must wait a lil longer after a teleport, ex: loading the Casino building.
-            if pickupGroup["extraWait_Time"] then
-                local start_Time = os.clock()
-                while (os.clock() - start_Time) < initialWait_Time do
-                    teleport_myself(pickupGroup.coords.x, pickupGroup.coords.y, pickupGroup.coords.z)
-                    system.yield(100)
-                end
-            end
-
-            local start_Time = os.clock()
-            local foundPickupNearby = false
-            local verifyPickup_Time = nil
-
-            -- Check for any matching collectibles for up to 4 seconds
-            while (os.clock() - start_Time) < 4 do -- Going under that makes it not collect 100% of them.
-                system.yield()
-
-                if foundPickupNearby and (os.clock() - verifyPickup_Time) > 3 then
-                    break -- Timeout of 3 seconds if a matched pickup was found, but still not collected
-                end
-
-                local nearbyPickups_Table = object.get_all_pickups() -- OBJECT::HAS_PICKUP_BEEN_COLLECTED, OBJECT::DOES_PICKUP_EXIST, OBJECT::DOES_PICKUP_OBJECT_EXIST
-                for _, nearbyPickup in pairs(nearbyPickups_Table) do
-                    local entityHash = entity.get_entity_model_hash(nearbyPickup)
-                    if table_contains(pickupHashes_Table, entityHash) then
-                        foundPickupNearby = true
-                        verifyPickup_Time = os.clock() -- Init verification time
-                        local pickupEntityPos = entity.get_entity_coords(nearbyPickup)
-                        teleport_myself(pickupEntityPos.x, pickupEntityPos.y, pickupEntityPos.z)
-                        system.yield(1000) -- Wait 1 second before rechecking, I do that in case the player as to "fall" on the ground, in order to collect the pickup.
-                        break -- Exit the inner loop to recheck the list of pickups
-                    end
-                end
-
-                -- Exit the loop if no pickup is found after checking
-                if verifyPickup_Time and not foundPickupNearby then
-                    break
-                end
-            end
-        end
-    end
-end
-
-local function auto_mode_e(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
-    local function start_auto_mode(noClip_Feat)
-        local initialWait_Time = 4
-
-        local function try_and_collect_it(collectible)
-            local function rotate_around_entity(targetEntity, radius, stepAngle)
-                local entityPos = entity.get_entity_coords(targetEntity)
-                local startAngle = 0
-                local endAngle = 360
-                local lookFront_Time = os.clock()
-                local lookBehind_Time = nil
-                local e_Time = os.clock()
-                local e_State = true
-
-                -- Perform the 360-degree rotation
-                for angle = startAngle, endAngle - stepAngle, stepAngle do
-                    if not feat.on then
-                        return
-                    end
-
-                    if e_State then
-                        if (os.clock() - e_Time) > 0.053 then
-                            controls.set_control_normal(0, 51, 0.0)
-                            e_State = false
-                            e_Time = os.clock()
-                        end
-                    else
-                        if (os.clock() - e_Time) > 0.053 then
-                            controls.set_control_normal(0, 51, 1.0)
-                            e_State = true
-                            e_Time = os.clock()
-                        end
-                    end
-
-                    if lookFront_Time then
-                        lookBehind_Time = nil
-                        if (os.clock() - lookFront_Time) > 0.15 then
-                            lookFront_Time = nil
-                            lookBehind_Time = os.clock()
-                        end
-                        controls.set_control_normal(0, 26, 0.0)
-                    elseif lookBehind_Time then
-                        lookFront_Time = nil
-                        if (os.clock() - lookBehind_Time) > 0.15 then
-                            lookBehind_Time = nil
-                            lookFront_Time = os.clock()
-                        end
-                        controls.set_control_normal(0, 26, 1.0)
-                    end
-
-                    system.yield()
-
-                    -- Convert angle to radians
-                    local radians = math.rad(angle)
-
-                    -- Calculate the new position based on the angle
-                    local xOffset = radius * math.cos(radians)
-                    local yOffset = radius * math.sin(radians)
-
-                    -- Calculate the new position
-                    local newPos = {
-                        x = entityPos.x + xOffset,
-                        y = entityPos.y + yOffset,
-                        z = entityPos.z
-                    }
-
-                    teleport_myself(newPos.x, newPos.y, newPos.z)
-                end
-            end
-
-            local start_Time = os.clock()
-            local verifyCollectible_Time = nil
-            local checkNearbyCollectibles_Time = nil
-            local collectibleEntity = 0
-
-            -- Check for any matching collectibles for up to {initialWait_Time} seconds
-            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
-                if not feat.on then
-                    return
-                end
-                system.yield()
-
-                -- Timeout of 6 seconds if a matched collectible was found, but still not collected
-                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 6 then
-                    return
-                end
-
-                local foundCollectibleThisFrame = false
-
-                -- Update player's nearby collectibles every 0.1 second to reduce CPU usage.
-                if not checkNearbyCollectibles_Time or (os.clock() - checkNearbyCollectibles_Time) > 0.1 then
-                    for _, collectibleHash in ipairs(collectibleHashes_Table) do
-                        collectibleEntity = NATIVES.OBJECT.GET_CLOSEST_OBJECT_OF_TYPE(collectible[1], collectible[2], collectible[3], 0.01, collectibleHash, false, false, false)
-                        if collectibleEntity ~= 0 then
-                            break
-                        end
-                    end
-
-                    checkNearbyCollectibles_Time = os.clock()
-                end
-
-                if collectibleEntity ~= 0 then
-                    foundCollectibleThisFrame = true
-                    verifyCollectible_Time = os.clock() -- Init verification time
-
-                    local entityMaxSizeY = get_entity_max_size(collectibleEntity).y
-                    local radius = (entityMaxSizeY > 1.0 and entityMaxSizeY) or 1.0
-                    local stepAngle = 6 -- Define the angle increment for each step
-                    rotate_around_entity(collectibleEntity, radius, stepAngle)
-                end
-
-                -- Exit the loop if no collectibles are found after checking
-                if verifyCollectible_Time and not foundCollectibleThisFrame then
-                    return true
-                end
-            end
-
-            return false
-        end
-
-        local collectibleHandlers_Table = {
-            ["LD Organics Product"] = has_ld_organic_product,
-        }
-        local foundPreviousCollectible = false
-
-        -- Iterate through all collectibles
-        for i, collectible in ipairs(collectible_Table) do
-            if not feat.on then
-                return
-            end
-
-            -- Checks if we didn't already collected that one, if so skip.
-            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-                if collectible["notification"] then
-                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-                end
-
-
-                teleport_myself(collectible[1], collectible[2], collectible[3])
-                if foundPreviousCollectible then
-                    system.yield(3000) -- For 100% it's just requiered.
-                end
-                foundPreviousCollectible = try_and_collect_it(collectible, initialWait_Time)
-            end
-        end
-    end
-
-    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
-    local noClipState = noClip_Feat.on
-
-    start_auto_mode(noClip_Feat)
-
-    -- Restore player/ped settings
-    if not noClipState then
-        noClip_Feat.on = false
-    end
-    controls.set_control_normal(0, 26, 0.0)
-    controls.set_control_normal(0, 51, 0.0)
-    system.yield()
-end
-
-local function auto_mode_destroyable(feat, collectible_Table, collectibleHashes_Table, collectibleTypeName)
-    local function start_auto_mode(noClip_Feat)
-        local function try_and_collect_it(collectible, initialWait_Time)
-            local start_Time = os.clock()
-            local verifyCollectible_Time = nil
-
-            -- Check for any matching collectibles for up to {initialWait_Time} seconds
-            while (os.clock() - start_Time) < initialWait_Time do -- Going under {initialWait_Time} will makes it not collect 100% of the time depending how fast the world generates on TP.
-                if not feat.on then
-                    return
-                end
-                system.yield()
-
-                if verifyCollectible_Time and (os.clock() - verifyCollectible_Time) > 3 then
-                    return -- Timeout of 3 seconds if a matched collectible to shoot was found, but still not collected
-                end
-
-                local foundCollectibleNearby = false
-                local nearbyObjects_Table = object.get_all_objects()
-                for _, nearbyObject in pairs(nearbyObjects_Table) do
-                    local entityHash = entity.get_entity_model_hash(nearbyObject)
-                    if table_contains(collectibleHashes_Table, entityHash) then
-                        foundCollectibleNearby = true
-                        verifyCollectible_Time = os.clock() -- Init verification time
-                        local playerPed = player.player_ped()
-                        local playerPos = entity.get_entity_coords(playerPed)
-                        local collectibleEntity = nearbyObject
-                        local collectibleEntityPos = entity.get_entity_coords(collectibleEntity)
-                        if NATIVES.SYSTEM.VDIST(collectible[1], collectible[2], collectible[3], collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z) <= 0.01 then
-                            teleport_myself(collectibleEntityPos.x - 2, collectibleEntityPos.y - 2, collectibleEntityPos.z)
-                            NATIVES.FIRE.ADD_OWNED_EXPLOSION(playerPed, collectibleEntityPos.x, collectibleEntityPos.y, collectibleEntityPos.z, 36, 0.2, false, true, 0.0) -- 36 = railgun
-                            NATIVES.ENTITY.SET_ENTITY_HEALTH(collectibleEntity, 0, 0, 0) -- not needed but it doesn't hurt
-                            --gameplay.shoot_single_bullet_between_coords(playerPos, collectibleEntityPos, 0, gameplay.get_hash_key("weapon_pistol"), playerPed, false, true, 100000.0)
-                            break -- Exit the inner loop to recheck the list of collectibles
-                        end
-                    end
-                end
-
-                -- Exit the loop if no collectibles to shoot is found after checking
-                if verifyCollectible_Time and not foundCollectibleNearby then
-                    system.yield(1000) -- It just depends if you want it to be fast or not. I personally don't like it being too fast.
-                    return
-                end
-            end
-        end
-
-        local collectibleHandlers_Table = {
-            ["Signal Jammers"] = has_signal_jammer,
-            ["Snowmen"] = has_snowman,
-        }
-        local initialWait_Time = 8
-
-        -- Iterate through all collectibles to shoot
-        for i, collectible in ipairs(collectible_Table) do
-            if not feat.on then
-                return
-            end
-
-            -- Checks if we didn't already collected that one, if so skip.
-            if not collectibleHandlers_Table[collectibleTypeName](i-1) then
-                menu.notify("Auto Mode (" .. collectibleTypeName .. ") progress: " .. i .. "/" .. #collectible_Table, SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-
-                if collectible["notification"] then
-                    menu.notify(collectible["notification"], SCRIPT_TITLE, initialWait_Time, COLOR.BLUE.int)
-                end
-
-                if not noClip_Feat.on then
-                    noClip_Feat.on = true
-                end
-
-                teleport_myself(collectible[1], collectible[2], collectible[3])
-                try_and_collect_it(collectible, initialWait_Time)
-            end
-        end
-    end
-
-    local noClip_Feat = menu.get_feature_by_hierarchy_key("local.misc.no_clip")
-    local noClipState = noClip_Feat.on
-
-    start_auto_mode(noClip_Feat)
-
-    -- Restore player/ped settings
-    if not noClipState then
-        noClip_Feat.on = false
-    end
-end
-
-local function remove_event_listener(eventType, listener)
-    if listener and event.remove_event_listener(eventType, listener) then
-        return
-    end
-
-    return listener
-end
-
-local function handle_script_exit(params)
-    params = params or {}
-    if params.clearAllNotifications == nil then
-        params.clearAllNotifications = false
-    end
-    if params.hasScriptCrashed == nil then
-        params.hasScriptCrashed = false
-    end
-
-    scriptExitEventListener = remove_event_listener("exit", scriptExitEventListener)
-
-    -- This will delete notifications from other scripts too.
-    -- Suggestion is open: https://discord.com/channels/1088976448452304957/1092480948353904752/1253065431720394842
-    if params.clearAllNotifications then
-        menu.clear_all_notifications()
-    end
-
-    if params.hasScriptCrashed then
-        menu.notify("Oh no... Script crashed:(\nYou gotta restart it manually.", SCRIPT_NAME, 12, COLOR.RED.int)
-    end
-
-    menu.exit()
-end
----- Global functions 2/2 END
-
----- Global event listeners START
-scriptExitEventListener = event.add_event_listener("exit", function()
-    handle_script_exit()
-end)
----- Global event listeners END
--- Globals END
-
-
--- Permissions Startup Checking START
-local unnecessaryPermissions = {}
-local missingPermissions = {}
-
-for _, flag in ipairs(TRUSTED_FLAGS) do
-    if menu.is_trusted_mode_enabled(flag.bitValue) then
-        if not flag.isRequiered then
-            table.insert(unnecessaryPermissions, flag.menuName)
-        end
-    else
-        if flag.isRequiered then
-            table.insert(missingPermissions, flag.menuName)
-        end
-    end
-end
-
-if #unnecessaryPermissions > 0 then
-    menu.notify("You do not require the following " .. pluralize("permission", #unnecessaryPermissions) .. ":\n" .. table.concat(unnecessaryPermissions, "\n"),
-        SCRIPT_NAME, 6, COLOR.ORANGE.int)
-end
-if #missingPermissions > 0 then
-    menu.notify(
-        "You need to enable the following " .. pluralize("permission", #missingPermissions) .. ":\n" .. table.concat(missingPermissions, "\n"),
-        SCRIPT_NAME, 6, COLOR.RED.int)
-    handle_script_exit()
-end
--- Permissions Startup Checking END
-
-
--- === Main Menu Features === --
 local myRootMenu_Feat = menu.add_feature(SCRIPT_TITLE, "parent", 0)
 
 local exitScript_Feat = menu.add_feature("#FF0000DD#Stop Script#DEFAULT#", "action", myRootMenu_Feat.id, function()
     handle_script_exit()
 end)
 exitScript_Feat.hint = 'Stop "' .. SCRIPT_NAME .. '"'
+
+local scriptSettings_Feat = menu.add_feature("Settings", "parent", myRootMenu_Feat.id)
+
+teleportWithVehicleSetting_Feat = menu.add_feature("Teleport With Vehicle", "toggle", scriptSettings_Feat.id)
+teleportWithVehicleSetting_Feat.hint = "Teleports you to locations with your current vehicle."
+
+--hideCollectedBlipsSetting_Feat = menu.add_feature("Hide Collected Blips", "toggle", scriptSettings_Feat.id)
+--hideCollectedBlipsSetting_Feat.hint = 'In "Show Blips on Mini-Map" feature, do not show icons on the minimap and pause menu map for items that have been collected.'
+
+--hideInactiveBlipsSetting_Feat = menu.add_feature("Hide Inactive Blips", "toggle", scriptSettings_Feat.id)
+--hideInactiveBlipsSetting_Feat.hint = 'In "Show Blips on Mini-Map" feature, do not show icons on the minimap and pause menu map for items that are inactive(s).'
 
 menu.add_feature("<- - - -  Collectibles by IB_U_Z_Z_A_R_Dl  - - - - ->", "action", myRootMenu_Feat.id)
 
@@ -2207,9 +2694,9 @@ local seasonalCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonals]", "par
 
 local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]", "parent", collectiblesOnlineMenu_Feat.id)
 
------------------------- Action Figures (100)       ------------------------
+------------------------ Action Figures (100)        ------------------------
     local actionFiguresMenu_Feat = menu.add_feature("Action Figures (-1/100)", "parent", collectiblesOnlineMenu_Feat.id, function()
-        menu.notify("99 and 100 will only appear after you've collected all the others.", SCRIPT_TITLE, 8, COLOR.BLUE.int)
+        menu.notify("99 and 100 will only appear after you've collected all the others.", SCRIPT_TITLE, 8, COLORS.BLUE.int)
     end)
 
     local autoActionFigures_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", actionFiguresMenu_Feat.id, function(feat)
@@ -2224,7 +2711,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
                 gameplay.get_hash_key("vw_prop_vw_colle_rsrgeneric"),
                 gameplay.get_hash_key("vw_prop_vw_colle_sasquatch")
             }
-            auto_mode_pickup(feat, collectibles.actionFigures, actionFiguresHashes_Table, "Action Figures")
+            auto_mode_pickup(feat, collectibles.actionFigures, actionFiguresHashes_Table, "Action Figures", has_action_figure)
             feat.on = false
         end
     end)
@@ -2239,7 +2726,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end
     end
 --
------------------------- Ghosts Exposed (10)        ------------------------
+------------------------ Ghosts Exposed (10)         ------------------------
     local ghostsExposedMenu_Feat = menu.add_feature("Ghosts Exposed (-1/25)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local ghostsExposedTimeOverride_Feat = menu.add_feature("Override Time On Teleport", "toggle", ghostsExposedMenu_Feat.id)
@@ -2276,7 +2763,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         ghostExposed.feat.hint = ghostExposed.hint
     end
 --
------------------------- LD Organics Product (100)  ------------------------
+------------------------ LD Organics Products (100)  ------------------------
     local ldOrganicsProductMenu_Feat = menu.add_feature("LD Organics Product (-1/25)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoLdOrganicsProduct_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", ldOrganicsProductMenu_Feat.id, function(feat)
@@ -2296,9 +2783,9 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end)
     end
 --
------------------------- Movie Props (10)           ------------------------
+------------------------ Movie Props (10)            ------------------------
     local moviePropsMenu_Feat = menu.add_feature("Movie Props (-1/10)", "parent", collectiblesOnlineMenu_Feat.id, function()
-        menu.notify("There are 10 movie props in total, but 7 of them are fixed.\nThe remaining 3 are random events, such as cars spawning randomly, so I can't assist you with those.", SCRIPT_TITLE, 10, COLOR.BLUE.int)
+        menu.notify("There are 10 movie props in total, but 7 of them are fixed.\nThe remaining 3 are random events, such as cars spawning randomly, so I can't assist you with those.", SCRIPT_TITLE, 10, COLORS.BLUE.int)
     end)
 
     local autoMovieProps_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", moviePropsMenu_Feat.id, function(feat)
@@ -2312,7 +2799,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
                 gameplay.get_hash_key("sum_prop_ac_mummyhead_01a"),
                 gameplay.get_hash_key("sum_prop_ac_wifaaward_01a"),
             }
-            auto_mode_pickup(feat, collectibles.movieProps, moviePropsHashes_Table, "Movie Props")
+            auto_mode_pickup(feat, collectibles.movieProps, moviePropsHashes_Table, "Movie Props", has_movie_prop)
             feat.on = false
         end
     end)
@@ -2334,7 +2821,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end
     end
 --
------------------------- Playing Cards (54)         ------------------------
+------------------------ Playing Cards (54)          ------------------------
     local playingCardsMenu_Feat = menu.add_feature("Playing Cards (-1/54)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoPlayingCards_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", playingCardsMenu_Feat.id, function(feat)
@@ -2342,7 +2829,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
             local playingCardsHashes_Table = {
                 gameplay.get_hash_key("vw_prop_vw_lux_card_01a")
             }
-            auto_mode_pickup(feat, collectibles.playingCards, playingCardsHashes_Table, "Playing Cards")
+            auto_mode_pickup(feat, collectibles.playingCards, playingCardsHashes_Table, "Playing Cards", has_playing_card)
             feat.on = false
         end
     end)
@@ -2355,7 +2842,7 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end)
     end
 --
------------------------- Signal Jammers (50)        ------------------------
+------------------------ Signal Jammers (50)         ------------------------
     local signalJammersMenu_Feat = menu.add_feature("Signal Jammers (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoSignalJammers_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", signalJammersMenu_Feat.id, function(feat)
@@ -2375,7 +2862,8 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end)
     end
 --
------------------------- Snowmen (25)               ------------------------
+
+------------------------ Snowmen (25)                ------------------------
     local snowmenMenu_Feat = menu.add_feature("Snowmen (-1/25)", "parent", seasonalCollectiblesOnlineMenu_Feat.id)
 
     local autoSnowmen_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", snowmenMenu_Feat.id, function(feat)
@@ -2397,8 +2885,11 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end)
     end
 --
------------------------- Stunt Jumps (50)           ------------------------
+------------------------ Stunt Jumps (50)            ------------------------
     local stuntJumpsMenu_Feat = menu.add_feature("Stunt Jumps (-1/50)", "parent", collectiblesOnlineMenu_Feat.id)
+
+    --local stuntJumpsBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", stuntJumpsMenu_Feat.id)
+    --stuntJumpsBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
 
     for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
         stuntJumpGroup.feat = menu.add_feature("Stunt Jump " .. i, "action_value_i", stuntJumpsMenu_Feat.id, function(feat)
@@ -2414,15 +2905,58 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end)
         stuntJumpGroup.feat.min = 1
         stuntJumpGroup.feat.max = 2
+        stuntJumpGroup.feat.hint = "Note:\n< 1 > is the trigger event;\n< 2 > is the landing location."
     end
 --
------------------------- Epsilon Robes (3)          ------------------------
+------------------------ Treasure Hunt (1)           ------------------------
+    local treasureHuntMenu_Feat = menu.add_feature("Treasure Hunt (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
+
+    local treasureHuntFirstClueMenu_Feat = menu.add_feature("First Clue (20)", "parent", treasureHuntMenu_Feat.id)
+
+    --local treasureHuntFirstClueBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", treasureHuntFirstClueMenu_Feat.id)
+    --treasureHuntFirstClueBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
+    local treasureHuntRemainingCluesMenu_Feat = menu.add_feature("Remaining Clues (3)", "parent", treasureHuntMenu_Feat.id)
+
+    --local treasureHuntRemainingCluesBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", treasureHuntRemainingCluesMenu_Feat.id)
+    --treasureHuntRemainingCluesBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
+    local treasureHuntFinalLocationMenu_Feat = menu.add_feature("Final Location (20)", "parent", treasureHuntMenu_Feat.id)
+
+    --local treasureHuntFinalLocationBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", treasureHuntFinalLocationMenu_Feat.id)
+    --treasureHuntFinalLocationBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
+    for i, treasureHuntType in ipairs(collectibles.treasureHunts) do
+        local groupMenu_Feat
+        if treasureHuntType.group == "First Clue" then
+            groupMenu_Feat = treasureHuntFirstClueMenu_Feat
+        elseif treasureHuntType.group == "Remaining Clues" then
+            groupMenu_Feat = treasureHuntRemainingCluesMenu_Feat
+        elseif treasureHuntType.group == "Final Location" then
+            groupMenu_Feat = treasureHuntFinalLocationMenu_Feat
+        end
+
+        for i2, treasureHuntGroup in ipairs(treasureHuntType.locations) do
+            treasureHuntGroup.feat = menu.add_feature(treasureHuntType.group .. " " .. i2, "action", groupMenu_Feat.id, function()
+                teleport_myself(treasureHuntGroup.coords.x, treasureHuntGroup.coords.y, treasureHuntGroup.coords.z)
+            end)
+        end
+    end
+--
+------------------------ Epsilon Robes (3)           ------------------------
+    local openedNightclubs_Table = {}
+
     local epsilonRobesMenu_Feat = menu.add_feature("Epsilon Robes (-1/3)", "parent", collectiblesOnlineMenu_Feat.id)
 
     local autoEpsilonRobesMenu_Feat = menu.add_feature("Auto Mode", "toggle", epsilonRobesMenu_Feat.id, function(feat)
+        if #openedNightclubs_Table <= 0 then
+            feat.on = false
+            return
+        end
+
         local playerNextToAttendantCoords = v3(-1611.39, -3009.97, -79.01)
 
-        while feat.on and GET_LOCAL_PLAYER_NUM_EPSILON_ROBES_COLLECTED() < 3 do
+        while feat.on and count_collected_bool_stat_items(has_epsilon_robe, 3) < 3 do
             local playerCoords = player.get_player_coords(player.player_id())
 
             if NATIVES.SYSTEM.VDIST(playerCoords.x, playerCoords.y, playerCoords.z, playerNextToAttendantCoords.x, playerNextToAttendantCoords.y, playerNextToAttendantCoords.z) > 0.01 then
@@ -2444,15 +2978,19 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
 
     for i, epsilonRobeGroup in ipairs(collectibles.epsilonRobes) do
         epsilonRobeGroup.feat = menu.add_feature(epsilonRobeGroup.name, "action_value_i", epsilonRobesMenu_Feat.id, function(feat)
-            local selectedCoords = nightclubs[feat.value]
+            if #openedNightclubs_Table <= 0 then
+                return
+            end
+
+            local selectedCoords = openedNightclubs_Table[feat.value]
             teleport_myself(selectedCoords.x, selectedCoords.y, selectedCoords.z)
         end)
-        epsilonRobeGroup.feat.min = 1
+        epsilonRobeGroup.feat.min = 0
         epsilonRobeGroup.feat.max = #nightclubs
         epsilonRobeGroup.feat.hint = "Need help?\nCheck out the guide on GTA Wiki:\nhttps://gta.fandom.com/wiki/Epsilon_Robes"
     end
 --
------------------------- Media Sticks (9)           ------------------------
+------------------------ Media Sticks (9)            ------------------------
     local mediaSticksMenu_Feat = menu.add_feature("Media Sticks (-1/9)", "parent", collectiblesOnlineMenu_Feat.id)
 
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
@@ -2465,19 +3003,20 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
         end
     end
 --
------------------------- Metal Detectors (1)        ------------------------
-    local metalDetectorsMenu_Feat = menu.add_feature("Metal Detectors (-1/10)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
-    local metalDetectors_Feat = menu.add_feature("Metal Detector", "action_value_i", metalDetectorsMenu_Feat.id, function(feat)
+------------------------ Metal Detector (1)          ------------------------
+    local metalDetectorMenu_Feat = menu.add_feature("Metal Detectors (-1/10)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
+
+    local metalDetector_Feat = menu.add_feature("Metal Detector", "action_value_i", metalDetectorMenu_Feat.id, function(feat)
         local index = feat.value
         local selectedMetalDetector = collectibles.metalDetectors[index]
         teleport_myself(selectedMetalDetector.coords.x, selectedMetalDetector.coords.y, selectedMetalDetector.coords.z)
     end)
-    metalDetectors_Feat.min = 1
-    metalDetectors_Feat.max = #collectibles.metalDetectors
-    metalDetectors_Feat.hint = 'Note:\nOnce you collect a "Metal Detector", it will no longer appear on Skeletons. However, you\'ll unlock the "Burried Stashes" Daily Collectible in Cayo Perico.'
+    metalDetector_Feat.min = 1
+    metalDetector_Feat.max = #collectibles.metalDetectors
+    metalDetector_Feat.hint = 'Note:\nOnce you collect a "Metal Detector", it will no longer appear on Skeletons. However, you\'ll unlock the "Buried Stashes" Daily Collectible in Cayo Perico.'
 --
------------------------- Weapon Components (5)      ------------------------
+------------------------ Weapon Components (5)       ------------------------
     local weaponComponentsMenu_Feat = menu.add_feature("Weapon Components (-1/5)", "parent", randomEventCollectiblesOnlineMenu_Feat.id)
 
     local weaponComponents_Feat = menu.add_feature("Crime Scene (Search Area)", "action_value_i", weaponComponentsMenu_Feat.id, function(feat)
@@ -2488,17 +3027,17 @@ local randomEventCollectiblesOnlineMenu_Feat = menu.add_feature("[Random Events]
     weaponComponents_Feat.min = 1
     weaponComponents_Feat.max = #collectibles.weaponComponents
 --
------------------------- Spray Cans (1)             ------------------------
-    local sprayCansMenu_Feat = menu.add_feature("Spray Can (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
+------------------------ Spray Can (1)               ------------------------
+    local sprayCanMenu_Feat = menu.add_feature("Spray Can (-1/1)", "parent", collectiblesOnlineMenu_Feat.id)
 
-    local sprayCans_Feat = menu.add_feature("Spray Can", "action_value_i", sprayCansMenu_Feat.id, function(feat)
+    local sprayCan_Feat = menu.add_feature("Spray Can", "action_value_i", sprayCanMenu_Feat.id, function(feat)
         local index = feat.value
         local selectedSprayCan = collectibles.sprayCans[index]
         teleport_myself(selectedSprayCan.coords.x, selectedSprayCan.coords.y, selectedSprayCan.coords.z)
     end)
-    sprayCans_Feat.min = 1
-    sprayCans_Feat.max = #collectibles.sprayCans
-    sprayCans_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
+    sprayCan_Feat.min = 1
+    sprayCan_Feat.max = #collectibles.sprayCans
+    sprayCan_Feat.hint = 'Note:\nOnce you collect a spray can, no more spray can crates will appear on your map. However, you\'ll unlock the "Ls Tags" collectible, allowing you to spray tags around Los Santos.'
 --
 
 local dailyCollectiblesOnlineMenu_Feat = menu.add_feature("Daily Collectibles", "parent", collectiblesOnlineParentMenu_Feat.id)
@@ -2508,6 +3047,9 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
 ------------------------ Buried Stashes (2)         ------------------------
     local buriedStashesMenu_Feat = menu.add_feature("Buried Stashes (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     buriedStashesMenu_Feat.hint = "Synced with other players: Yes"
+
+    --local buriedStashesBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", buriedStashesMenu_Feat.id)
+    --buriedStashesBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
 
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
         buriedStashGroup.feat = menu.add_feature("Buried Stash " .. i, "action", buriedStashesMenu_Feat.id, function()
@@ -2519,13 +3061,16 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     local hiddenCachesMenu_Feat = menu.add_feature("Hidden Caches (-1/10)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     hiddenCachesMenu_Feat.hint = "Synced with other players: Yes"
 
+    --local hiddenCachesBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", hiddenCachesMenu_Feat.id)
+    --hiddenCachesBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
     -- TODO: So that it works out, I need to implement that we can loop trough the Main Loop content but I was lazy at the time I'm writting this.
     --local autohiddenCaches_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", hiddenCachesMenu_Feat.id, function(feat)
     --    if feat.on then
     --        local hiddenCacheHash_Table = {
     --            gameplay.get_hash_key("h4_prop_h4_box_ammo_02a"),
     --        }
-    --        auto_mode_pickup(feat, dailyCollectibles.hiddenCaches, hiddenCacheHash_Table, "Hidden Caches")
+    --        auto_mode_pickup(feat, dailyCollectibles.hiddenCaches, hiddenCacheHash_Table, "Hidden Caches", has_hidden_cache)
     --        feat.on = false
     --    end
     --end)
@@ -2552,6 +3097,9 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     local shipwreckMenu_Feat = menu.add_feature("Shipwreck (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     shipwreckMenu_Feat.hint = "Synced with other players: Yes"
 
+    local shipwreckBlipSetting_Feat = menu.add_feature("Show Blip on Mini-Map", "toggle", shipwreckMenu_Feat.id)
+    shipwreckBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
         shipwreckGroup.feat = menu.add_feature("Shipwreck " .. i, "action", shipwreckMenu_Feat.id, function()
             teleport_myself(shipwreckGroup.coords.x, shipwreckGroup.coords.y, shipwreckGroup.coords.z)
@@ -2562,26 +3110,25 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     local treasureChestsMenu_Feat = menu.add_feature("Treasure Chests (-1/2)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     treasureChestsMenu_Feat.hint = "Synced with other players: Yes"
 
+    --local treasureChestsBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", treasureChestsMenu_Feat.id)
+    --treasureChestsBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
     for i, treasureChestGroup in ipairs(dailyCollectibles.treasureChests) do
         treasureChestGroup.feat = menu.add_feature("Treasure Chest (" .. treasureChestGroup.name .. ")", "action_value_i", treasureChestsMenu_Feat.id, function(feat)
             local index = feat.value
-            if treasureChestGroup.name == "underwater" and index >= 6 then
-                index = index + 1
-            end
             local selectedTreasureChest = treasureChestGroup.spawns[index]
             teleport_myself(selectedTreasureChest.coords.x, selectedTreasureChest.coords.y, selectedTreasureChest.coords.z)
         end)
         treasureChestGroup.feat.min = 1
-        if treasureChestGroup.name == "underwater" then
-            treasureChestGroup.feat.max = #treasureChestGroup.spawns - 1
-        else
-            treasureChestGroup.feat.max = #treasureChestGroup.spawns
-        end
+        treasureChestGroup.feat.max = #treasureChestGroup.spawns
     end
 --
 ------------------------ Trick Or Treat (10)        ------------------------
     local trickOrTreatMenu_Feat = menu.add_feature("Trick Or Treat (-1/10)", "parent", seasonalDailyCollectiblesOnlineMenu_Feat.id)
     trickOrTreatMenu_Feat.hint = "Synced with other players: Unknown" -- I haven't been able to test that yet
+
+    --local trickOrTreatBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", trickOrTreatMenu_Feat.id)
+    --trickOrTreatBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
 
     --local autoTrickOrTreat_Feat = menu.add_feature("Auto Mode (Invite Only Session recommended)", "toggle", trickOrTreatMenu_Feat.id, function(feat)
     --    if feat.on then
@@ -2606,6 +3153,9 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     local lsTagsMenu_Feat = menu.add_feature("LS Tags (-1/5)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     lsTagsMenu_Feat.hint = "Synced with other players: Yes"
 
+    --local lsTagsBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", lsTagsMenu_Feat.id)
+    --lsTagsBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
+
     for i, lsTagGroup in ipairs(dailyCollectibles.lsTags) do
         lsTagGroup.feat = menu.add_feature("LS Tag " .. i, "action", lsTagsMenu_Feat.id, function()
             teleport_myself(lsTagGroup.coords.x, lsTagGroup.coords.y, lsTagGroup.coords.z)
@@ -2617,7 +3167,7 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
     local luckyWheelMenu_Feat = menu.add_feature("Lucky Wheel (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     luckyWheelMenu_Feat.hint = "Synced with other players: Yes"
 
-    dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action", luckyWheelMenu_Feat.id, function()
+    dailyCollectibles.luckyWheel.feat = menu.add_feature("Lucky Wheel", "action_value_i", luckyWheelMenu_Feat.id, function(feat)
         --local playerNextToLuckyWheelCoords = v3(1110.53, 225.31, -49.84)
         --local initialWait_Time = 30
         --local minInteriorTime = 3  -- Minimum time in seconds the player has to be in the interior
@@ -2641,13 +3191,24 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
         --end
         --
         -- Player sometimes doesn't teleport in the casino but stay in the void, + sometimes player is stuck so I commented it all ...
-        teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
+
+        local inFrontOfTheCasinoLuckyWheelPos = v3(1111.05,228.46,-49.64)
+        if feat.value == 1 then
+            teleport_myself(dailyCollectibles.luckyWheel.coords.x, dailyCollectibles.luckyWheel.coords.y, dailyCollectibles.luckyWheel.coords.z)
+        elseif feat.value == 2 then
+            teleport_myself(inFrontOfTheCasinoLuckyWheelPos.x, inFrontOfTheCasinoLuckyWheelPos.y, inFrontOfTheCasinoLuckyWheelPos.z)
+        end
     end)
     dailyCollectibles.luckyWheel.feat.hint = dailyCollectibles.luckyWheel.hint
+    dailyCollectibles.luckyWheel.feat.min = 1
+    dailyCollectibles.luckyWheel.feat.max = 2
 --
 ------------------------ G's Cache (1)              ------------------------
     local gCachesMenu_Feat = menu.add_feature("G's Cache (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
     gCachesMenu_Feat.hint = "Synced with other players: No"
+
+    --local gCachesBlipSetting_Feat = menu.add_feature("Show Blips on Mini-Map", "toggle", gCachesMenu_Feat.id)
+    --gCachesBlipSetting_Feat.hint = "Show icons on the minimap and pause menu map for items that have been found or collected."
 
     for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
         gCacheGroup.feat = menu.add_feature("G's Cache" .. " (" .. "Search Area " .. i .. ")", "action_value_i", gCachesMenu_Feat.id, function(feat)
@@ -2679,7 +3240,7 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
         RCBanditoTimeTrialGroup.feat = menu.add_feature("RC Bandito Time Trial " .. i .. " (" .. RCBanditoTimeTrialGroup.name .. ")", "action", RCBanditoTimeTrialMenu_Feat.id, function()
             teleport_myself(RCBanditoTimeTrialGroup.coords.x, RCBanditoTimeTrialGroup.coords.y, RCBanditoTimeTrialGroup.coords.z)
         end)
-        RCBanditoTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(RCBanditoTimeTrialGroup.parTime)
+        RCBanditoTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(RCBanditoTimeTrialGroup.parTime)
     end
 --
 ------------------------ Junk Energy Time Trial (1) ------------------------
@@ -2690,15 +3251,15 @@ local seasonalDailyCollectiblesOnlineMenu_Feat = menu.add_feature("[Seasonal Dai
         junkEnergyTimeTrialGroup.feat = menu.add_feature("Junk Energy Time Trial " .. i .. " (" .. junkEnergyTimeTrialGroup.name .. ")", "action", junkEnergyTimeTrialMenu_Feat.id, function()
             teleport_myself(junkEnergyTimeTrialGroup.coords.x, junkEnergyTimeTrialGroup.coords.y, junkEnergyTimeTrialGroup.coords.z)
         end)
-        junkEnergyTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(junkEnergyTimeTrialGroup.parTime)
+        junkEnergyTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(junkEnergyTimeTrialGroup.parTime)
     end
 --
 ------------------------ Madrazo Hit (1)            ------------------------
-    local madrazoHitsMenu_Feat = menu.add_feature("Madrazo Hit (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
-    madrazoHitsMenu_Feat.hint = "Synced with other players: No" --  Location #2 [In Private Solo sessions]
+    local madrazoHitMenu_Feat = menu.add_feature("Madrazo Hit (-1/1)", "parent", dailyCollectiblesOnlineMenu_Feat.id)
+    madrazoHitMenu_Feat.hint = "Synced with other players: No" --  Location #2 [In Private Solo sessions]
 
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
-        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitsMenu_Feat.id, function(feat)
+        madrazoHitGroup.feat = menu.add_feature("Madrazo Hit " .. i, "action_value_i", madrazoHitMenu_Feat.id, function(feat)
             local selectedCoords = nil
             if feat.value == 1 then
                 selectedCoords = madrazoHitGroup.eventTrigger
@@ -2731,14 +3292,14 @@ local weeklyCollectiblesOnlineMenu_Feat = menu.add_feature("Weekly Collectibles"
         end)
         timeTrialGroup.feat.min = 1
         timeTrialGroup.feat.max = 2
-        timeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(timeTrialGroup.parTime)
+        timeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(timeTrialGroup.parTime)
     end
 --
 
-local gunVansOnlineMenu_Feat = menu.add_feature("Gun Vans", "parent", collectiblesOnlineParentMenu_Feat.id)
+local gunVansOnlineMenu_Feat = menu.add_feature("Gun Van", "parent", collectiblesOnlineParentMenu_Feat.id)
 
 ------------------------ Gun Van (1)                ------------------------
-    local gunVansMenu_Feat = menu.add_feature("Gun Vans (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
+    local gunVansMenu_Feat = menu.add_feature("Gun Van (-1/1)", "parent", gunVansOnlineMenu_Feat.id)
     gunVansMenu_Feat.hint = "Synced with other players: Yes"
 
     local gunVan_Feat = menu.add_feature("Gun Van", "action_value_i", gunVansMenu_Feat.id, function(feat)
@@ -2774,6 +3335,29 @@ local statsViewerMP0Menu_Feat = menu.add_feature("MultiPlayer 1", "parent", stat
 local statsViewerMP1Menu_Feat = menu.add_feature("MultiPlayer 2", "parent", statsViewerMenu_Feat.id)
 
 local statsViewerMPPLYMenu_Feat = menu.add_feature("MultiPlayer Player", "parent", statsViewerMenu_Feat.id)
+
+local STAT_VIEWER_NAMES__LIST <const> = {
+    "MPx_SNOWMEN_COLLECTED",
+    "MPx_USB_RADIO_COLLECTED",
+    "MPx_ACTION_FIG_COLLECTED",
+    "MPx_LDORGANICS_COLLECTED",
+    "MPx_MOVIE_PROPS_COLLECTED",
+    "MPx_PLAYING_CARD_COLLECTED",
+    "MPx_SIGNAL_JAMMERS_COLLECTED",
+    "MPx_USJS_COMPLETED",
+    "MPPLY_RCTTCOMPLETEDWEEK",
+    "MPPLY_BTTCOMPLETED",
+    "MPPLY_TIMETRIAL_COMPLETED_WEEK",
+    "MPx_LUCKY_WHEEL_NUM_SPIN",
+    "MPx_BURIED_STASH_COLLECTED",
+    "MPx_UNDERWATRPACK_COLLECTED",
+    "MPx_SKYDIVES_COLLECTED", -- R* ISSUE (The stat updates only on session switch)
+    "MPx_SHIPWRECKED_COLLECTED", -- R* ISSUE (total count from the begining I think?)
+    "MPx_TREASURECHEST_COLLECTED",
+    "MPx_TRICKORTREAT_COLLECTED",
+    "MPx_TAGGING_COLLECTED",
+    "MPx_DAILYDEADDROP_COLLECTED"
+}
 
 -- Function to create feats for a given MP stat prefix
 local function createStatViewerFeats(characterMenuID, MPStatPrefix)
@@ -2837,118 +3421,32 @@ createStatViewerFeats(statsViewerMP1Menu_Feat.id,   "MP1")
 createStatViewerFeats(statsViewerMPPLYMenu_Feat.id, "MPPLY")
 
 
-local function has_all_bools(packedStatBoolCodesTable)
-    for _, packedStatBoolCode in pairs(packedStatBoolCodesTable) do
-        if not NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatBoolCode, -1) then
-            return false
+-- Function generated from ChatGPT
+local function auto_create_table()
+    return setmetatable({}, {
+        __index = function(t, key)
+            t[key] = auto_create_table() -- Automatically create missing tables
+            return t[key]
         end
-    end
-    return true
+    })
 end
 
-local function has_action_figure(actionFigureId)
-    return is_in_range(actionFigureId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26811 + actionFigureId, -1) or false
-end
-local function has_ghost_exposed(ghostExposedId)
-    return is_in_range(ghostExposedId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(41316 + ghostExposedId, -1) or false
-end
-local function has_ld_organic_product(ldOrganicProductId)
-    return is_in_range(ldOrganicProductId, 0, 99) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(34262 + ldOrganicProductId, -1) or false
-end
-local function has_movie_prop(moviePropId)
-    return is_in_range(moviePropId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30241 + moviePropId, -1) or false
-end
-local function has_playing_card(playingCardId)
-    return is_in_range(playingCardId, 0, 53) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26911 + playingCardId, -1) or false
-end
-local function has_signal_jammer(signalJammerId)
-    return is_in_range(signalJammerId, 0, 49) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(28099 + signalJammerId, -1) or false
-end
-local function has_snowman(snowmanId)
-    return is_in_range(snowmanId, 0, 24) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36630 + snowmanId, -1) or false
-end
-local function has_epsilon_robe(epsilonRobeId)
-    return is_in_range(epsilonRobeId, 0, 2) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25003 + epsilonRobeId, -1) or false
-end
-local function has_weapon_component(weaponComponentId)
-    return is_in_range(weaponComponentId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(32319 + weaponComponentId, -1) or false
-end
 
-local function has_buried_stash(buriedStashId)
-    return is_in_range(buriedStashId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25522 + buriedStashId, -1) or false
-end
-local function has_hidden_cache(hiddenCacheId)
-    return is_in_range(hiddenCacheId, 0, 9) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30297 + hiddenCacheId, -1) or false
-end
-local function has_junk_energy_skydive(junkEnergySkydiveId)
-    --[[
-    ChatGPT + decompiled script enginered, I have done nothing but copy paste decompiled and asked GPT to make the working algorythm.
-    Expect the code to be buggy / I didn't make it, but it worked so far on my own testings.
-    ]]
-    if not is_in_range(junkEnergySkydiveId, 0, 9) then
-        return false
-    end
+-- Global vars updated once each "Main Loop" iteration, avoiding re-calculation of em, at the cost of more RAM usage; who cares?
+local Locals = {}
+local Globals = {}
+local Tunables = {}
+local resolvedLocationsIds = {}
+local hasPlayer = {}
+local numOf = auto_create_table() -- Create the numOf table with auto-create behavior
+local lastMpChar
+local isSessionStarted
+local isSessionStartedAndTransitionFinished
 
-    -- Calculate the base stat IDs for the specific skydive ID
-    local statId1 = 34837 + junkEnergySkydiveId * 4
-    local statId2 = 34839 + junkEnergySkydiveId * 4
-    local statId3 = 34838 + junkEnergySkydiveId * 4
-
-    -- Check if any of the stats indicate the skydive has been collected
-    return NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId1, -1) ~= 255
-        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId2, -1) ~= 255
-        or NATIVES.STATS.GET_PACKED_STAT_INT_CODE(statId3, -1) ~= 255
-end
-local function has_shipwreck(shipwreckId)
-    return is_in_range(shipwreckId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(31734 + shipwreckId, -1) or false
-end
-local function has_treasure_chest(treasureChestId)
-    return is_in_range(treasureChestId, 0, 1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(30307 + treasureChestId, -1) or false
-end
-local function has_ls_tag(lsTagId)
-    return is_in_range(lsTagId, 0, 4) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42252 + lsTagId, -1) or false
-end
-local function has_trick_or_treat(trickOrTreatId)
-    local packedStatId = false
-    if is_in_range(trickOrTreatId, 0, 9) then
-        packedStatId = 34252 + trickOrTreatId
-    elseif is_in_range(trickOrTreatId, 10, 199) then
-        packedStatId = 34512 + (trickOrTreatId - 10)
-    end
-    return packedStatId and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(packedStatId, -1) or false
-end
 
 -- This is the same code as the leaked source code.
-local function GET_MP_INT_CHARACTER_STAT(intStat, charSlot)
-    return stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, intStat, charSlot), -1) or 0
-end
-
-local function countCollectedBoolStatItems(hasCollectibleFunc, endIndex, hasCollectibleFunc__params)
-    endIndex = endIndex - 1
-
-    local startIndex = 0
-    local collectedCount = 0
-
-    for i = startIndex, endIndex do
-        if hasCollectibleFunc(i, hasCollectibleFunc__params) then
-            collectedCount = collectedCount + 1
-        end
-    end
-    return collectedCount
-end
-
-local function checkServiceCarbineUnlock(has_weapon_component)
-    if weapon.has_ped_got_weapon(player.player_ped(), gameplay.get_hash_key("weapon_tacticalrifle")) then
-        return true
-    end
-
-    for i = 1, 5 do
-        if not has_weapon_component(i - 1) then
-            return false
-        end
-    end
-
-    return true
+local function GET_MP_INT_CHARACTER_STAT(intStat)
+    return stats.stat_get_int(NATIVES.STATS._GET_STAT_HASH_FOR_CHARACTER_STAT(0, intStat, lastMpChar), -1) or 0
 end
 
 local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
@@ -2975,34 +3473,41 @@ local function GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
     return count
 end
 
+local function BitTest(value, bitPosition)
+    return (value & (1 << bitPosition)) ~= 0
+end
+
 -- This is the same code as the leaked source code.
-local function is_stunt_jump_completed(stuntJumpId, lastMpChar)
+local function is_stunt_jump_completed(stuntJumpId)
     local invalidstuntJumpId = -1
 
     if stuntJumpId ~= invalidstuntJumpId then
         local statHash = gameplay.get_hash_key("MP" .. lastMpChar .. "_USJS_COMPLETED_MASK")
         local stuntJumpsFoundMask = stats.stat_get_u64(statHash)
-        return (stuntJumpsFoundMask & (1 << stuntJumpId)) ~= 0
+        return BitTest(stuntJumpsFoundMask, stuntJumpId)
     end
 
     return false
 end
 
 -- This is the same code as the leaked source code.
-local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar)
-    local VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE)
-    local VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
-
-    local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar) -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today.
+local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H()
+    --[[
+    R* ISSUE / KNOWN BUG:
+    If you spin the wheel, delete your character and try spinning it again on a new character,
+    the script will think you can spin it but the game blocks it.
+    Also the game is broken cuz it should send you a notification for when is the next spin available- it doesn't.
+    ]]
+    local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STATS.LUCKY_WHEEL_USAGE) -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today.
     local iPlayerUsedTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LUCKY_WHEEL_USAGE"), -1) -- player stat posix time for Lucky Wheel usage -- It sounds like it only remember the hour and somehow knows it's from a previous day but it's hard codden to be today. -- it seems lucky wheel can only be played once for both characters but the game source code allows both. but currently its global only.
     local iCurrentPosixTime = NATIVES.NETWORK.GET_CLOUD_TIME_AS_INT()
-    local iNumSpin = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar)
+    local iNumSpin = GET_MP_INT_CHARACTER_STAT(MP_STATS.LUCKY_WHEEL_NUM_SPIN)
 
     if iCurrentPosixTime > iCharacterUsedTime and iCurrentPosixTime > iPlayerUsedTime then
-        -- SET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, 0)
+        -- SET_MP_INT_CHARACTER_STAT(MP_STATS.LUCKY_WHEEL_NUM_SPIN, 0)
         return false
-    elseif VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE > 0 then
-        if iNumSpin < VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY then
+    elseif Tunables.VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE then
+        if iNumSpin < Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY then
             return false
         end
     end
@@ -3010,124 +3515,389 @@ local function HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar)
     return true
 end
 
--- This is the same code as the leaked source code.
-local function get_lucky_wheel_spin_status_message(lastMpChar)
-    if HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar) then
-        local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_USAGE, lastMpChar)
+-- KNOWN BUG: A function I've wrote myself but it wont count the total number of spins if it can be more then 1 and character got deleted and you're not in the casino.
+local function GET_LOCAL_PLAYER_NUM_CASINO_LUCKY_WHEEL_SPINNED()
+    local numLuckyWheelSpin = GET_MP_INT_CHARACTER_STAT(MP_STATS.LUCKY_WHEEL_NUM_SPIN)
+
+    if HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H() and numLuckyWheelSpin <= 0 then
+        local spinCasinoLuckyWheelMask = Locals.spinCasinoLuckyWheelMask
+        if spinCasinoLuckyWheelMask and not BitTest(spinCasinoLuckyWheelMask, 20) then
+            numLuckyWheelSpin = Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY
+        else
+            numLuckyWheelSpin = 1
+        end
+
+    end
+
+    return numLuckyWheelSpin
+end
+
+-- This is approximatively the same code as the leaked source code / decompiled scripts.
+local function get_lucky_wheel_spin_status_message()
+    local function get_error_from_tunable()
+        if Tunables.VC_LUCKY_WHEEL_ADDITIONAL_SPINS_ENABLE then
+            if Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY == 2 then
+                return "You can only spin the Lucky Wheel twice per day."
+            elseif Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY == 3 then
+                return "You can only spin the Lucky Wheel three times per day."
+            elseif Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY == 4 then
+                return "You can only spin the Lucky Wheel four times per day."
+            end
+        end
+
+        return "You can only spin the Lucky Wheel once per day."
+    end
+
+
+    if HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H() then
+        local iCharacterUsedTime = GET_MP_INT_CHARACTER_STAT(MP_STATS.LUCKY_WHEEL_USAGE)
         local iCurrentPosixTime = NATIVES.NETWORK.GET_CLOUD_TIME_AS_INT()
         local iTimeDiff = iCharacterUsedTime - iCurrentPosixTime
+        -- I couldn't figures out how to output the generated table from 2T1 API, so I dropped this code commented.
+        --local sDate = native.ByteBuffer16() -- 32, 64, 128, 256
+        --NATIVES.NETWORK.CONVERT_POSIX_TIME(iTimeDiff, sDate)
+        --print(sDate)
+        --print(sDate:__tointeger())
 
         if iTimeDiff > 0 then
-            local sDate = CONVERT_POSIX_TIME(iTimeDiff)
-            sDate.hour = sDate.hour - 1 -- idk I added this because it seems to be that but it's weird, probably a reason why I should better use NATIVES.NETWORK.CONVERT_POSIX_TIME
-
-            local iTimeMS = (sDate.hour * 3600000)
-            iTimeMS = iTimeMS + (sDate.min * 60000)
-            iTimeMs = iTimeMS + (sDate.sec * 1000)
-
-            return "You can only spin the Lucky Wheel once per day.\nTime remaining before you can spin the Lucky Wheel: " .. sDate.hour .. ":" .. sDate.min .. ":" .. sDate.sec
-
-            -- I couldn't figures out how to output the generated table from 2T1 API, so I dropped this code commented.
-            --local sDate = native.ByteBuffer16() -- 32, 64, 128, 256
-            --NATIVES.NETWORK.CONVERT_POSIX_TIME(iTimeDiff, sDate)
-            --print(sDate)
-            --print(sDate:__tointeger())
+            timeComponents = time_components_from_seconds(iTimeDiff)
+            return get_error_from_tunable() .. "\nTime remaining before you can spin the Lucky Wheel: " .. string.format("%02d:%02d:%02d", timeComponents.hours, timeComponents.minutes, timeComponents.seconds)
         end
+    end
+
+    if Tunables.VC_CASINO_DISABLE_WHEEL then
+        return "Lucky Wheel is not available at this time. Please try again later."
+    end
+
+    if Locals.spinCasinoLuckyWheelMask then
+        if HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H() and not BitTest(Locals.spinCasinoLuckyWheelMask, 20) then
+            return get_error_from_tunable()
+        end
+
+        if BitTest(Locals.spinCasinoLuckyWheelMask, 25) then
+            return "This feature is not available now. Please come back later."
+        elseif BitTest(Locals.spinCasinoLuckyWheelMask, 28) then
+            return "This feature is not available for you."
+        end
+    end
+
+    if numOf.LuckyWheel.spinned == Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY then
+        return get_error_from_tunable()
     end
 
     return "Your spin of the Lucky Wheel is now available."
 end
 
+local function has_completed_time_trial(resolvedLocation, bestTime, timeTrials_Table)
+    if resolvedLocation == nil or resolvedLocation <= 0 or bestTime <= 0 then
+        return false
+    end
+
+    return bestTime < timeTrials_Table[resolvedLocation].parTime
+end
+
+function does_blip_exist_and_match_sprite(blip, blipSprite)
+    if blip and blip > 0 and NATIVES.HUD.DOES_BLIP_EXIST(blip) then
+        return NATIVES.HUD.GET_BLIP_SPRITE(blip) == blipSprite
+    end
+    return false
+end
+
+local function get_first_existing_blip_from_sprite(blipSprite)
+    local blip = NATIVES.HUD.GET_FIRST_BLIP_INFO_ID(blipSprite)
+    return blip > 0 and NATIVES.HUD.DOES_BLIP_EXIST(blip) and blip or nil
+end
+
 -- Function to remove any color codes from a feat name
-local function removeFeatNameColorCodes(featName)
-    featName = featName:gsub("^" .. COLOR.COLLECTED.hex, "")
-    featName = featName:gsub("^" .. COLOR.FOUND.hex, "")
+local function remove_feat_name_color_codes(featName)
+    featName = featName:gsub("^" .. COLORS.COLLECTED.hex, "")
+    featName = featName:gsub("^" .. COLORS.FOUND.hex, "")
     featName = featName:gsub("#DEFAULT#$", "")
     return featName
 end
 
-local function update_feat_name__collectibles__state(has_collectible__Func, collectiblesTable)
+--local function blip_manager(isThisBlipToggleSettingOn, thisCreatedBlips_Table, blipCoords, blipIndex, blipNumber, isCollected, isFound, numOfCollectiblesResolvedLocations, numOfCollectiblesCollectedCompletedAvailable, collectibleString, collectedOrCompletedString)
+--    local function blip_updater(blip)
+--        local numOfCollectiblesNotCollected = numOfCollectiblesResolvedLocations - numOfCollectiblesCollectedCompletedAvailable
+--        local collectibleStringPluralized = isCollected and pluralize(collectibleString, numOfCollectiblesCollectedCompletedAvailable) or pluralize(collectibleString, numOfCollectiblesNotCollected)
+--
+--        if isCollected then
+--            NATIVES.HUD.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING")
+--            NATIVES.HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(collectibleStringPluralized .. " [" .. collectedOrCompletedString .. "]")
+--            NATIVES.HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
+--
+--            ui.set_blip_colour(blip, BLIP_COLORS.COLLECTED)
+--            NATIVES.HUD.SHOW_TICK_ON_BLIP(blip, true)
+--            NATIVES.HUD.SHOW_FOR_SALE_ICON_ON_BLIP(blip, false)
+--        elseif isFound then
+--            NATIVES.HUD.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING")
+--            NATIVES.HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(collectibleStringPluralized .. " [found]")
+--            NATIVES.HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
+--
+--            ui.set_blip_colour(blip, BLIP_COLORS.FOUND)
+--            NATIVES.HUD.SHOW_FOR_SALE_ICON_ON_BLIP(blip, true)
+--            NATIVES.HUD.SHOW_TICK_ON_BLIP(blip, false)
+--        else
+--            NATIVES.HUD.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING")
+--            NATIVES.HUD.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(collectibleStringPluralized .. " [inactive]")
+--            NATIVES.HUD.END_TEXT_COMMAND_SET_BLIP_NAME(blip)
+--
+--            ui.set_blip_colour(blip, BLIP_COLORS.INACTIVE)
+--            NATIVES.HUD.SHOW_FOR_SALE_ICON_ON_BLIP(blip, false)
+--            NATIVES.HUD.SHOW_TICK_ON_BLIP(blip, false)
+--        end
+--
+--        NATIVES.HUD.SHOW_NUMBER_ON_BLIP(blip, blipNumber)
+--        -- NATIVES.HUD.SET_BLIP_AS_MINIMAL_ON_EDGE(blip, true)
+--    end
+--
+--    local function blip_creation()
+--        local blip = ui.add_blip_for_coord(blipCoords)
+--        if blip then
+--            thisCreatedBlips_Table[blipIndex] = blip
+--            blip_updater(blip)
+--        end
+--    end
+--
+--    local function blip_remover()
+--        local blip = thisCreatedBlips_Table[blipIndex]
+--        if blip and ui.remove_blip(blip) then
+--            thisCreatedBlips_Table[blipIndex] = nil
+--        end
+--    end
+--
+--    if isThisBlipToggleSettingOn and isSessionStarted and not (hideCollectedBlipsSetting_Feat.on and isCollected) and not (hideInactiveBlipsSetting_Feat.on and (not isFound and not isCollected)) then
+--        if thisCreatedBlips_Table[blipIndex] and NATIVES.HUD.DOES_BLIP_EXIST(thisCreatedBlips_Table[blipIndex]) then
+--            local blip = thisCreatedBlips_Table[blipIndex]
+--            if blip then
+--                blip_updater(blip)
+--            end
+--        else
+--            blip_remover()
+--            blip_creation()
+--        end
+--    else
+--        blip_remover()
+--    end
+--end
+
+local function update_feat__collectibles(has_collectible__Func, collectiblesTable)
     for i = 1, #collectiblesTable do
         local feat = collectiblesTable[i].feat
         local hasCollectible = has_collectible__Func(i - 1)
 
-        local updatedName = removeFeatNameColorCodes(feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(feat.name)
         if hasCollectible then
-            updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
         end
-        feat.name = updatedName
+
+        feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
+local function update_feat__stunt_jumps()
     for i, stuntJumpGroup in ipairs(collectibles.stuntJumps) do
-        local updatedName = removeFeatNameColorCodes(stuntJumpGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(stuntJumpGroup.feat.name)
+        local isCompleted = is_stunt_jump_completed(i - 1)
 
-        if is_stunt_jump_completed(i-1, lastMpChar) then
-            updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+        if isCompleted then
+            updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+        else
+            if isSessionStarted then
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+            end
         end
 
-        stuntJumpGroup.feat.name = updatedName
+        --blip_manager(stuntJumpsBlipSetting_Feat.on, createdBlips.stuntJumps, stuntJumpGroup.coords._start, i, i, isCompleted, true, numOf.StuntJump.completed, numOf.StuntJump.completed, "Stunt Jump", "completed")
+
+        stuntJumpGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__epsilon_robes__state(has_epsilon_robe, lastMpChar)
-    local selectedMaxProgress = {
-        [1] = 12,
-        [2] = 157,
-        [3] = 577
+local function update_feat__treasure_hunt(playerTreasureHuntProgress)
+    local BITSET_TREASURE_HUNT_1ST_RANDOM_CLUE = 9
+    local BITSET_TREASURE_HUNT_2ND_RANDOM_CLUE = 10
+    local BITSET_TREASURE_HUNT_3RD_RANDOM_CLUE = 11
+
+
+    local function is_quest_completed(treasureHuntIndex)
+        return playerTreasureHuntProgress >= treasureHuntIndex + 1
+    end
+
+
+    local parentFeatMap = {
+        [1] = treasureHuntFirstClueMenu_Feat,
+        [2] = treasureHuntRemainingCluesMenu_Feat,
+        [3] = treasureHuntFinalLocationMenu_Feat
     }
 
+    local bitsetMap = {
+        [1] = BITSET_TREASURE_HUNT_1ST_RANDOM_CLUE,
+        [2] = BITSET_TREASURE_HUNT_2ND_RANDOM_CLUE,
+        [3] = BITSET_TREASURE_HUNT_3RD_RANDOM_CLUE
+    }
+
+    for i, treasureHuntType in ipairs(collectibles.treasureHunts) do
+        local parentFeat = parentFeatMap[i]
+        local updatedParentFeatName = remove_feat_name_color_codes(parentFeat.name)
+        local isQuestCompleted = is_quest_completed(i)
+
+        if isQuestCompleted then
+            updatedParentFeatName = COLORS.COLLECTED.hex .. updatedParentFeatName .. "#DEFAULT#"
+        end
+
+        for i2, treasureHuntGroup in ipairs(treasureHuntType.locations) do
+            local updatedFeatName = remove_feat_name_color_codes(treasureHuntGroup.feat.name)
+            local isFound = false
+            local isThisClueCompleted = false
+
+            if isQuestCompleted then
+                if i == 1 and playerTreasureHuntProgress >= 1 and i2 == resolvedLocationsIds.activeTreasureHuntFirstClueLocation then
+                    updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                elseif i == 2 and playerTreasureHuntProgress >= 2 then
+                    updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                elseif i == 3 and playerTreasureHuntProgress >= 3 and i2 == resolvedLocationsIds.activetreasureHuntFinalLocation then
+                    updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                end
+            else
+                if isSessionStarted and Tunables.ENABLE_TREASURE_HUNT then
+                    if i == 1 and playerTreasureHuntProgress == 1 and i2 == resolvedLocationsIds.activeTreasureHuntFirstClueLocation then
+                        updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                        isFound = true
+                    elseif i == 2 and playerTreasureHuntProgress == 2 then
+                        if BitTest(Locals.treasureHuntBitset, bitsetMap[i2]) then
+                            updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                            isThisClueCompleted = true
+                        else
+                            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                            isFound = true
+                        end
+                    elseif i == 3 and playerTreasureHuntProgress == 3 and i2 == resolvedLocationsIds.activetreasureHuntFinalLocation then
+                        updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                        isFound = true
+                    end
+                end
+            end
+
+            --if i == 1 then
+            --    blip_manager(treasureHuntFirstClueBlipSetting_Feat.on, createdBlips.treasureHunts.FirstClue, treasureHuntGroup.coords, i2, i2, isQuestCompleted and i2 == resolvedLocationsIds.activeTreasureHuntFirstClueLocation, isFound, 20, numOf.TreasureHunt.completed, "Treasure Hunt (First Clue)", "collected")
+            --elseif i == 2 then
+            --    blip_manager(treasureHuntRemainingCluesBlipSetting_Feat.on, createdBlips.treasureHunts.RemainingClues, treasureHuntGroup.coords, i2, i2, isQuestCompleted or isThisClueCompleted, isFound, 3, numOf.TreasureHunt.completed, "Treasure Hunt (Remaining Clue)", "collected")
+            --elseif i == 3 then
+            --    local shouldCallBlipManager = false
+            --    if i2 == resolvedLocationsIds.activetreasureHuntFinalLocation then
+            --        if not isCompleted and is_quest_completed(2) then
+            --            -- TODO: if does_blip_exist_and_match_sprite(Globals.treasureChestBlip, BLIPS.RADAR_NHP_CHEST)
+            --            local radarChestBlip = get_first_existing_blip_from_sprite(BLIPS.RADAR_NHP_CHEST)
+            --            if not (radarChestBlip and NATIVES.HUD.GET_BLIP_COLOUR(radarChestBlip) == 5) then
+            --                shouldCallBlipManager = true
+            --            end
+            --        else
+            --            shouldCallBlipManager = true
+            --        end
+            --    else
+            --        shouldCallBlipManager = true
+            --    end
+            --    if shouldCallBlipManager then
+            --        blip_manager(treasureHuntFinalLocationBlipSetting_Feat.on, createdBlips.treasureHunts.FinalLocation, treasureHuntGroup.coords, i2, i2, isQuestCompleted and i2 == resolvedLocationsIds.activetreasureHuntFinalLocation, isFound, 20, numOf.TreasureHunt.completed, "Treasure Hunt (Final Location)", "collected")
+            --    end
+            --end
+
+            treasureHuntGroup.feat.name = updatedFeatName
+        end
+
+        parentFeat.name = updatedParentFeatName
+    end
+end
+
+local function update_feat__epsilon_robes()
+    local function get_num_of_open_nightclub()
+        --[[
+        TODO:
+        I currently don't check if my own nightclub as been all setted up and ready to be open.
+        The purpose of this function should normally be to check if it's open and all setted up.
+        Here are some notes if I later want to adds it:
+        The goal will be to get the global for local player ceo color, then check if from the 32 iterations,
+        one matches this color, then check if all bool stats for this nightclub are passed.
+
+        MP_STAT_NIGHTCLUB_OWNED
+        15530 - enter first time in a nightclub
+        22042 - seen the guy for robe (packet int from 0 to 1)
+        22106: has completed nightclub cutscene (first)
+        15534: has completed nightclub cutscene (next)
+        ]]
+
+        local count = 0
+        local blip = NATIVES.HUD.GET_FIRST_BLIP_INFO_ID(BLIPS.RADAR_BAT_CLUB_PROPERTY)
+        for i = 1, 32 do
+            if NATIVES.HUD.DOES_BLIP_EXIST(blip) then
+                count = count + 1
+                openedNightclubs_Table[count] = NATIVES.HUD.GET_BLIP_COORDS(blip)
+            end
+            blip = NATIVES.HUD.GET_NEXT_BLIP_INFO_ID(BLIPS.RADAR_BAT_CLUB_PROPERTY)
+        end
+        return count
+    end
+
     for i, epsilonRobeGroup in ipairs(collectibles.epsilonRobes) do
-        local updatedName = removeFeatNameColorCodes(epsilonRobeGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(epsilonRobeGroup.feat.name)
+
+        numOfNightclubOpen = get_num_of_open_nightclub()
+        if numOfNightclubOpen > 0 then
+            epsilonRobeGroup.feat.min = 1
+            epsilonRobeGroup.feat.max = numOfNightclubOpen
+        else
+            epsilonRobeGroup.feat.min = 0
+            epsilonRobeGroup.feat.max = 0
+            openedNightclubs_Table = {}
+        end
 
         if has_epsilon_robe(i - 1) then
-            updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+            updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+        else
+            if isSessionStarted and numOfNightclubOpen > 0 then
+                -- TODO: if is at least one nightlub propriety open in the session then COLORS.FOUND
+                -- I think I can do that trough checking if either of the blip exists but if it's my own then gotta check if I completed the nightclub setups ^^
+                -- HUD::SET_BLIP_NAME_FROM_TEXT_FILE(*uParam1, "NIGHTCLUB_R_BLIP" /* GXT: Rival's Nightclub */);
+    			-- HUD::SET_BLIP_NAME_FROM_TEXT_FILE(*uParam1, "BLIP_614" /* GXT: Nightclub Property */);
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+            end
         end
 
-        local maxProgressNum = -1
-        local currentProgressNum = script.get_global_i(Global.numberOfNightclubToiletAttendantTipped)
+        local currentProgressNum = Globals.numberOfNightclubToiletAttendantTipped
+        local maxProgressNum = nil
         if epsilonRobeGroup.name == "Seeking the Truth" then
             maxProgressNum = 12
-            if currentProgressNum >= maxProgressNum then
-                currentProgressNum = maxProgressNum
-            end
         elseif epsilonRobeGroup.name == "Chasing the Truth" then
             maxProgressNum = 157
-            if currentProgressNum >= maxProgressNum then
-                currentProgressNum = maxProgressNum
-            end
         elseif epsilonRobeGroup.name == "Bearing the Truth" then
             maxProgressNum = 577
-            if currentProgressNum >= maxProgressNum then
-                currentProgressNum = maxProgressNum
-            end
         end
 
-        epsilonRobeGroup.feat.name = updatedName
+        epsilonRobeGroup.feat.name = updatedFeatName
         epsilonRobeGroup.feat.hint = epsilonRobeGroup.hint .. "\n\nCurrent progress:\n" .. currentProgressNum .. "/" .. maxProgressNum
     end
 end
 
-local function update_feat_name__media_sticks__state(resolvedLocationsIds)
+local function update_feat__media_sticks()
     for i, mediaStickGroup in ipairs(collectibles.mediaSticks) do
-        local updatedParentFeatName = removeFeatNameColorCodes(mediaStickGroup.feat.name)
+        local updatedParentFeatName = remove_feat_name_color_codes(mediaStickGroup.feat.name)
         local hasCollectedAllMediaSticks = true
 
         for i2, location in ipairs(mediaStickGroup.locations) do
-            local updatedFeatName = removeFeatNameColorCodes(location.feat.name)
+            local updatedFeatName = remove_feat_name_color_codes(location.feat.name)
 
             if has_all_bools(location.bools) then
-                updatedFeatName = COLOR.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
                 if
-                    is_session_started()
+                    isSessionStarted
                     and mediaStickGroup.group == "Permanent Locations (Chop Shop DLC)"
                     and location.artist == "DâM-FunK"
                     and location.title == "Even the Score"
                     and i2 == resolvedLocationsIds.mediaStick_DamFunk_EvenTheScore
                 then
-                    updatedFeatName = COLOR.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                    updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
                 end
 
                 hasCollectedAllMediaSticks = false
@@ -3137,213 +3907,235 @@ local function update_feat_name__media_sticks__state(resolvedLocationsIds)
         end
 
         if hasCollectedAllMediaSticks then
-            updatedParentFeatName = COLOR.COLLECTED.hex .. updatedParentFeatName .. "#DEFAULT#"
+            updatedParentFeatName = COLORS.COLLECTED.hex .. updatedParentFeatName .. "#DEFAULT#"
         end
 
         mediaStickGroup.feat.name = updatedParentFeatName
     end
 end
 
-local function update_feat_name__weapon_components__state(has_weapon_component, hasPlayerUnlockedServiceCarbine)
-    weaponComponents_Feat.name = removeFeatNameColorCodes(weaponComponents_Feat.name)
+local function update_feat__weapon_components()
+    local function has_player_unlocked_service_carbine()
+        if isSessionStarted and weapon.has_ped_got_weapon(player.player_ped(), gameplay.get_hash_key("weapon_tacticalrifle")) then
+            return true
+        end
 
-    if hasPlayerUnlockedServiceCarbine then
-        weaponComponents_Feat.name = COLOR.COLLECTED.hex .. weaponComponents_Feat.name .. "#DEFAULT#"
+        for i = 1, 5 do
+            if not has_weapon_component(i - 1) then
+                return false
+            end
+        end
+
+        return true
     end
+
+    local updatedFeatName = remove_feat_name_color_codes(weaponComponents_Feat.name)
+
+    if has_player_unlocked_service_carbine() then
+        updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+    else
+        if isSessionStarted then
+            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+        end
+    end
+
+    weaponComponents_Feat.name = updatedFeatName
 end
 
-local function update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
-    metalDetectors_Feat.name = removeFeatNameColorCodes(metalDetectors_Feat.name)
+local function update_feat__metal_detector(hasPlayerCollectedMetalDetectorForBuriedStashes)
+    local updatedFeatName = remove_feat_name_color_codes(metalDetector_Feat.name)
 
     if hasPlayerCollectedMetalDetectorForBuriedStashes then
-        metalDetectors_Feat.name = COLOR.COLLECTED.hex .. metalDetectors_Feat.name .. "#DEFAULT#"
+        updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+    else
+        if isSessionStarted then
+            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+        end
     end
+
+    metalDetector_Feat.name = updatedFeatName
 end
 
-local function update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
-    sprayCans_Feat.name = removeFeatNameColorCodes(sprayCans_Feat.name)
+local function update_feat__spray_can(hasPlayerCollectedSprayCanForPosterTagging)
+    local updatedFeatName = remove_feat_name_color_codes(sprayCan_Feat.name)
 
     if hasPlayerCollectedSprayCanForPosterTagging then
-        sprayCans_Feat.name = COLOR.COLLECTED.hex .. sprayCans_Feat.name .. "#DEFAULT#"
+        updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+    else
+        if isSessionStarted then
+            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+        end
     end
+
+    sprayCan_Feat.name = updatedFeatName
 end
 
-local function update_feat_name__buried_stashes__state(resolvedLocationsIds)
+local function update_feat__buried_stashes()
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.buriedStashes) do
+        numOfResolvedLocations = numOfResolvedLocations + 1
         resolvedLocationsSet[resolvedLocationId] = i
     end
 
     for i, buriedStashGroup in ipairs(dailyCollectibles.buriedStashes) do
-        local updatedName = removeFeatNameColorCodes(buriedStashGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(buriedStashGroup.feat.name)
+        local isCollected = false
 
-        if
-            is_session_started()
-            and resolvedLocationsSet[i]
-        then
-            if has_buried_stash(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+        if isSessionStarted and resolvedLocationsSet[i] then
+            isCollected = has_buried_stash(resolvedLocationsSet[i] - 1)
+            updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
         end
 
-        buriedStashGroup.feat.name = updatedName
+        --blip_manager(buriedStashesBlipSetting_Feat.on, createdBlips.buriedStashes, buriedStashGroup.coords, i, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.BuriedStash.collected, "Buried Stash", "collected")
+
+        buriedStashGroup.feat.name = updatedFeatName
         buriedStashGroup.feat.hint = 'Note:\nYou must first collect a "Metal Detector" from a Skeleton in [Collectibles > Random Events], for the chests to spawn in Cayo Perico.'
     end
 end
 
-local function update_feat_name__hidden_caches__state(resolvedLocationsIds)
+local function update_feat__hidden_caches()
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.hiddenCaches) do
+        numOfResolvedLocations = numOfResolvedLocations + 1
         resolvedLocationsSet[resolvedLocationId] = i
     end
 
     for i, hiddenCacheGroup in ipairs(dailyCollectibles.hiddenCaches) do
-        local updatedName = removeFeatNameColorCodes(hiddenCacheGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(hiddenCacheGroup.feat.name)
+        local isCollected = false
 
-        if
-            is_session_started()
-            and resolvedLocationsSet[i]
-        then
-            if has_hidden_cache(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+        if isSessionStarted and resolvedLocationsSet[i] then
+            isCollected = has_hidden_cache(resolvedLocationsSet[i] - 1)
+            updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
         end
 
-        hiddenCacheGroup.feat.name = updatedName
+        --blip_manager(hiddenCachesBlipSetting_Feat.on, createdBlips.hiddenCaches, hiddenCacheGroup.coords, i, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.HiddenCache.collected, "Hidden Cache", "collected")
+
+        hiddenCacheGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__junk_energy_skydives__state(resolvedLocationsIds)
+local function update_feat__junk_energy_skydives()
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.junkEnergySkydives) do
         resolvedLocationsSet[resolvedLocationId] = i
     end
 
     for i, junkEnergySkydiveGroup in ipairs(dailyCollectibles.junkEnergySkydives) do
-        local updatedName = removeFeatNameColorCodes(junkEnergySkydiveGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(junkEnergySkydiveGroup.feat.name)
 
         if
-            is_session_started()
+            isSessionStarted
             and resolvedLocationsSet[i]
         then
             if has_junk_energy_skydive(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
             end
         end
 
-        junkEnergySkydiveGroup.feat.name = updatedName
+        junkEnergySkydiveGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__shipwreck__state(resolvedLocationsIds)
+local function update_feat__shipwreck()
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.shipwreck) do
-        resolvedLocationsSet[resolvedLocationId] = i
+        if i <= Tunables.NUMBER_OF_ACTIVE_SHIPWRECKED then
+            numOfResolvedLocations = numOfResolvedLocations + 1
+            resolvedLocationsSet[resolvedLocationId] = i
+        end
     end
 
     for i, shipwreckGroup in ipairs(dailyCollectibles.shipwreck) do
-        local updatedName = removeFeatNameColorCodes(shipwreckGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(shipwreckGroup.feat.name)
+        local isCollected = false
 
-        if
-            is_session_started()
-            and resolvedLocationsSet[i]
-        then
-            if has_shipwreck(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+        if isSessionStarted and resolvedLocationsSet[i] then
+            isCollected = has_shipwreck(resolvedLocationsSet[i] - 1)
+            updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
         end
 
-        shipwreckGroup.feat.name = updatedName
+        --blip_manager(shipwreckBlipSetting_Feat.on, createdBlips.shipwreck, shipwreckGroup.coords, i, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.Shipwreck.collected, "Shipwreck", "collected")
+
+        shipwreckGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__treasure_chests__state(resolvedLocationsIds)
+local function update_feat__treasure_chests()
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.treasureChests) do
+        -- Removes the duplicate from R* source code.
+        if resolvedLocationId == 16 then
+            resolvedLocationId = 12
+            i = 2
+        end
+        numOfResolvedLocations = numOfResolvedLocations + 1
         resolvedLocationsSet[resolvedLocationId] = i
     end
+    -- Removes the duplicate from R* source code.
+    if resolvedLocationsSet[12] and resolvedLocationsSet[16] then
+        numOfResolvedLocations = numOfResolvedLocations - 1
+    end
 
-    -- I still have to iterate all of em one by one for the hint to update.
     for i, treasureChestGroup in ipairs(dailyCollectibles.treasureChests) do
-        local feat = treasureChestGroup.feat
-        local selectedChestIndex = feat.value
-        if treasureChestGroup.name == "underwater" and selectedChestIndex >= 6 then
-            selectedChestIndex = selectedChestIndex + 1
-        end
-        local updatedName = removeFeatNameColorCodes(treasureChestGroup.feat.name)
-        local updatedHint = "This is Treasure Chest #" .. treasureChestGroup.spawns[selectedChestIndex].id
+        local updatedFeatName = remove_feat_name_color_codes(treasureChestGroup.feat.name)
+        local updatedFeatHint = "This is Treasure Chest #" .. treasureChestGroup.spawns[treasureChestGroup.feat.value].id
         if treasureChestGroup.name == "underwater" then
-            updatedHint = "Note:\nTreasure Chest (underwater) #16 is the same location then #12 so I removed it.\n\n" .. updatedHint
+            updatedFeatHint = updatedFeatHint .. "\n\nNote:\nTreasure Chest (underwater) #16 is the same location then #12 so I removed it."
         end
+        local isCollected = false
         local foundAt = {}
 
-        for i2, treasureChest in ipairs(treasureChestGroup.spawns) do
-            local resolvedFeatIndexFound = i2
+        for featValue, treasureChest in ipairs(treasureChestGroup.spawns) do
+            if isSessionStarted and resolvedLocationsSet[treasureChest.id] then
+                isCollected = has_treasure_chest(resolvedLocationsSet[treasureChest.id] - 1)
+                updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
 
-            if treasureChestGroup.name == "underwater" then
-                if resolvedFeatIndexFound >= 6 then
-                    if resolvedFeatIndexFound == 6 then
-                        resolvedFeatIndexFound = 2
-                    else
-                        resolvedFeatIndexFound = resolvedFeatIndexFound - 1
-                    end
-                end
+                local statusText = string.format("%s at: < %i >", isCollected and "Collected" or "Found", featValue)
+                table.insert(foundAt, (#foundAt == 0 and "\n\n" or "\n") .. statusText)
             end
 
-            if
-                is_session_started()
-                and resolvedLocationsSet[treasureChest.id]
-            then
-                if has_treasure_chest(i - 1) then
-                    updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-                    table.insert(foundAt, (#foundAt == 0 and "\n\n" or "\n") .. "Collected at: < " .. resolvedFeatIndexFound .. " >")
-                else
-                    updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-                    table.insert(foundAt, (#foundAt == 0 and "\n\n" or "\n") .. "Found at: < " .. resolvedFeatIndexFound .. " >")
-                end
-            end
+            --blip_manager(treasureChestsBlipSetting_Feat.on, createdBlips.treasureChests, treasureChest.coords, treasureChest.id, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.TreasureChest.collected, "Treasure Chest", "collected")
         end
 
-        treasureChestGroup.feat.name = updatedName
-        treasureChestGroup.feat.hint = updatedHint .. table.concat(foundAt)
+        treasureChestGroup.feat.name = updatedFeatName
+        treasureChestGroup.feat.hint = updatedFeatHint .. table.concat(foundAt)
     end
 end
 
-local function update_feat_name__ls_tags__state(resolvedLocationsIds)
+local function update_feat__ls_tags()
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
     for i, resolvedLocationId in pairs(resolvedLocationsIds.lsTags) do
+        numOfResolvedLocations = numOfResolvedLocations + 1
         resolvedLocationsSet[resolvedLocationId] = i
     end
 
     for i, lsTagGroup in ipairs(dailyCollectibles.lsTags) do
-        local updatedName = removeFeatNameColorCodes(lsTagGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(lsTagGroup.feat.name)
+        local isCollected = false
 
-        if
-            is_session_started()
-            and resolvedLocationsSet[i]
-        then
-            if has_ls_tag(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+        if isSessionStarted and resolvedLocationsSet[i] then
+            isCollected = has_ls_tag(resolvedLocationsSet[i] - 1)
+            updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
         end
 
-        lsTagGroup.feat.name = updatedName
+        --blip_manager(lsTagsBlipSetting_Feat.on, createdBlips.lsTags, lsTagGroup.coords, i, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.LSTag.tagged, "LS Tag", "tagged")
+
+        lsTagGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    -- TODO: I should check if lanterns are enabled too so that it COLOR.FOUND even if the resolved locations are not set. (this scenario is possible using mods)
-    local function are__trick_or_treat__resolved_locations_enabled(resolvedLocationsIds)
+
+local function update_feat__trick_or_treats()
+    -- TODO: I should check if lanterns are enabled too so that it COLORS.FOUND even if the resolved locations are not set. (this scenario is possible using mods)
+    local function are__trick_or_treat__resolved_locations_enabled()
         --[[
         If all locations are set to 1, they are disabled (return false).
         Otherwise, return true.
@@ -3356,232 +4148,242 @@ local function update_feat_name__trick_or_treats__state(resolvedLocationsIds)
         return false
     end
 
+    local numOfResolvedLocations = 0
     local resolvedLocationsSet = {}
-    if are__trick_or_treat__resolved_locations_enabled(resolvedLocationsIds) then
+    if are__trick_or_treat__resolved_locations_enabled() then
         for i, resolvedLocationId in pairs(resolvedLocationsIds.trickOrTreats) do
+            numOfResolvedLocations = numOfResolvedLocations + 1
             resolvedLocationsSet[resolvedLocationId] = i
         end
     end
 
     for i, trickOrTreatGroup in ipairs(dailyCollectibles.trickOrTreats) do
-        local updatedName = removeFeatNameColorCodes(trickOrTreatGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(trickOrTreatGroup.feat.name)
+        local isCollected = false
 
-        if
-            is_session_started()
-            and resolvedLocationsSet[i]
-        then
-            if has_trick_or_treat(resolvedLocationsSet[i] - 1) then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
-            else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
-            end
+        if isSessionStarted and resolvedLocationsSet[i] then
+            isCollected = has_trick_or_treat(resolvedLocationsSet[i] - 1)
+            updatedFeatName = (isCollected and COLORS.COLLECTED.hex or COLORS.FOUND.hex) .. updatedFeatName .. "#DEFAULT#"
         end
 
-        trickOrTreatGroup.feat.name = updatedName
+        --blip_manager(trickOrTreatBlipSetting_Feat.on, createdBlips.trickOrTreat, trickOrTreatGroup.coords, i, resolvedLocationsSet, isCollected, true, numOfResolvedLocations, numOf.TrickOrTreat.collected, "Jack O'Lantern", "collected")
+
+        trickOrTreatGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
+local function update_feat__lucky_wheel()
     local feat = dailyCollectibles.luckyWheel.feat
-
-    local updatedName = removeFeatNameColorCodes(feat.name)
-    local updatedHint = feat.hint
+    local updatedFeatName = remove_feat_name_color_codes(feat.name)
+    local updatedFeatHint = feat.hint
+    local hasPlayerCompletedCasinoTutorial = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.CASINO_SEEN_CASINO_MOCAP, -1)
+    local hasPlayerAcquiredCasinoMembership = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.CASINO_MEMBERSHIP_PURCHASED, -1)
     local updateSpinStatusMessage = false
 
-    if is_session_started() then
-        if localPlayerNumLuckyWheelSpinned == maxNumLuckyWheelSpinsPerDay then
-            updatedName = COLOR.COLLECTED.hex .. feat.name .. "#DEFAULT#"
+    if numOf.LuckyWheel.spinned == numOf.LuckyWheel.max then
+        updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+        updateSpinStatusMessage = true
+    else
+        if isSessionStarted and hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoMembership then
+            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
             updateSpinStatusMessage = true
-        else
-            if hasPlayerCompletedCasinoTutorial and hasPlayerAcquiredCasinoMembership then
-                updatedName = COLOR.FOUND.hex .. feat.name .. "#DEFAULT#"
-                updateSpinStatusMessage = true
-            end
         end
     end
 
     if updateSpinStatusMessage then
-        -- There is a bug where when you just spin then the text is at -01:59:59
-        updatedHint = dailyCollectibles.luckyWheel.hint .. "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n" .. get_lucky_wheel_spin_status_message(lastMpChar)
+        updatedFeatHint = dailyCollectibles.luckyWheel.hint .. "\n\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n\n" .. get_lucky_wheel_spin_status_message()
     end
 
-    feat.name = updatedName
-    feat.hint = updatedHint
+    feat.name = updatedFeatName
+    feat.hint = updatedFeatHint
 end
 
-local function update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
-    for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
-        gCacheGroup.feat.name = removeFeatNameColorCodes(gCacheGroup.feat.name)
-        gCacheGroup.feat.hint = ""
+local function update_feat__g_caches(hasPlayerCollectedGCache)
+    local numOfResolvedLocations = 0
+    local resolvedLocationsSet = { [resolvedLocationsIds.gCache.searchArea] = 1 }
 
-        if
-            is_session_started()
-            and resolvedLocationsIds.gCache.searchArea >= 1
-            and resolvedLocationsIds.gCache.searchArea <= #dailyCollectibles.gCaches
-            and resolvedLocationsIds.gCache.spawn >= 1
-            and resolvedLocationsIds.gCache.spawn <= #dailyCollectibles.gCaches[i].spawns
-        then
+    -- todo check for validity in resolvedlocationset
+    -- if resolvedLocationsIds.gCache.searchArea >= 1
+    -- and resolvedLocationsIds.gCache.searchArea <= #dailyCollectibles.gCaches
+    -- and resolvedLocationsIds.gCache.spawn >= 1
+    -- and resolvedLocationsIds.gCache.spawn <= #dailyCollectibles.gCaches[i].spawns
+
+    for i, gCacheGroup in ipairs(dailyCollectibles.gCaches) do
+        local updatedFeatName = remove_feat_name_color_codes(gCacheGroup.feat.name)
+        local updatedFeatHint = ""
+
+        if isSessionStarted and resolvedLocationsSet[i] then
             if i == resolvedLocationsIds.gCache.searchArea then
                 if hasPlayerCollectedGCache then
-                    gCacheGroup.feat.name = COLOR.COLLECTED.hex .. gCacheGroup.feat.name .. "#DEFAULT#"
-                    gCacheGroup.feat.hint = "Collected at:\n< " .. resolvedLocationsIds.gCache.spawn .. " >"
+                    updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+                    updatedFeatHint = "Collected at:\n< " .. resolvedLocationsIds.gCache.spawn .. " >"
                 else
-                    gCacheGroup.feat.name = COLOR.FOUND.hex .. gCacheGroup.feat.name .. "#DEFAULT#"
-                    gCacheGroup.feat.hint = "Found at:\n< " .. resolvedLocationsIds.gCache.spawn .. " >"
+                    updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                    updatedFeatHint = "Found at:\n< " .. resolvedLocationsIds.gCache.spawn .. " >"
                 end
             end
         end
+
+        --blip_manager(gCachesBlipSetting_Feat.on, createdBlips.gCaches, dailyCollectibles.gCaches[resolvedLocationsIds.gCache.searchArea].spawns[resolvedLocationsIds.gCache.spawn], i, resolvedLocationsSet, hasPlayerCollectedGCache, true, 1, numOf.GCache.collected, "G's Cache", "collected")
+
+        gCacheGroup.feat.name = updatedFeatName
+        gCacheGroup.feat.hint = updatedFeatHint
     end
 end
 
-local function update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerRaidedStashHouse)
-    stashHouse_Feat.name = removeFeatNameColorCodes(stashHouse_Feat.name)
-    stashHouse_Feat.hint = ""
+local function update_feat__stash_house(hasPlayerRaidedStashHouse)
+    local updatedFeatName = remove_feat_name_color_codes(stashHouse_Feat.name)
+    local updatedFeatHint = ""
 
     if
-        is_session_started()
-        and resolvedLocationsIds.stashHouse.marker >= 1
-        and resolvedLocationsIds.stashHouse.marker <= #dailyCollectibles.stashHouses
+        isSessionStarted
+        and resolvedLocationsIds.stashHouse >= 1
+        and resolvedLocationsIds.stashHouse <= #dailyCollectibles.stashHouses
     then
         if hasPlayerRaidedStashHouse then
-            stashHouse_Feat.name = COLOR.COLLECTED.hex .. stashHouse_Feat.name .. "#DEFAULT#"
-            stashHouse_Feat.hint = "Collected at:\n< " .. resolvedLocationsIds.stashHouse.marker .. " >"
+            updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
+            updatedFeatHint = "Collected at:\n< " .. resolvedLocationsIds.stashHouse .. " >"
         else
-            stashHouse_Feat.name = COLOR.FOUND.hex .. stashHouse_Feat.name .. "#DEFAULT#"
-            stashHouse_Feat.hint = "Found at:\n< " .. resolvedLocationsIds.stashHouse.marker .. " >"
+            updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+            updatedFeatHint = "Found at:\n< " .. resolvedLocationsIds.stashHouse .. " >"
         end
     end
+
+    stashHouse_Feat.name = updatedFeatName
+    stashHouse_Feat.hint = updatedFeatHint
 end
 
-local function update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime, RCTimeTrialParTimeOverride)
+local function update_feat__rc_bandito_time_trial(hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime)
     for i, RCBanditoTimeTrialGroup in ipairs(dailyCollectibles.RCBanditoTimeTrials) do
-        local updatedName = removeFeatNameColorCodes(RCBanditoTimeTrialGroup.feat.name)
-        local updatedHint = ""
+        local updatedFeatName = remove_feat_name_color_codes(RCBanditoTimeTrialGroup.feat.name)
+        local updatedFeatHint = ""
 
         if
-            is_session_started()
-            and i == resolvedLocationsIds.RCBanditoTimeTrial.spawn
+            isSessionStarted
+            and i == resolvedLocationsIds.RCBanditoTimeTrial
         then
             if hasPlayerCompletedRCBanditoTimeTrial then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
             end
-            updatedHint = "\nPERSONAL BEST: " .. formattedRCBanditoTimeTrialBestTime
+            updatedFeatHint = "\nPERSONAL BEST: " .. formattedRCBanditoTimeTrialBestTime
         end
 
-        RCBanditoTimeTrialGroup.feat.name = updatedName
-        RCBanditoTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(RCTimeTrialParTimeOverride > 0 and RCTimeTrialParTimeOverride or RCBanditoTimeTrialGroup.parTime) .. updatedHint
+        RCBanditoTimeTrialGroup.feat.name = updatedFeatName
+        RCBanditoTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(Tunables.RC_TIME_TRIAL_OVERRIDE_TIME > 0 and Tunables.RC_TIME_TRIAL_OVERRIDE_TIME or RCBanditoTimeTrialGroup.parTime) .. updatedFeatHint
     end
 end
 
-local function update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
+local function update_feat__junk_energy_time_trial(hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
     for i, junkEnergyTimeTrialGroup in ipairs(dailyCollectibles.junkEnergyTimeTrials) do
-        local updatedName = removeFeatNameColorCodes(junkEnergyTimeTrialGroup.feat.name)
-        local updatedHint = ""
+        local updatedFeatName = remove_feat_name_color_codes(junkEnergyTimeTrialGroup.feat.name)
+        local updatedFeatHint = ""
 
         if
-            is_session_started()
-            and i == resolvedLocationsIds.junkEnergyTimeTrial.spawn
+            isSessionStarted
+            and i == resolvedLocationsIds.junkEnergyTimeTrial
         then
             if hasPlayerCompletedJunkEnergyTimeTrial then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
             end
-            updatedHint = "\nPERSONAL BEST: " .. formattedJunkEnergyTimeTrialBestTime
+            updatedFeatHint = "\nPERSONAL BEST: " .. formattedJunkEnergyTimeTrialBestTime
         end
 
-        junkEnergyTimeTrialGroup.feat.name = updatedName
-        junkEnergyTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(junkEnergyTimeTrialGroup.parTime) .. updatedHint
+        junkEnergyTimeTrialGroup.feat.name = updatedFeatName
+        junkEnergyTimeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(junkEnergyTimeTrialGroup.parTime) .. updatedFeatHint
     end
 end
 
-local function update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
+local function update_feat__madrazo_hits(hasPlayerKilledMadrazoHit)
     for i, madrazoHitGroup in ipairs(dailyCollectibles.madrazoHits) do
-        local updatedName = removeFeatNameColorCodes(madrazoHitGroup.feat.name)
+        local updatedFeatName = remove_feat_name_color_codes(madrazoHitGroup.feat.name)
 
         if
-            is_session_started()
-            and i == resolvedLocationsIds.madrazoHits
+            isSessionStarted
+            and i == resolvedLocationsIds.madrazoHit
         then
             if hasPlayerKilledMadrazoHit then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
             end
         end
 
-        madrazoHitGroup.feat.name = updatedName
+        madrazoHitGroup.feat.name = updatedFeatName
     end
 end
 
-local function update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime, timeTrialParTimeOverride)
+local function update_feat__time_trial(hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime)
     for i, timeTrialGroup in ipairs(weeklyCollectibles.timeTrials) do
-        local updatedName = removeFeatNameColorCodes(timeTrialGroup.feat.name)
-        local updatedHint = ""
+        local updatedFeatName = remove_feat_name_color_codes(timeTrialGroup.feat.name)
+        local updatedFeatHint = ""
 
         if
-            is_session_started()
-            and i == resolvedLocationsIds.timeTrial.spawn
+            isSessionStarted
+            and i == resolvedLocationsIds.timeTrial
         then
             if hasPlayerCompletedTimeTrial then
-                updatedName = COLOR.COLLECTED.hex .. updatedName .. "#DEFAULT#"
+                updatedFeatName = COLORS.COLLECTED.hex .. updatedFeatName .. "#DEFAULT#"
             else
-                updatedName = COLOR.FOUND.hex .. updatedName .. "#DEFAULT#"
+                if not Tunables.DISABLE_EVENT_ATOBTIMETRIAL then
+                    updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+                    updatedFeatHint = "\nPERSONAL BEST: " .. formattedTimeTrialBestTime
+                end
             end
-            updatedHint = "\nPERSONAL BEST: " .. formattedTimeTrialBestTime
         end
 
-        timeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time(timeTrialParTimeOverride > 0 and timeTrialParTimeOverride or timeTrialGroup.parTime) .. updatedHint
+        timeTrialGroup.feat.name = updatedFeatName
+        timeTrialGroup.feat.hint = "Par Time: " .. format_on_races_display_time_from_ms(Tunables.TIME_TRIAL_OVERRIDE_TIME > 0 and Tunables.TIME_TRIAL_OVERRIDE_TIME or timeTrialGroup.parTime) .. updatedFeatHint
     end
 end
 
-local function update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
-    gunVan_Feat.name = removeFeatNameColorCodes(gunVan_Feat.name)
-    gunVan_Feat.hint = ""
+local function update_feat__gun_van()
+    local updatedFeatName = remove_feat_name_color_codes(gunVan_Feat.name)
+    local updatedFeatHint = ""
 
     if
-        is_session_started()
-        and isGunVanAvailable
-        and resolvedLocationsIds.gunVan.spawn >= 1
-        and resolvedLocationsIds.gunVan.spawn <= #others.gunVans
+        isSessionStarted
+        and Tunables.XM22_GUN_VAN_AVAILABLE
+        and resolvedLocationsIds.gunVan >= 1
+        and resolvedLocationsIds.gunVan <= #others.gunVans
     then
-        gunVan_Feat.name = COLOR.FOUND.hex .. gunVan_Feat.name .. "#DEFAULT#"
-        gunVan_Feat.hint = "Found at:\n< " .. resolvedLocationsIds.gunVan.spawn .. " >"
+        updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+        updatedFeatHint = "Found at:\n< " .. resolvedLocationsIds.gunVan .. " >"
     end
+
+    gunVan_Feat.name = updatedFeatName
+    gunVan_Feat.hint = updatedFeatHint
 end
 
-local function update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
-    local function areStreetDealersResolvedLocationsValid(streetDealersResolvedLocationsIds)
+local function update_feat__street_dealers()
+    local function areStreetDealersResolvedLocationsValid()
         for i = 1, 3 do
-            if streetDealersResolvedLocationsIds[i] < 1 or streetDealersResolvedLocationsIds[i] > #others.streetDealers then
+            if resolvedLocationsIds.streetDealers[i] < 1 or resolvedLocationsIds.streetDealers[i] > #others.streetDealers then
                 return false
             end
         end
         return true
     end
 
-    streetDealers_Feat.name = removeFeatNameColorCodes(streetDealers_Feat.name)
-    streetDealers_Feat.hint = ""
+    local updatedFeatName = remove_feat_name_color_codes(streetDealers_Feat.name)
+    local updatedFeatHint = ""
 
     if
-        is_session_started()
-        and areStreetDealersAvailable
-        and areStreetDealersResolvedLocationsValid(resolvedLocationsIds.streetDealers)
+        isSessionStarted
+        and Tunables.ENABLE_STREETDEALERS_DLC22022
+        and areStreetDealersResolvedLocationsValid()
     then
-        streetDealers_Feat.name = COLOR.FOUND.hex .. streetDealers_Feat.name .. "#DEFAULT#"
-        streetDealers_Feat.hint = "Found at:\n< " .. table.concat(resolvedLocationsIds.streetDealers, " >\n< ") .. " >"
+        updatedFeatName = COLORS.FOUND.hex .. updatedFeatName .. "#DEFAULT#"
+        updatedFeatHint = "Found at:\n< " .. table.concat(resolvedLocationsIds.streetDealers, " >\n< ") .. " >"
     end
+
+    streetDealers_Feat.name = updatedFeatName
+    streetDealers_Feat.hint = updatedFeatHint
 end
 
-local function get_local_i_incremented_value(scriptName, _Local)
-    local value = script.get_local_i(gameplay.get_hash_key(scriptName), _Local)
-    if value ~= nil then
-        return value + 1
-    end
-    return nil
-end
 
 -- Define tables to hold references to the properties
 local statsViewer_Table = {
@@ -3633,18 +4435,41 @@ local statsViewer_Table = {
 
 -- === Main Loop === --
 mainLoop_Thread = create_tick_handler(function()
-    local lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
+    lastMpChar = stats.stat_get_int(gameplay.get_hash_key("MPPLY_LAST_MP_CHAR"), -1)
+    isSessionStarted = is_session_started()
+    isSessionStartedAndTransitionFinished = is_session_started({ hasTransitionFinished = true })
 
-    local resolvedLocationsIds = {
-        mediaStick_DamFunk_EvenTheScore = script.get_global_i(Global.activeMediaStick_DamFunk_EvenTheScore) + 1,
-        madrazoHits = script.get_global_i(Global.activeMadrazoHits) + 1,
+    for name, data in pairs(LOCALS_INDEXES) do
+        local scriptHash = gameplay.get_hash_key(data.script)
+
+        Locals[name] = script.get_local_i(scriptHash, data.index)
+    end
+
+    for name, index in pairs(GLOBALS_INDEXES) do
+        Globals[name] = script.get_global_i(index)
+    end
+
+    for name, data in pairs(TUNABLES_INDEXES) do
+        if data.type == "bool" then
+            Tunables[name] = script.get_global_i(data.index) == 1
+        elseif data.type == "int" then
+            Tunables[name] = script.get_global_i(data.index)
+        elseif data.type == "float" then
+            Tunables[name] = script.get_global_f(data.index)
+        end
+    end
+
+    resolvedLocationsIds = {
+        activeTreasureHuntFirstClueLocation = Locals.activeTreasureHuntFirstClueLocation and (Locals.activeTreasureHuntFirstClueLocation + 1) or nil,
+        activetreasureHuntFinalLocation = Locals.activetreasureHuntFinalLocation and (Locals.activetreasureHuntFinalLocation + 1) or nil,
+        mediaStick_DamFunk_EvenTheScore = Globals.activeMediaStick_DamFunk_EvenTheScore + 1,
         buriedStashes = {
             [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH0"), -1) + 1,
             [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_BURIEDSTASH1"), -1) + 1
         },
         shipwreck = {
-            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1
-            --[2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- Note: I think R* originally planned 2, but for now it's 1 max.
+            [1] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED0"), -1) + 1,
+            [2] =  stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECT_SHIPWRECKED1"), -1) + 1 -- Note: I think R* originally planned 2, but for now it's 1 max.
         },
         hiddenCaches = {
             [1]  = stats.stat_get_int(gameplay.get_hash_key("MP" .. lastMpChar .. "_DAILYCOLLECTABLES_HIDECACH0"), -1) + 1,
@@ -3694,159 +4519,180 @@ mainLoop_Thread = create_tick_handler(function()
             [5] = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(51550, -1) + 1
         },
         gCache = {
-            searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41214, -1) + 1,
-            spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41213, -1) + 1
+            spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(PACKED_MP_INT.DAILYCOLLECT_DEAD_DROP_LOCATION_0, -1) + 1,
+            searchArea = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(PACKED_MP_INT.DAILYCOLLECT_DEAD_DROP_AREA_0, -1) + 1
         },
-        stashHouse = {
-            marker = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(36623, -1) + 1 -- BUG: location 12 didn't need +1 (it was actually 11) or maybe is an issue with my teleports? maybe a teleport moved or got deleted
-        },
-        RCBanditoTimeTrial = {
-            spawn = get_local_i_incremented_value("freemode", Local.activeRCBanditoTimeTrial)
-        },
-        junkEnergyTimeTrial = {
-            spawn = get_local_i_incremented_value("freemode", Local.activeJunkEnergyTimeTrial)
-        },
-        timeTrial = {
-            spawn = get_local_i_incremented_value("freemode", Local.activeTimeTrial)
-        },
-        gunVan = {
-            spawn = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1
-        },
+        stashHouse = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(PACKED_MP_INT.DAILY_STASH_HOUSE, -1) + 1, -- BUG: location 12 didn't need +1 (it was actually 11) or maybe is an issue with my teleports? maybe a teleport moved or got deleted
+        -- Technically speaking I should be able to check for time trials without the Locals, because R* hardcode their locations.
+        RCBanditoTimeTrial = Locals.activeRCBanditoTimeTrial and (Locals.activeRCBanditoTimeTrial + 1) or nil,
+        junkEnergyTimeTrial = Locals.activeJunkEnergyTimeTrial and (Locals.activeJunkEnergyTimeTrial + 1) or nil,
+        madrazoHit = Globals.activeMadrazoHit + 1,
+        timeTrial = Locals.activeTimeTrial and (Locals.activeTimeTrial + 1) or nil,
+        gunVan = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(41239, -1) + 1,
         streetDealers = {
-            [1] = script.get_global_i(Global.activeStreetDealer1) + 1,
-            [2] = script.get_global_i(Global.activeStreetDealer2) + 1,
-            [3] = script.get_global_i(Global.activeStreetDealer3) + 1
+            [1] = Globals.activeStreetDealer1 + 1,
+            [2] = Globals.activeStreetDealer2 + 1,
+            [3] = Globals.activeStreetDealer3 + 1
         }
     }
 
-    local hasPlayerUnlockedServiceCarbine = checkServiceCarbineUnlock(has_weapon_component)
-    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25520, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(25521, -1) -- TODO: idk exactly which one is the actual one, but wathever I just assumed both.
+    local playerTreasureHuntProgress = NATIVES.STATS.GET_PACKED_STAT_INT_CODE(PACKED_MP_BOOL.SERIAL_KILLER_CLUE_1, -1)
+    local hasPlayerCollectedTreasureHunt = playerTreasureHuntProgress == 4 and true or false
+    local hasPlayerCollectedMetalDetectorForBuriedStashes = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.STARTED_METAL_DETECTOR_COLLECTABLE, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.COLLECTED_METAL_DETECTOR, -1)
     local hasPlayerCollectedSprayCanForPosterTagging = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(51189, -1)
-
-    local hasPlayerCompletedCasinoTutorial = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(27089, -1)
-    local hasPlayerAcquiredCasinoMembership = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(26966, -1)
-    local maxNumLuckyWheelSpinsPerDay = script.get_global_i(Global.Tunable.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY)
-    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36628, -1)
+    local hasPlayerCollectedGCache = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.DEAD_DROP_COLLECTED_FIRST, -1) and NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(PACKED_MP_BOOL.DAILYCOLLECT_DEAD_DROP_0, -1)
     local hasPlayerRaidedStashHouse = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(36657, -1)
-    local hasPlayerCompletedRCBanditoTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTCOMPLETEDWEEK"), -1) ~= -1
-    local formattedRCBanditoTimeTrialBestTime = format_on_races_display_time(stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTBESTTIME"), -1))
-    local hasPlayerCompletedJunkEnergyTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTCOMPLETED"), -1) ~= -1
-    local formattedJunkEnergyTimeTrialBestTime =format_on_races_display_time(stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTBESTTIME"), -1))
-    local RCTimeTrialParTimeOverride = script.get_global_i(Global.Tunable.RC_TIME_TRIAL_OVERRIDE_TIME)
+    local RCBanditoTimeTrialBestTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_RCTTBESTTIME"), -1)
+    local hasPlayerCompletedRCBanditoTimeTrial = has_completed_time_trial(resolvedLocationsIds.RCBanditoTimeTrial, RCBanditoTimeTrialBestTime, dailyCollectibles.RCBanditoTimeTrials)
+    local formattedRCBanditoTimeTrialBestTime = hasPlayerCompletedRCBanditoTimeTrial and format_on_races_display_time_from_ms(RCBanditoTimeTrialBestTime) or format_on_races_display_time_from_ms(0)
+    local JunkEnergyTimeTrialBestTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_BTTBESTTIME"), -1)
+    local hasPlayerCompletedJunkEnergyTimeTrial = has_completed_time_trial(resolvedLocationsIds.junkEnergyTimeTrial, JunkEnergyTimeTrialBestTime, dailyCollectibles.junkEnergyTimeTrials)
+    local formattedJunkEnergyTimeTrialBestTime = hasPlayerCompletedJunkEnergyTimeTrial and format_on_races_display_time_from_ms(JunkEnergyTimeTrialBestTime) or format_on_races_display_time_from_ms(0)
     local hasPlayerKilledMadrazoHit = NATIVES.STATS.GET_PACKED_STAT_BOOL_CODE(42269, -1)
 
-    local hasPlayerCompletedTimeTrial = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIAL_COMPLETED_WEEK"), -1) ~= -1
-    local formattedTimeTrialBestTime = format_on_races_display_time(stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIALBESTTIME"), -1))
-    local timeTrialParTimeOverride = script.get_global_i(Global.Tunable.TIME_TRIAL_OVERRIDE_TIME)
+    local TimeTrialBestTime = stats.stat_get_int(gameplay.get_hash_key("MPPLY_TIMETRIALBESTTIME"), -1)
+    local hasPlayerCompletedTimeTrial = has_completed_time_trial(resolvedLocationsIds.timeTrial, TimeTrialBestTime, weeklyCollectibles.timeTrials)
+    local formattedTimeTrialBestTime = hasPlayerCompletedTimeTrial and format_on_races_display_time_from_ms(TimeTrialBestTime) or format_on_races_display_time_from_ms(0)
 
-    local isGunVanAvailable = script.get_global_i(Global.Tunable.XM22_GUN_VAN_AVAILABLE) == 1
+    numOf.ActionFigure.collected = count_collected_bool_stat_items(has_action_figure, 100)
+    numOf.ActionFigure.max = 100
+    numOf.GhostExposed.collected = Globals.numberOfGhostsExposedCollected
+    numOf.GhostExposed.max = 10
+    numOf.LDOrganicsProduct.collected = count_collected_bool_stat_items(has_ld_organic_product, 100)
+    numOf.LDOrganicsProduct.max = Tunables.NUMBER_OF_ACTIVE_LD_ORGANICS
+    numOf.MovieProp.collected = count_collected_bool_stat_items(has_movie_prop, 10)
+    numOf.MovieProp.max = 10
+    numOf.PlayingCard.collected = count_collected_bool_stat_items(has_playing_card, 54)
+    numOf.PlayingCard.max = 54
+    numOf.SignalJammer.collected = count_collected_bool_stat_items(has_signal_jammer, 50)
+    numOf.SignalJammer.max = 50
+    numOf.Snowman.collected = count_collected_bool_stat_items(has_snowman, 25)
+    numOf.Snowman.max = Tunables.NUMBER_OF_ACTIVE_SNOWMEN
+    numOf.StuntJump.completed = count_collected_bool_stat_items(is_stunt_jump_completed, 50, lastMpChar)
+    numOf.StuntJump.max = 50
+    numOf.TreasureHunt.completed = tonumber(hasPlayerCollectedTreasureHunt and 1 or 0)
+    numOf.TreasureHunt.max = 1
+    numOf.EpsilonRobe.collected = count_collected_bool_stat_items(has_epsilon_robe, 3)
+    numOf.EpsilonRobe.max = 3
+    numOf.UsbRadio.collected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
+    numOf.UsbRadio.max = 9
+    numOf.TacticalRifleComponent.collected = count_collected_bool_stat_items(has_weapon_component, 5)
+    numOf.TacticalRifleComponent.max = 5
+    numOf.MetalDetector.collected = tonumber(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)
+    numOf.MetalDetector.max = 1
+    numOf.SprayCan.collected = tonumber(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)
+    numOf.SprayCan.max = 1
 
-    local areStreetDealersAvailable = script.get_global_i(Global.Tunable.ENABLE_STREETDEALERS_DLC22022) == 1
+    numOf.BuriedStash.collected = count_collected_bool_stat_items(has_buried_stash, 2)
+    numOf.BuriedStash.max = Tunables.NUMBER_OF_ACTIVE_BURIED_STASH
+    numOf.HiddenCache.collected = count_collected_bool_stat_items(has_hidden_cache, 10)
+    numOf.HiddenCache.max = Tunables.NUMBER_OF_ACTIVE_HIDDEN_CACHES
+    numOf.JunkEnergySkydive.completed = count_collected_bool_stat_items(has_junk_energy_skydive, 10)
+    numOf.JunkEnergySkydive.max = Tunables.NUMBER_OF_ACTIVE_SKYDIVES
+    numOf.Shipwreck.collected = count_collected_bool_stat_items(has_shipwreck, 1)
+    numOf.Shipwreck.max = Tunables.NUMBER_OF_ACTIVE_SHIPWRECKED
+    numOf.TreasureChest.collected = count_collected_bool_stat_items(has_treasure_chest, 2)
+    numOf.TreasureChest.max = 2
+    numOf.TrickOrTreat.collected = count_collected_bool_stat_items(has_trick_or_treat, 10)
+    numOf.TrickOrTreat.max = Tunables.NUMBER_OF_ACTIVE_TRICK_OR_TREAT
+    numOf.LSTag.tagged = count_collected_bool_stat_items(has_ls_tag, 5)
+    numOf.LSTag.max = 5
+    numOf.LuckyWheel.spinned = GET_LOCAL_PLAYER_NUM_CASINO_LUCKY_WHEEL_SPINNED()
+    numOf.LuckyWheel.max = Tunables.VC_LUCKY_WHEEL_NUM_SPINS_PER_DAY
+    numOf.GCache.collected = tonumber(hasPlayerCollectedGCache and 1 or 0)
+    numOf.GCache.max = Tunables.NUMBER_OF_ACTIVE_DEAD_DROP
+    numOf.StashHouse.raided = tonumber(hasPlayerRaidedStashHouse and 1 or 0)
+    numOf.StashHouse.max = 1
+    numOf.RCBanditoTimeTrial.completed = tonumber(hasPlayerCompletedRCBanditoTimeTrial and 1 or 0)
+    numOf.RCBanditoTimeTrial.max = 1
+    numOf.JunkEnergyTimeTrial.completed = tonumber(hasPlayerCompletedJunkEnergyTimeTrial and 1 or 0)
+    numOf.JunkEnergyTimeTrial.max = 1
+    numOf.MadrazoHit.killed = tonumber(hasPlayerKilledMadrazoHit and 1 or 0)
+    numOf.MadrazoHit.max = 1
 
-    local localPlayerNumActionFiguresCollected = countCollectedBoolStatItems(has_action_figure, 100)
-    local localPlayerNumGhostsExposedCollected = script.get_global_i(Global.numberOfGhostsExposedCollected)
-    local localPlayerNumLDOrganicsProductsCollected = countCollectedBoolStatItems(has_action_figure, 100)
-    local localPlayerNumMoviePropsCollected = countCollectedBoolStatItems(has_movie_prop, 10)
-    local localPlayerNumPlayingCardsCollected = countCollectedBoolStatItems(has_playing_card, 54)
-    local localPlayerNumSignalJammersCollected = countCollectedBoolStatItems(has_signal_jammer, 50)
-    local localPlayerNumSnowmenCollected = countCollectedBoolStatItems(has_snowman, 25)
-    local localPlayerNumStuntJumpsCollected = countCollectedBoolStatItems(is_stunt_jump_completed, 50, lastMpChar)
-    local localPlayerNumEpsilonRobesCollected = countCollectedBoolStatItems(has_epsilon_robe, 3)
-    local localPlayerNumUsbRadioCollected = GET_LOCAL_PLAYER_NUM_USB_RADIO_COLLECTED_COLLECTED()
-    local localPlayerNumTacticalRifleComponentsCollected = countCollectedBoolStatItems(has_weapon_component, 5)
-    local localPlayerNumMetalDetectorsCollected = tonumber(hasPlayerCollectedMetalDetectorForBuriedStashes and 1 or 0)
-    local localPlayerNumSprayCansCollected = tonumber(hasPlayerCollectedSprayCanForPosterTagging and 1 or 0)
+    numOf.TimeTrial.completed = tonumber(hasPlayerCompletedTimeTrial and 1 or 0)
+    numOf.TimeTrial.max = 1
 
-    local localPlayerNumBuriedStashesCollected = countCollectedBoolStatItems(has_buried_stash, 2)
-    local localPlayerNumHiddenCachesCollected = countCollectedBoolStatItems(has_hidden_cache, 10)
-    local localPlayerNumJunkEnergySkydivesCompleted = countCollectedBoolStatItems(has_junk_energy_skydive, 10)
-    local localPlayerNumShipwreckCollected = countCollectedBoolStatItems(has_shipwreck, 1)
-    local localPlayerNumTreasureChestsCollected = countCollectedBoolStatItems(has_treasure_chest, 2)
-    local localPlayerNumTrickOrTreatCollected = countCollectedBoolStatItems(has_trick_or_treat, 10)
-    local localPlayerNumLSTagsTagged = countCollectedBoolStatItems(has_ls_tag, 5)
-    local localPlayerNumLuckyWheelSpinned = HAS_PLAYER_USED_LUCKY_WHEEL_IN_PAST_24_H(lastMpChar) and GET_MP_INT_CHARACTER_STAT(MP_STAT.LUCKY_WHEEL_NUM_SPIN, lastMpChar) or 0
-    local localPlayerNumGCacheCollected = tonumber(hasPlayerCollectedGCache and 1 or 0)
-    local localPlayerNumStashHouseRaided = tonumber(hasPlayerRaidedStashHouse and 1 or 0)
-    local localPlayerNumRCBanditoTimeTrialCompleted = tonumber(hasPlayerCompletedRCBanditoTimeTrial and 1 or 0)
-    local localPlayerNumJunkEnergyTimeTrialCompleted = tonumber(hasPlayerCompletedJunkEnergyTimeTrial and 1 or 0)
-    local localPlayerNumMadrazoHitCollected = tonumber(hasPlayerKilledMadrazoHit and 1 or 0)
+    numOf.GunVan.available = tonumber(Tunables.XM22_GUN_VAN_AVAILABLE and 1 or 0)
+    numOf.GunVan.max = 1
 
-    local localPlayerNumTimeTrialCompleted = tonumber(hasPlayerCompletedTimeTrial and 1 or 0)
+    --[[ TODO: These are globals I can try and find them from bruteforcing...
+    CONST_INT STREET_DEALER_MAX_LOCATIONS			50
+    CONST_INT STREET_DEALER_MAX_ACTIVE				3
+    ]]
+    numOf.StreetDealer.available = tonumber(Tunables.ENABLE_STREETDEALERS_DLC22022 and 3 or 0)
+    numOf.StreetDealer.max = 3
 
-    local localPlayerNumGunVanAvailable = tonumber(isGunVanAvailable and 1 or 0)
+    actionFiguresMenu_Feat.name       = "Action Figures ("         .. numOf.ActionFigure.collected           .. "/" .. numOf.ActionFigure.max           .. ")"
+    ghostsExposedMenu_Feat.name       = "Ghosts Exposed ("         .. numOf.GhostExposed.collected           .. "/" .. numOf.GhostExposed.max           .. ")"
+    ldOrganicsProductMenu_Feat.name   = "LD Organics Product ("    .. numOf.LDOrganicsProduct.collected      .. "/" .. numOf.LDOrganicsProduct.max      .. ")"
+    moviePropsMenu_Feat.name          = "Movie Props ("            .. numOf.MovieProp.collected              .. "/" .. numOf.MovieProp.max              .. ")"
+    playingCardsMenu_Feat.name        = "Playing Cards ("          .. numOf.PlayingCard.collected            .. "/" .. numOf.PlayingCard.max            .. ")"
+    signalJammersMenu_Feat.name       = "Signal Jammers ("         .. numOf.SignalJammer.collected           .. "/" .. numOf.SignalJammer.max           .. ")"
+    snowmenMenu_Feat.name             = "Snowmen ("                .. numOf.Snowman.collected                .. "/" .. numOf.Snowman.max                .. ")"
+    stuntJumpsMenu_Feat.name          = "Stunt Jumps ("            .. numOf.StuntJump.completed              .. "/" .. numOf.StuntJump.max              .. ")"
+    treasureHuntMenu_Feat.name        = "Treasure Hunt ("          .. numOf.TreasureHunt.completed           .. "/" .. numOf.TreasureHunt.max           .. ")"
+    epsilonRobesMenu_Feat.name        = "Epsilon Robes ("          .. numOf.EpsilonRobe.collected            .. "/" .. numOf.EpsilonRobe.max            .. ")"
+    mediaSticksMenu_Feat.name         = "Media Sticks ("           .. numOf.UsbRadio.collected               .. "/" .. numOf.UsbRadio.max               .. ")"
+    weaponComponentsMenu_Feat.name    = "Weapon Components ("      .. numOf.TacticalRifleComponent.collected .. "/" .. numOf.TacticalRifleComponent.max .. ")"
+    metalDetectorMenu_Feat.name       = "Metal Detector ("         .. numOf.MetalDetector.collected          .. "/" .. numOf.MetalDetector.max          .. ")"
+    sprayCanMenu_Feat.name            = "Spray Can ("              .. numOf.SprayCan.collected               .. "/" .. numOf.SprayCan.max               .. ")"
 
-    local localPlayerNumStreetDealersAvailable = tonumber(areStreetDealersAvailable and 3 or 0) -- TODO: ew shit is hardcodded.
+    buriedStashesMenu_Feat.name       = "Buried Stashes ("         .. numOf.BuriedStash.collected            .. "/" .. numOf.BuriedStash.max            .. ")"
+    hiddenCachesMenu_Feat.name        = "Hidden Caches ("          .. numOf.HiddenCache.collected            .. "/" .. numOf.HiddenCache.max            .. ")"
+    junkEnergySkydivesMenu_Feat.name  = "Junk Energy Skydives ("   .. numOf.JunkEnergySkydive.completed      .. "/" .. numOf.JunkEnergySkydive.max      .. ")"
+    shipwreckMenu_Feat.name           = "Shipwreck ("              .. numOf.Shipwreck.collected              .. "/" .. numOf.Shipwreck.max              .. ")"
+    treasureChestsMenu_Feat.name      = "Treasure Chests ("        .. numOf.TreasureChest.collected          .. "/" .. numOf.TreasureChest.max          .. ")"
+    trickOrTreatMenu_Feat.name        = "Trick Or Treat ("         .. numOf.TrickOrTreat.collected           .. "/" .. numOf.TrickOrTreat.max           .. ")"
+    lsTagsMenu_Feat.name              = "LS Tags ("                .. numOf.LSTag.tagged                     .. "/" .. numOf.LSTag.max                  .. ")"
+    luckyWheelMenu_Feat.name          = "Lucky Wheel ("            .. numOf.LuckyWheel.spinned               .. "/" .. numOf.LuckyWheel.max             .. ")"
+    gCachesMenu_Feat.name             = "G's Cache ("              .. numOf.GCache.collected                 .. "/" .. numOf.GCache.max                 .. ")"
+    stashHousesMenu_Feat.name         = "Stash House ("            .. numOf.StashHouse.raided                .. "/" .. numOf.StashHouse.max             .. ")"
+    RCBanditoTimeTrialMenu_Feat.name  = "RC Bandito Time Trial ("  .. numOf.RCBanditoTimeTrial.completed     .. "/" .. numOf.RCBanditoTimeTrial.max     .. ")"
+    junkEnergyTimeTrialMenu_Feat.name = "Junk Energy Time Trial (" .. numOf.JunkEnergyTimeTrial.completed    .. "/" .. numOf.JunkEnergyTimeTrial.max    .. ")"
+    madrazoHitMenu_Feat.name          = "Madrazo Hit ("            .. numOf.MadrazoHit.killed                .. "/" .. numOf.MadrazoHit.max             .. ")"
 
-    -- Known bug: in SP globals dont reset to 0 so... will have to fix that
-    actionFiguresMenu_Feat.name         = "Action Figures ("                              .. localPlayerNumActionFiguresCollected           .. "/100)"
-    ghostsExposedMenu_Feat.name         = "Ghosts Exposed ("                              .. localPlayerNumGhostsExposedCollected           .. "/10)"
-    ldOrganicsProductMenu_Feat.name     = "LD Organics Product ("                         .. localPlayerNumLDOrganicsProductsCollected      .. "/100)"
-    moviePropsMenu_Feat.name            = "Movie Props ("                                 .. localPlayerNumMoviePropsCollected              .. "/10)"
-    playingCardsMenu_Feat.name          = "Playing Cards ("                               .. localPlayerNumPlayingCardsCollected            .. "/54)"
-    signalJammersMenu_Feat.name         = "Signal Jammers ("                              .. localPlayerNumSignalJammersCollected           .. "/50)"
-    snowmenMenu_Feat.name               = "Snowmen ("                                     .. localPlayerNumSnowmenCollected                 .. "/25)"
-    stuntJumpsMenu_Feat.name            = "Stunt Jumps ("                                 .. localPlayerNumStuntJumpsCollected              .. "/50)"
-    epsilonRobesMenu_Feat.name          = "Epsilon Robes ("                               .. localPlayerNumEpsilonRobesCollected            .. "/3)"
-    mediaSticksMenu_Feat.name           = "Media Sticks ("                                .. localPlayerNumUsbRadioCollected                .. "/9)"
-    weaponComponentsMenu_Feat.name      = "Weapon Components ("                           .. localPlayerNumTacticalRifleComponentsCollected .. "/5)"
-    metalDetectorsMenu_Feat.name        = "Metal Detectors ("                             .. localPlayerNumMetalDetectorsCollected          .. "/1)"
-    sprayCansMenu_Feat.name             = "Spray Cans ("                                  .. localPlayerNumSprayCansCollected               .. "/1)"
+    timeTrialMenu_Feat.name           = "Time Trial ("             .. numOf.TimeTrial.completed              .. "/" .. numOf.TimeTrial.max              .. ")"
 
-    buriedStashesMenu_Feat.name         = "Buried Stashes ("                              .. localPlayerNumBuriedStashesCollected           .. "/2)"
-    hiddenCachesMenu_Feat.name          = "Hidden Caches ("                               .. localPlayerNumHiddenCachesCollected            .. "/10)"
-    junkEnergySkydivesMenu_Feat.name    = "Junk Energy Skydives ("                        .. localPlayerNumJunkEnergySkydivesCompleted      .. "/10)"
-    shipwreckMenu_Feat.name             = "Shipwreck ("                                   .. localPlayerNumShipwreckCollected               .. "/1)"
-    treasureChestsMenu_Feat.name        = "Treasure Chests ("                             .. localPlayerNumTreasureChestsCollected          .. "/2)"
-    trickOrTreatMenu_Feat.name          = "Trick Or Treat ("                              .. localPlayerNumTrickOrTreatCollected            .. "/10)"
-    lsTagsMenu_Feat.name                = "LS Tags ("                                     .. localPlayerNumLSTagsTagged                     .. "/5)"
-    luckyWheelMenu_Feat.name            = "Lucky Wheel ("                                 .. localPlayerNumLuckyWheelSpinned                .. "/"     .. maxNumLuckyWheelSpinsPerDay .. ")"
-    gCachesMenu_Feat.name               = "G's Cache ("                                   .. localPlayerNumGCacheCollected                  .. "/1)"
-    stashHousesMenu_Feat.name           = "Stash House ("                                 .. localPlayerNumStashHouseRaided                 .. "/1)"
-    RCBanditoTimeTrialMenu_Feat.name    = "RC Bandito Time Trial ("                       .. localPlayerNumRCBanditoTimeTrialCompleted      .. "/1)"
-    junkEnergyTimeTrialMenu_Feat.name   = "Junk Energy Time Trial ("                      .. localPlayerNumJunkEnergyTimeTrialCompleted     .. "/1)"
-    madrazoHitsMenu_Feat.name           = "Madrazo Hit ("                                 .. localPlayerNumMadrazoHitCollected              .. "/1)"
+    gunVansMenu_Feat.name             = "Gun Van ("                .. numOf.GunVan.available                 .. "/" .. numOf.GunVan.max                 .. ")"
 
-    timeTrialMenu_Feat.name             = "Time Trial ("                                  .. localPlayerNumTimeTrialCompleted               .. "/1)"
+    streetDealersMenu_Feat.name       = "Street Dealers ("         .. numOf.StreetDealer.available           .. "/" .. numOf.StreetDealer.max           .. ")"
 
-    gunVansMenu_Feat.name               = "Gun Vans ("                                    .. localPlayerNumGunVanAvailable                  .. "/1)"
+    update_feat__collectibles(has_action_figure,      collectibles.actionFigures,     numOf.ActionFigure.collected)
+    update_feat__collectibles(has_ghost_exposed,      collectibles.ghostsExposed,     numOf.GhostExposedCollected)
+    update_feat__collectibles(has_ld_organic_product, collectibles.ldOrganicsProduct, numOf.LDOrganicsProductCollected)
+    update_feat__collectibles(has_movie_prop,         collectibles.movieProps,        numOf.MoviePropCollected)
+    update_feat__collectibles(has_playing_card,       collectibles.playingCards,      numOf.PlayingCardCollected)
+    update_feat__collectibles(has_signal_jammer,      collectibles.signalJammers,     numOf.SignalJammerCollected)
+    update_feat__collectibles(has_snowman,            collectibles.snowmen,           numOf.SnowmanCollected)
+    update_feat__stunt_jumps()
+    update_feat__treasure_hunt(playerTreasureHuntProgress)
+    update_feat__epsilon_robes()
+    update_feat__media_sticks()
+    update_feat__weapon_components()
+    update_feat__metal_detector(hasPlayerCollectedMetalDetectorForBuriedStashes)
+    update_feat__spray_can(hasPlayerCollectedSprayCanForPosterTagging)
 
-    streetDealersMenu_Feat.name         = "Street Dealers ("                              .. localPlayerNumStreetDealersAvailable           .. "/3)"
+    update_feat__buried_stashes()
+    update_feat__hidden_caches()
+    update_feat__junk_energy_skydives()
+    update_feat__shipwreck()
+    update_feat__treasure_chests()
+    update_feat__ls_tags()
+    update_feat__trick_or_treats()
+    update_feat__lucky_wheel()
+    update_feat__g_caches(hasPlayerCollectedGCache)
+    update_feat__stash_house(hasPlayerRaidedStashHouse)
+    update_feat__rc_bandito_time_trial(hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime)
+    update_feat__junk_energy_time_trial(hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
+    update_feat__madrazo_hits(hasPlayerKilledMadrazoHit)
 
-    update_feat_name__collectibles__state(has_action_figure,      collectibles.actionFigures)
-    update_feat_name__collectibles__state(has_ghost_exposed,      collectibles.ghostsExposed)
-    update_feat_name__collectibles__state(has_ld_organic_product, collectibles.ldOrganicsProduct)
-    update_feat_name__collectibles__state(has_movie_prop,         collectibles.movieProps)
-    update_feat_name__collectibles__state(has_playing_card,       collectibles.playingCards)
-    update_feat_name__collectibles__state(has_signal_jammer,      collectibles.signalJammers)
-    update_feat_name__collectibles__state(has_snowman,            collectibles.snowmen)
-    update_feat_name__stunt_jumps__state(is_stunt_jump_completed, lastMpChar)
-    update_feat_name__epsilon_robes__state(has_epsilon_robe)
-    update_feat_name__media_sticks__state(resolvedLocationsIds)
-    update_feat_name__weapon_components__state(has_weapon_component, hasPlayerUnlockedServiceCarbine)
-    update_feat_name__metal_detector__state(hasPlayerCollectedMetalDetectorForBuriedStashes)
-    update_feat_name__spray_can__state(hasPlayerCollectedSprayCanForPosterTagging)
+    update_feat__time_trial(hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime)
 
-    update_feat_name__buried_stashes__state(resolvedLocationsIds)
-    update_feat_name__hidden_caches__state(resolvedLocationsIds)
-    update_feat_name__junk_energy_skydives__state(resolvedLocationsIds)
-    update_feat_name__shipwreck__state(resolvedLocationsIds)
-    update_feat_name__treasure_chests__state(resolvedLocationsIds)
-    update_feat_name__ls_tags__state(resolvedLocationsIds)
-    update_feat_name__trick_or_treats__state(resolvedLocationsIds)
-    update_feat_name__lucky_wheel__state(maxNumLuckyWheelSpinsPerDay, hasPlayerCompletedCasinoTutorial, hasPlayerAcquiredCasinoMembership, localPlayerNumLuckyWheelSpinned, lastMpChar)
-    update_feat_name__g_caches__state(resolvedLocationsIds, hasPlayerCollectedGCache)
-    update_feat_name__stash_house__state(resolvedLocationsIds, hasPlayerRaidedStashHouse)
-    update_feat_name__rc_bandito_time_trial__state(resolvedLocationsIds, hasPlayerCompletedRCBanditoTimeTrial, formattedRCBanditoTimeTrialBestTime, RCTimeTrialParTimeOverride)
-    update_feat_name__junk_energy_time_trial__state(resolvedLocationsIds, hasPlayerCompletedJunkEnergyTimeTrial, formattedJunkEnergyTimeTrialBestTime)
-    update_feat_name__madrazo_hits__state(resolvedLocationsIds, hasPlayerKilledMadrazoHit)
+    update_feat__gun_van()
 
-    update_feat_name__time_trial__state(resolvedLocationsIds, hasPlayerCompletedTimeTrial, formattedTimeTrialBestTime, timeTrialParTimeOverride)
+    update_feat__street_dealers()
 
-    update_feat_name__gun_van__state(resolvedLocationsIds, isGunVanAvailable)
-
-    update_feat_name__street_dealers__state(resolvedLocationsIds, areStreetDealersAvailable)
-
-    -- Loop through each character and stat type to set values
     for _, statName in ipairs(STAT_VIEWER_NAMES__LIST) do
         if statName:match("^MPx_") then
             local strippedStatName = statName:gsub("^MPx_", "")
@@ -3875,13 +4721,12 @@ end, 0)
     https://gta.fandom.com/wiki/Navy_Revolver
     https://gta.fandom.com/wiki/Los_Santos_Slasher
     https://gta.fandom.com/wiki/Stone_Hatchet
-    https://gta.fandom.com/wiki/Double-Action_Revolver
+    https://gta.fandom.com/wiki/Shipwrecks ("The Frontier" outfit (for collecting seven in total))
 
     Add Green color to all collected MenuFeat's
     make snowmens, jack o lanters etc .. blue when they are available otherwite remove color
     maybe make note hints green when done
     make a protection for globals when running on the wrong version of the game.
-    I really need to find out when to tp with vehicles or not, make a setting for each probably.
 ]]
 
 --[[ DEV NOTES:

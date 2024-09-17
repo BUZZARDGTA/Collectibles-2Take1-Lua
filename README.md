@@ -21,10 +21,11 @@ Script to collect collectibles. Is in development but here are stable commits on
 - [gta.fandom.com](https://gta.fandom.com/wiki/Main_Page) - Great website with tons of information, often super useful, great Wiki.
 - [root-cause/v-decompiled-scripts](https://github.com/root-cause/v-decompiled-scripts) - Where I reverse-engineer almost everything that I couldn't find elsewhere.
 - [www.rockstargames.com/gta-v](https://www.rockstargames.com/gta-v) - In September 2022, the GTA V source code was leaked, and I sometimes use it for reverse engineering.
-- [YimMenu-Lua/DailyCollectibles](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes, I would copy and paste their code or review how they implemented things to save time on reverse engineering. Additionally, all three Time Trials are based on their code.
+- [YimMenu-Lua/DailyCollectibles](https://github.com/YimMenu-Lua/DailyCollectibles) - Sometimes, I would copy and paste their code or review how they implemented things to save time on reverse engineering.
 - [YimMenu-Lua/RandomEvents](https://github.com/YimMenu-Lua/RandomEvents) - Helped with debugging by force-starting some random events.
 - [@DurtyFree](https://github.com/DurtyFree) - Taught me where to find the accurate list of all multiplayer stats.
 - [@doctorflexochan](https://github.com/doctorflexochan) - Provided me with the "Unique Stunt Jump" stat name before @DurtyFree taught me...
+- [citizenfx/fivem-docs](https://github.com/citizenfx/fivem-docs/blob/master/content/docs/game-references/blips.md) and [docs.fivem.net](https://docs.fivem.net/docs/game-references/blips/#blip-colors) - Two awesome lists for radar blips, the first one is always up to date.
 - [GTALens.com Maps](https://gtalens.com/map) - The owner is really nice and updated the website on my requests. They often provided me with locations whenever I couldn't find them through reverse engineering by myself:
   - [Media Sticks](https://gtalens.com/map/media-sticks)
   - [Metal Detectors](https://gtalens.com/map/metal-detectors)
